@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Admin</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="logo.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script src="language.js"></script>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <span>🇴🇲 Oman’s marketplace</span>
+    <div>
+      <a href="dashboard.html">Dashboard</a>
+      <b>•</b>
+      <a href="index.html">Home</a>
+    </div>
+  </div>
+</div>
+
+<header class="header">
+  <div class="container nav">
+
+    <a class="logo" href="index.html">
+      <img src="logo-en.png" alt="BINGO Oman">
+    </a>
+
+    <button class="hamb"
+      onclick="document.getElementById('navlinks').classList.toggle('open')">
+      ☰
+    </button>
+
+    <nav class="navlinks" id="navlinks"></nav>
+
+    <div class="actions"></div>
+
+  </div>
+</header>
+
+
+<main class="admin-page">
+
+<div class="container">
+
+  <div class="admin-hero">
+
+    <div>
+      <span class="eyebrow">ADMIN CENTER</span>
+
+      <h1 id="adminTitle">
+        BINGO Control Center
+      </h1>
+
+      <p id="adminSub">
+        Review listings, manage users and publish approved products.
+      </p>
+    </div>
+
+    <a class="btn" href="dashboard.html">
+      ← Dashboard
+    </a>
+
+  </div>
+
+
+  <div id="denied"
+       class="empty-state"
+       style="display:none">
+
+    <div class="empty-icon">🔒</div>
+
+    <h2 id="deniedTitle">
+      Admin access required
+    </h2>
+
+    <p id="deniedText">
+      This area is restricted to BINGO administrators.
+    </p>
+
+    <a class="btn primary" href="dashboard.html">
+      Back to account
+    </a>
+
+  </div>
+
+
+  <section id="adminApp" style="display:none">
+
+    <div class="admin-stats">
+
+      <div class="admin-stat">
+        <small>Total listings</small>
+        <strong id="statTotal">0</strong>
+      </div>
+
+      <div class="admin-stat">
+        <small>Pending review</small>
+        <strong id="statPending">0</strong>
+      </div>
+
+      <div class="admin-stat">
+        <small>Published</small>
+        <strong id="statPublished">0</strong>
+      </div>
+
+      <div class="admin-stat">
+        <small>Rejected</small>
+        <strong id="statRejected">0</strong>
+      </div>
+
+      <div class="admin-stat">
+        <small>Users</small>
+        <strong id="statUsers">0</strong>
+      </div>
+
+    </div>
+
+
+    <div class="admin-toolbar">
+
+      <div class="admin-tabs">
+
+        <button
+          class="admin-tab active"
+          data-status="pending">
+          Pending
+        </button>
+
+        <button
+          class="admin-tab"
+          data-status="published">
+          Published
+        </button>
+
+        <button
+          class="admin-tab"
+          data-status="rejected">
+          Rejected
+        </button>
+
+        <button
+          class="admin-tab"
+          data-status="all">
+          All
+        </button>
+
+      </div>
+
+      <button class="btn" id="refreshBtn">
+        ↻ Refresh
+      </button>
+
+    </div>
+
+
+    <div id="adminMessage"
+         class="form-message">
+    </div>
+
+
+    <div id="listingQueue"
+         class="admin-listings">
+
+      <div class="empty-state">
+        <h3>Loading listings…</h3>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+</main>
+
+
+<footer>
+
+<div class="container footergrid">
+
+  <div>
+    <img src="logo-en.png" alt="BINGO Oman">
+    <p>
+      Oman’s marketplace to buy, sell, bid and trade.
+    </p>
+  </div>
+
+  <div>
+    <h4>Explore</h4>
+    <a href="marketplace.html">Marketplace</a>
+    <a href="auctions.html">Auctions</a>
+    <a href="tenders.html">Tenders</a>
+  </div>
+
+  <div>
+    <h4>Admin</h4>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="index.html">Home</a>
+  </div>
+
+  <div>
+    <h4>BINGO Oman</h4>
+    <p class="orangeText">
+      Buy • Sell • Trade
+    </p>
+    <small>
+      © 2026 BINGO Oman
+    </small>
+  </div>
+
+</div>
+
+</footer>
+
+
+<script>
+
+const $ = id => document.getElementById(id);
+
+const esc = value =>
+  String(value ?? '').replace(
+    /[&<>'"]/g,
+    c => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      "'":'&#39;',
+      '"':'&quot;'
+    }[c])
+  );
+
+
+const money = value =>
+  Number(value || 0).toLocaleString(
+    'en-OM',
+    {
+      minimumFractionDigits:3,
+      maximumFractionDigits:3
+    }
+  ) + ' OMR';
+
+
+const labels = {
+  pending:'Pending review',
+  published:'Published',
+  rejected:'Rejected',
+  draft:'Draft',
+  sold:'Sold',
+  archived:'Archived'
+};
+
+
+let current = 'pending';
+let adminUser = null;
+
+
+function showMessage(text,type='') {
+
+  $('adminMessage').textContent = text;
+
+  $('adminMessage').className =
+    'form-message ' + type;
+
+}
+
+
+function imageUrl(row) {
+
+  const imgs =
+    Array.isArray(row.listing_images)
+      ? [...row.listing_images]
+      : [];
+
+  imgs.sort(
+    (a,b) =>
+      (a.sort_order || 0) -
+      (b.sort_order || 0)
+  );
+
+  return imgs[0]?.image_url || '';
+
+}
+
+
+/* =========================================================
+   ADMIN CHECK
+========================================================= */
+
+async function verifyAdmin(user) {
+
+  if (!user?.id) {
+    return false;
+  }
+
+  const { data, error } =
+    await sb
+      .from('profiles')
+      .select('id,role,is_active,full_name,username')
+      .eq('id', user.id)
+      .maybeSingle();
+
+  if (error) {
+
+    console.error(
+      'Admin profile check failed:',
+      error
+    );
+
+    return false;
+  }
+
+  if (!data) {
+    return false;
+  }
+
+  return (
+    data.role === 'admin' &&
+    data.is_active === true
+  );
+
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+async function loadStats() {
+
+  try {
+
+    const results =
+      await Promise.all([
+
+        sb
+          .from('listings')
+          .select('id', {
+            count:'exact',
+            head:true
+          }),
+
+        sb
+          .from('listings')
+          .select('id', {
+            count:'exact',
+            head:true
+          })
+          .eq('status','pending'),
+
+        sb
+          .from('listings')
+          .select('id', {
+            count:'exact',
+            head:true
+          })
+          .eq('status','published'),
+
+        sb
+          .from('listings')
+          .select('id', {
+            count:'exact',
+            head:true
+          })
+          .eq('status','rejected'),
+
+        sb
+          .from('profiles')
+          .select('id', {
+            count:'exact',
+            head:true
+          })
+
+      ]);
+
+
+    const [
+      total,
+      pending,
+      published,
+      rejected,
+      users
+    ] = results;
+
+
+    if (total.error)
+      console.error('Total listings:', total.error);
+
+    if (pending.error)
+      console.error('Pending listings:', pending.error);
+
+    if (published.error)
+      console.error('Published listings:', published.error);
+
+    if (rejected.error)
+      console.error('Rejected listings:', rejected.error);
+
+    if (users.error)
+      console.error('Users:', users.error);
+
+
+    $('statTotal').textContent =
+      total.count ?? 0;
+
+    $('statPending').textContent =
+      pending.count ?? 0;
+
+    $('statPublished').textContent =
+      published.count ?? 0;
+
+    $('statRejected').textContent =
+      rejected.count ?? 0;
+
+    $('statUsers').textContent =
+      users.count ?? 0;
+
+
+  } catch(error) {
+
+    console.error(
+      'Statistics error:',
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD LISTINGS
+========================================================= */
+
+async function loadListings() {
+
+  $('listingQueue').innerHTML =
+    `
+    <div class="empty-state">
+      <h3>Loading listings…</h3>
+    </div>
+    `;
+
+
+  let query =
+    sb
+      .from('listings')
+      .select(
+        `
+        id,
+        title,
+        description,
+        price,
+        city,
+        condition,
+        status,
+        created_at,
+        user_id,
+        listing_images(
+          image_url,
+          sort_order
+        )
+        `
+      );
+
+
+  if (current !== 'all') {
+
+    query =
+      query.eq(
+        'status',
+        current
+      );
+
+  }
+
+
+  query =
+    query.order(
+      'created_at',
+      {
+        ascending:false
+      }
+    );
+
+
+  const {
+    data,
+    error
+  } = await query;
+
+
+  if (error) {
+
+    console.error(
+      'LISTINGS ERROR:',
+      error
+    );
+
+
+    $('listingQueue').innerHTML =
+      `
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          ⚠️
+        </div>
+
+        <h3>
+          Could not load listings
+        </h3>
+
+        <p>
+          ${esc(error.message)}
+        </p>
+
+        <small>
+          Code: ${esc(error.code || 'unknown')}
+        </small>
+
+      </div>
+      `;
+
+    return;
+  }
+
+
+  if (!data?.length) {
+
+    $('listingQueue').innerHTML =
+      `
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          📦
+        </div>
+
+        <h3>
+          No listings in this queue
+        </h3>
+
+        <p>
+          There is nothing to review here.
+        </p>
+
+      </div>
+      `;
+
+    return;
+  }
+
+
+  /* =======================================================
+     LOAD SELLER PROFILES SEPARATELY
+  ======================================================= */
+
+  const userIds =
+    [
+      ...new Set(
+        data
+          .map(item => item.user_id)
+          .filter(Boolean)
+      )
+    ];
+
+
+  let profiles = [];
+
+
+  if (userIds.length) {
+
+    const profileResult =
+      await sb
+        .from('profiles')
+        .select(
+          'id,full_name,username,phone'
+        )
+        .in(
+          'id',
+          userIds
+        );
+
+
+    if (!profileResult.error) {
+
+      profiles =
+        profileResult.data || [];
+
+    } else {
+
+      console.warn(
+        'Could not load seller profiles:',
+        profileResult.error
+      );
+
+    }
+
+  }
+
+
+  const profileMap =
+    new Map(
+      profiles.map(
+        p => [p.id,p]
+      )
+    );
+
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
+  $('listingQueue').innerHTML =
+    data.map(item => {
+
+      const img =
+        imageUrl(item);
+
+      const seller =
+        profileMap.get(
+          item.user_id
+        ) || {};
+
+
+      return `
+      <article
+        class="admin-listing-card"
+        data-id="${esc(item.id)}"
+      >
+
+        <div class="admin-listing-media">
+
+          ${
+            img
+            ?
+            `
+            <img
+              src="${esc(img)}"
+              alt="${esc(item.title)}"
+            >
+            `
+            :
+            `
+            <span>📦</span>
+            `
+          }
+
+        </div>
+
+
+        <div class="admin-listing-main">
+
+          <div class="admin-listing-top">
+
+            <span
+              class="ad-status ${esc(item.status)}"
+            >
+              ${esc(
+                labels[item.status]
+                || item.status
+              )}
+            </span>
+
+            <small>
+              ${new Date(
+                item.created_at
+              ).toLocaleString()}
+            </small>
+
+          </div>
+
+
+          <h2>
+            ${esc(item.title)}
+          </h2>
+
+
+          <div class="admin-price">
+            ${money(item.price)}
+          </div>
+
+
+          <p class="admin-meta">
+
+            ${esc(item.city || 'Oman')}
+            ·
+            ${esc(item.condition || '—')}
+            ·
+
+            <b>Seller:</b>
+
+            ${esc(
+              seller.full_name
+              ||
+              seller.username
+              ||
+              item.user_id
+            )}
+
+          </p>
+
+
+          <p class="admin-description">
+
+            ${esc(
+              item.description
+              ||
+              'No description'
+            )}
+
+          </p>
+
+
+          <div class="admin-actions">
+
+            ${
+              item.status !== 'published'
+              ?
+              `
+              <button
+                class="btn primary"
+                data-action="publish"
+              >
+                ✓ Publish
+              </button>
+              `
+              :
+              ''
+            }
+
+
+            ${
+              item.status !== 'rejected'
+              ?
+              `
+              <button
+                class="btn danger"
+                data-action="reject"
+              >
+                ✕ Reject
+              </button>
+              `
+              :
+              ''
+            }
+
+
+            <a
+              class="btn"
+              href="listing.html?id=${encodeURIComponent(item.id)}"
+              target="_blank"
+            >
+              View
+            </a>
+
+
+            <button
+              class="btn ghost"
+              data-action="delete"
+            >
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
+      `;
+
+    }).join('');
+
+}
+
+
+/* =========================================================
+   UPDATE LISTING STATUS
+========================================================= */
+
+async function updateStatus(
+  id,
+  status
+) {
+
+  if (!id) {
+
+    showMessage(
+      'Invalid listing ID.',
+      'error'
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    'Updating…'
+  );
+
+
+  const {
+    data,
+    error
+  } =
+    await sb
+      .from('listings')
+      .update({
+        status:status,
+        updated_at:new Date().toISOString()
+      })
+      .eq('id',id)
+      .select('id,status')
+      .single();
+
+
+  if (error) {
+
+    console.error(
+      'UPDATE LISTING ERROR:',
+      error
+    );
+
+
+    showMessage(
+      error.message,
+      'error'
+    );
+
+    return;
+  }
+
+
+  console.log(
+    'Listing updated:',
+    data
+  );
+
+
+  showMessage(
+    status === 'published'
+      ? 'Listing published successfully.'
+      : 'Listing rejected.',
+    'success'
+  );
+
+
+  await loadStats();
+
+  await loadListings();
+
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+async function deleteListing(id) {
+
+  if (
+    !confirm(
+      'Delete this listing permanently?'
+    )
+  ) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await sb
+      .from('listings')
+      .delete()
+      .eq('id',id);
+
+
+  if (error) {
+
+    console.error(
+      'DELETE ERROR:',
+      error
+    );
+
+    showMessage(
+      error.message,
+      'error'
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    'Listing deleted.',
+    'success'
+  );
+
+
+  await loadStats();
+
+  await loadListings();
+
+}
+
+
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
+
+$('listingQueue')
+  .addEventListener(
+    'click',
+    event => {
+
+      const button =
+        event.target.closest(
+          '[data-action]'
+        );
+
+      if (!button) {
+        return;
+      }
+
+
+      const card =
+        button.closest(
+          '.admin-listing-card'
+        );
+
+
+      const id =
+        card?.dataset.id;
+
+
+      if (!id) {
+        return;
+      }
+
+
+      const action =
+        button.dataset.action;
+
+
+      if (
+        action === 'publish'
+      ) {
+
+        updateStatus(
+          id,
+          'published'
+        );
+
+      }
+
+
+      if (
+        action === 'reject'
+      ) {
+
+        updateStatus(
+          id,
+          'rejected'
+        );
+
+      }
+
+
+      if (
+        action === 'delete'
+      ) {
+
+        deleteListing(
+          id
+        );
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+document
+  .querySelectorAll(
+    '.admin-tab'
+  )
+  .forEach(button => {
+
+    button.onclick =
+      () => {
+
+        document
+          .querySelectorAll(
+            '.admin-tab'
+          )
+          .forEach(
+            item =>
+              item.classList.remove(
+                'active'
+              )
+          );
+
+
+        button.classList.add(
+          'active'
+        );
+
+
+        current =
+          button.dataset.status;
+
+
+        loadListings();
+
+      };
+
+  });
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+$('refreshBtn')
+  .onclick =
+    async () => {
+
+      await loadStats();
+
+      await loadListings();
+
+    };
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+async function init() {
+
+  try {
+
+    const user =
+      await BingoAuth.getUser();
+
+
+    if (!user) {
+
+      location.href =
+        'login.html?next=admin.html';
+
+      return;
+
+    }
+
+
+    console.log(
+      'Logged in user:',
+      user.id
+    );
+
+
+    const isAdmin =
+      await verifyAdmin(
+        user
+      );
+
+
+    console.log(
+      'Admin:',
+      isAdmin
+    );
+
+
+    if (!isAdmin) {
+
+      $('denied').style.display =
+        'block';
+
+      return;
+
+    }
+
+
+    const {
+      data:profile
+    } =
+      await sb
+        .from('profiles')
+        .select(
+          'id,role,full_name,username,is_active'
+        )
+        .eq(
+          'id',
+          user.id
+        )
+        .maybeSingle();
+
+
+    adminUser =
+      profile;
+
+
+    $('adminApp').style.display =
+      'block';
+
+
+    await loadStats();
+
+    await loadListings();
+
+
+  } catch(error) {
+
+    console.error(
+      'ADMIN INIT ERROR:',
+      error
+    );
+
+
+    $('listingQueue').innerHTML =
+      `
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          ⚠️
+        </div>
+
+        <h3>
+          Admin initialization failed
+        </h3>
+
+        <p>
+          ${esc(error.message)}
+        </p>
+
+      </div>
+      `;
+
+  }
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
