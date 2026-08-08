@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO عُمان | بيع • شراء • مزادات • مناقصات</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="top"><span>🇴🇲 منصة عُمانية للبيع والشراء والمزادات والمناقصات</span><span>خدمة العملاء 24/7</span></div>
+<nav><a href="ar.html"><img class="logo" src="bingo-logo.png" alt="BINGO Oman"></a>
+<div class="links">
+<a href="#market">السوق</a><a href="#auctions">المزادات</a><a href="#tenders">المناقصات</a><a href="#companies">الشركات</a><a href="#about">عن BINGO</a>
+</div><div class="actions"><button class="btn light" onclick="openM('login')">دخول</button><button class="btn orange" onclick="openM('register')">تسجيل</button><a class="btn light" href="en.html">English</a></div></nav>
+
+<header class="hero"><div class="hero-inner">
+<div class="badge3d">✨ عُمان • تجربة سوق ثلاثية الأبعاد</div>
+<h1>كل ما تحتاجه في <span>مكان واحد.</span></h1><p>بع، اشترِ، بادل، زايد واكتشف فرص الأعمال في سلطنة عُمان مع BINGO.</p>
+<div class="search"><input id="q" placeholder="ابحث عن سيارات، هواتف، عقارات، خدمات..."><select><option>كل الأقسام</option><option>Cars</option><option>Electronics</option><option>Real Estate</option><option>Services</option></select><select><option>كل عُمان</option><option>Muscat</option><option>Seeb</option><option>Sohar</option><option>Salalah</option></select><button class="btn orange" onclick="searchNow()">بحث 🔎</button></div>
+</div></header>
+
+<section class="section" id="market"><div class="head"><div><h2>تصفح الأقسام</h2><p>اعثر على ما تحتاجه بسرعة وسهولة.</p></div><button class="btn orange" onclick="openM('ad')">+ أضف إعلاناً</button></div>
+<div class="cats">
+<div class="cat"><span class="icon">🚗</span><b>السيارات</b></div><div class="cat"><span class="icon">📱</span><b>الإلكترونيات</b></div><div class="cat"><span class="icon">🏠</span><b>العقارات</b></div><div class="cat"><span class="icon">🛋️</span><b>المنزل والأثاث</b></div><div class="cat"><span class="icon">🛠️</span><b>الخدمات</b></div><div class="cat"><span class="icon">💼</span><b>الوظائف</b></div><div class="cat"><span class="icon">👕</span><b>الأزياء</b></div><div class="cat"><span class="icon">🐾</span><b>الحيوانات</b></div>
+</div></section>
+
+<section class="section"><div class="features">
+<div class="feature market"><h2>🛒 السوق</h2><p>اشترِ وبع المنتجات الجديدة والمستعملة مع أشخاص في جميع أنحاء عُمان.</p><button class="btn orange">تصفح الإعلانات</button><div class="shape">🛒</div></div>
+<div class="feature auction" id="auctions"><h2>🔨 المزادات</h2><p>شارك في مزادات تنافسية واحصل على أفضل العروض من البائعين.</p><button class="btn orange">عرض المزادات</button><div class="shape">🔨</div></div>
+<div class="feature tender"><h2>📋 المناقصات</h2><p>انشر مشاريعك وتواصل مع الشركات والموردين والمقاولين.</p><button class="btn orange" onclick="document.getElementById('tenders').scrollIntoView({behavior:'smooth'})">عرض المناقصات</button><div class="shape">📋</div></div>
+</div></section>
+
+<section class="section"><div class="head"><div><h2>إعلانات مميزة 🔥</h2><p>منتجات شائعة على BINGO عُمان.</p></div><button class="btn light">عرض الكل</button></div>
+<div class="cards">
+<div class="card"><div class="pic">📱<span class="tag">FOR SALE</span></div><div class="body"><h3>iPhone 15 Pro Max 256GB</h3><div class="price">OMR 420</div><div class="meta">📍 Muscat · Electronics</div></div></div>
+<div class="card"><div class="pic">🛋️<span class="tag">FEATURED</span></div><div class="body"><h3>Modern 3-Seater Sofa</h3><div class="price">OMR 150</div><div class="meta">📍 Muscat · Home</div></div></div>
+<div class="card"><div class="pic">🚙<span class="tag">AUCTION</span></div><div class="body"><h3>Toyota Land Cruiser 2019</h3><div class="price">OMR 12,000</div><div class="meta">📍 Muscat · Cars</div></div></div>
+<div class="card"><div class="pic">🪑<span class="tag">FOR SALE</span></div><div class="body"><h3>Office Desk + Ergonomic Chair</h3><div class="price">OMR 120</div><div class="meta">📍 Nizwa · Furniture</div></div></div>
+</div></section>
+
+<section class="section" id="tenders"><div class="head"><div><h2>📋 أحدث المناقصات</h2><p>فرص أعمال للشركات والموردين.</p></div><button class="btn orange" onclick="openM('tender')">+ أضف مناقصة</button></div>
+<div class="tenders">
+<div class="trow"><div><span class="open">● OPEN FOR BIDS</span><h3>توريد وتركيب ستائر للمكاتب</h3><p>Muscat · Deadline: 25 August 2026 · 12 bids</p></div><button class="btn light" onclick="openM('bid')">التفاصيل وتقديم عرض</button></div>
+<div class="trow"><div><span class="open">● OPEN FOR BIDS</span><h3>صيانة أجهزة التكييف لمجمع تجاري</h3><p>Seeb · Deadline: 19 August 2026 · 8 bids</p></div><button class="btn light" onclick="openM('bid')">التفاصيل وتقديم عرض</button></div>
+<div class="trow"><div><span class="open">● OPEN FOR BIDS</span><h3>توريد أجهزة الحاسب والشبكات</h3><p>Bawshar · Deadline: 12 August 2026 · 17 bids</p></div><button class="btn light" onclick="openM('bid')">التفاصيل وتقديم عرض</button></div>
+</div></section>
+
+<section class="cta" id="companies"><div><h2>طوّر أعمالك مع BINGO عُمان</h2><p>الوصول إلى المشترين ونشر المناقصات والفوز بفرص أعمال جديدة.</p></div><button class="btn light" onclick="openM('register')">إنشاء حساب مجاني</button></section>
+<footer id="about"><div><strong style="font-size:25px">BINGO Oman</strong><p>بيع • شراء • مبادلة • مزادات • مناقصات</p></div><div>© 2026 BINGO Oman</div></footer>
+
+<div class="modal" id="modal"><div class="box"><button class="close" onclick="closeM()">✕</button><div id="content"></div></div></div>
+<script>
+const rtl={{'true' if direction=='rtl' else 'false'}};
+function openM(t){
+let ar=rtl;
+let f=ar?{
+login:`<h2>تسجيل الدخول إلى BINGO</h2><input placeholder="رقم الهاتف"><input type="password" placeholder="كلمة المرور"><button class="btn orange" style="width:100%">دخول</button>`,
+register:`<h2>إنشاء حساب BINGO</h2><input placeholder="الاسم الكامل"><input placeholder="رقم الهاتف في عُمان"><input placeholder="البريد الإلكتروني"><input type="password" placeholder="كلمة المرور"><button class="btn orange" style="width:100%">إنشاء الحساب</button>`,
+ad:`<h2>إضافة إعلان</h2><input placeholder="عنوان الإعلان"><input type="number" placeholder="السعر بالريال العماني"><select><option>اختر القسم</option><option>سيارات</option><option>إلكترونيات</option><option>عقارات</option><option>خدمات</option></select><textarea rows="4" placeholder="الوصف"></textarea><button class="btn orange" style="width:100%">نشر الإعلان</button>`,
+tender:`<h2>إضافة مناقصة</h2><input placeholder="عنوان المناقصة"><input type="number" placeholder="الميزانية المتوقعة"><input type="date"><input placeholder="القسم"><textarea rows="4" placeholder="نطاق العمل والمتطلبات"></textarea><button class="btn orange" style="width:100%">نشر المناقصة</button>`,
+bid:`<h2>تقديم عرض</h2><p>أدخل سعرك ورسالتك لصاحب المناقصة.</p><input type="number" placeholder="قيمة العرض بالريال"><textarea rows="3" placeholder="رسالتك"></textarea><button class="btn orange" style="width:100%">إرسال العرض</button>`
+}:{
+login:`<h2>Login to BINGO</h2><input placeholder="Phone number"><input type="password" placeholder="Password"><button class="btn orange" style="width:100%">Login</button>`,
+register:`<h2>Create your BINGO account</h2><input placeholder="Full name"><input placeholder="Oman phone number"><input placeholder="Email"><input type="password" placeholder="Password"><button class="btn orange" style="width:100%">Create Account</button>`,
+ad:`<h2>Post an Ad</h2><input placeholder="Ad title"><input type="number" placeholder="Price in OMR"><select><option>Choose category</option><option>Cars</option><option>Electronics</option><option>Real Estate</option><option>Services</option></select><textarea rows="4" placeholder="Description"></textarea><button class="btn orange" style="width:100%">Publish Ad</button>`,
+tender:`<h2>Post a Tender</h2><input placeholder="Tender title"><input type="number" placeholder="Estimated budget in OMR"><input type="date"><input placeholder="Category"><textarea rows="4" placeholder="Scope and requirements"></textarea><button class="btn orange" style="width:100%">Publish Tender</button>`,
+bid:`<h2>Submit Your Bid</h2><p>Enter your offer and message for the tender owner.</p><input type="number" placeholder="Your bid in OMR"><textarea rows="3" placeholder="Message"></textarea><button class="btn orange" style="width:100%">Submit Bid</button>`
+};
+document.getElementById('content').innerHTML=f[t];document.getElementById('modal').classList.add('show')}
+function closeM(){document.getElementById('modal').classList.remove('show')}
+function searchNow(){let q=document.getElementById('q').value.trim();alert(q?(rtl?'جاري البحث في BINGO عن: ':'Searching BINGO for: ')+q:(rtl?'أدخل كلمة للبحث.':'Please enter a search term.'))}
+</script></body></html>
