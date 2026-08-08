@@ -1,1 +1,0 @@
-BINGO Oman V3 connected to Supabase Authentication. Upload these files to GitHub Pages after running the BINGO SQL database script. The config contains the Supabase publishable key, which is intended for browser use. Never put a secret/service-role key in the frontend.
