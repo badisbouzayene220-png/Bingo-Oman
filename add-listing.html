@@ -49,7 +49,7 @@ $('listingForm').onsubmit=async e=>{e.preventDefault(); const user=await require
     const {data:pub}=sb.storage.from('listing-images').getPublicUrl(path);
     const {error:ie}=await sb.from('listing_images').insert({listing_id:listing.id,image_url:pub.publicUrl,sort_order:i}); if(ie)throw ie;
   }
-  msg('Your listing was submitted for review.','success'); setTimeout(()=>location.href='dashboard.html',900);
+  msg('Your listing was submitted for review.','success'); setTimeout(()=>location.href='dashboard.html#myListings',700);
  }catch(err){console.error(err);msg(err.message||'Could not create listing.','error');btn.disabled=false;btn.textContent='Publish listing';}
 };
 (async()=>{const u=await requireUser();if(u){await loadCategories();}})();

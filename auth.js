@@ -25,6 +25,11 @@
       const user=session?.user;
       if(user){
         const menu=ensureActions();
+        const {data:profile}=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();
+        const menuBox=menu.querySelector('#menu');
+        if(menuBox && profile?.role==='admin' && !menuBox.querySelector('.admin-link')){
+          const a=document.createElement('a'); a.className='admin-link'; a.href='admin.html'; a.textContent='Admin Center'; menuBox.insertBefore(a,menuBox.querySelector('#logout'));
+        }
         const avatar=menu.querySelector('#avatar');
         avatar.textContent=nameOf(user).charAt(0).toUpperCase();
         avatar.onclick=()=>menu.querySelector('#menu').classList.toggle('open');

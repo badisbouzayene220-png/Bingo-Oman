@@ -1,2 +1,54 @@
 <!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BINGO Dashboard</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script><script src="auth.js"></script><script src="language.js"></script></head><body><div class="topbar"><div class="container"><span>🇴🇲 Oman’s marketplace</span><div><a href="tenders.html">Business & Tenders</a><b>•</b><a href="auctions.html">Live Auctions</a></div></div></div>
-<header class="header"><div class="container nav"><a class="logo" href="index.html"><img src="logo1.png" alt="BINGO Oman"></a><button class="hamb" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button><nav class="navlinks" id="navlinks"></nav><div class="actions"></div></div></header><div class="dash"><div class="container dashgrid"><aside class="side"><a class="active" href="dashboard.html">Overview</a><a href="marketplace.html">My Ads</a><a href="marketplace.html">Favorites</a><a href="marketplace.html">Messages</a><a href="index.html" id="logout">Logout</a></aside><section class="panel"><h2 id="welcome">Loading…</h2><div class="stats"><div class="stat"><small>My Ads</small><strong>0</strong></div><div class="stat"><small>Favorites</small><strong>0</strong></div><div class="stat"><small>Messages</small><strong>0</strong></div></div><div class="panel" style="background:#f8faff"><h3>Account profile</h3><p id="profile">Loading profile…</p><div class="dash-actions"><a class="btn primary" href="add-listing.html">+ Create listing</a><a class="btn" href="marketplace.html">Browse marketplace</a></div><div id="myListings" class="my-listings"><h3>My listings</h3><p>Loading…</p></div></div></section></div></div><footer><div class="container footergrid"><div><img src="logo1.png" alt="BINGO Oman"><p>Oman’s marketplace to buy, sell, bid and trade.</p></div><div><h4>Explore</h4><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></div><div><h4>Account</h4><a href="login.html">Login</a><a href="register.html">Create account</a><a href="dashboard.html">Dashboard</a></div><div><h4>BINGO Oman</h4><p class="orangeText">Buy • Sell • Trade</p><small>© 2026 BINGO Oman</small></div></div></footer><script>async function go(){const user=await BingoAuth.getUser();if(!user){location.href="login.html";return}const {data,error}=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();welcome.textContent="Welcome, "+(data?.full_name||user.user_metadata?.full_name||"User");if(error){profile.textContent="Profile details are temporarily unavailable."}else{profile.innerHTML="Username: "+(data?.username||"—")+"<br>Email: "+(user.email||"—")+"<br>Phone: "+(data?.phone||"—")+"<br>Account: "+(data?.account_type||"—")+"<br>City: "+(data?.city||"—")+"<br>Role: "+(data?.role||"—")}} const {data:ads}=await sb.from("listings").select("id,title,price,city,status,created_at,listing_images(image_url,sort_order)").eq("user_id",user.id).order("created_at",{ascending:false}); const box=document.getElementById("myListings"); box.innerHTML="<h3>My listings</h3>"+((ads||[]).map(a=>`<div class="my-ad"><div>${a.listing_images?.[0]?.image_url?`<img src="${a.listing_images[0].image_url}">`:`<span>📦</span>`}</div><section><b>${a.title}</b><small>${Number(a.price||0).toLocaleString("en-OM",{minimumFractionDigits:3})} OMR • ${a.city||"Oman"}</small><em>${a.status}</em></section></div>`).join("")||"<p>No listings yet.</p>"); }document.getElementById("logout").onclick=async e=>{e.preventDefault();await sb.auth.signOut();location.href="index.html"};go()</script></body></html>
+<header class="header"><div class="container nav"><a class="logo" href="index.html"><img src="logo1.png" alt="BINGO Oman"></a><button class="hamb" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button><nav class="navlinks" id="navlinks"></nav><div class="actions"></div></div></header><div class="dash"><div class="container dashgrid"><aside class="side"><a class="active" href="dashboard.html">Overview</a><a href="#myListings">My Ads</a><a href="marketplace.html">Favorites</a><a href="marketplace.html">Messages</a><a href="admin.html" id="adminLink" style="display:none">Admin Center</a><a href="index.html" id="logout">Logout</a></aside><section class="panel"><h2 id="welcome">Loading…</h2><div class="stats"><div class="stat"><small>My Ads</small><strong id="myAdCount">0</strong></div><div class="stat"><small>Published</small><strong id="publishedCount">0</strong></div><div class="stat"><small>Pending</small><strong id="pendingCount">0</strong></div></div><div class="panel" style="background:#f8faff"><h3>Account profile</h3><p id="profile">Loading profile…</p><div class="dash-actions"><a class="btn primary" href="add-listing.html">+ Create listing</a><a class="btn" href="marketplace.html">Browse marketplace</a></div><div id="myListings" class="my-listings"><h3>My listings</h3><p>Loading…</p></div></div></section></div></div><footer><div class="container footergrid"><div><img src="logo1.png" alt="BINGO Oman"><p>Oman’s marketplace to buy, sell, bid and trade.</p></div><div><h4>Explore</h4><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></div><div><h4>Account</h4><a href="login.html">Login</a><a href="register.html">Create account</a><a href="dashboard.html">Dashboard</a></div><div><h4>BINGO Oman</h4><p class="orangeText">Buy • Sell • Trade</p><small>© 2026 BINGO Oman</small></div></div></footer><script>
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const money = value => Number(value || 0).toLocaleString('en-OM',{minimumFractionDigits:3,maximumFractionDigits:3}) + ' OMR';
+const statusLabel = s => ({pending:'Pending review',published:'Published',draft:'Draft',rejected:'Rejected',sold:'Sold',archived:'Archived'}[s] || s || '—');
+
+async function go(){
+  const user = await BingoAuth.getUser();
+  if(!user){ location.href='login.html?next=dashboard.html'; return; }
+
+  const {data:profileData,error:profileError} = await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
+  const profile = profileData || {};
+  if(profile.role==='admin') $('adminLink').style.display='block';
+  $('welcome').textContent = 'Welcome, ' + (profile.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User');
+  $('profile').innerHTML = profileError
+    ? 'Profile details are temporarily unavailable.'
+    : `Username: ${esc(profile.username || '—')}<br>Email: ${esc(user.email || '—')}<br>Phone: ${esc(profile.phone || '—')}<br>Account: ${esc(profile.account_type || 'individual')}<br>City: ${esc(profile.city || '—')}<br>Role: ${esc(profile.role || 'user')}`;
+
+  const {data:ads,error:adsError} = await sb.from('listings')
+    .select('id,title,price,city,status,created_at,listing_images(image_url,sort_order)')
+    .eq('user_id',user.id)
+    .order('created_at',{ascending:false});
+
+  const rows = ads || [];
+  const published = rows.filter(x=>x.status==='published').length;
+  $('myAdCount').textContent = rows.length;
+  $('publishedCount').textContent = published;
+  $('pendingCount').textContent = rows.filter(x=>x.status==='pending').length;
+
+  const box = $('myListings');
+  if(adsError){
+    box.innerHTML = `<div class="empty-state"><h3>Could not load your ads</h3><p>${esc(adsError.message)}</p></div>`;
+    return;
+  }
+  if(!rows.length){
+    box.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><h3>You have no ads yet</h3><p>Create your first listing and it will appear here.</p><a class="btn primary" href="add-listing.html">+ Create your first ad</a></div>`;
+    return;
+  }
+  box.innerHTML = `<div class="my-listings-head"><div><h3>My Ads</h3><p>${rows.length} listing${rows.length===1?'':'s'} in your account</p></div><a class="btn primary" href="add-listing.html">+ Add new ad</a></div>` + rows.map(a=>{
+    const imgs=(a.listing_images||[]).sort((x,y)=>(x.sort_order||0)-(y.sort_order||0));
+    const img=imgs[0]?.image_url;
+    return `<article class="my-ad-card">
+      <a class="my-ad-image" href="listing.html?id=${encodeURIComponent(a.id)}">${img?`<img src="${esc(img)}" alt="${esc(a.title)}">`:'<span>📦</span>'}</a>
+      <div class="my-ad-body"><div class="my-ad-top"><span class="ad-status ${esc(a.status)}">${esc(statusLabel(a.status))}</span><small>${new Date(a.created_at).toLocaleDateString()}</small></div>
+      <h3>${esc(a.title)}</h3><p>${esc(a.city||'Oman')} · ${money(a.price)}</p>
+      <div class="my-ad-actions"><a class="btn small" href="listing.html?id=${encodeURIComponent(a.id)}">View ad</a>${a.status==='published'?'<span class="live">● Live</span>':''}</div></div>
+    </article>`;
+  }).join('');
+}
+
+document.getElementById('logout').onclick=async e=>{e.preventDefault();await sb.auth.signOut();location.href='index.html'};
+go();
+</script></body></html>
