@@ -404,5 +404,47 @@ html[dir="rtl"] .footer-logo {
     transition: none;
 
   }
+   .actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lang-switch {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 58px;
+    height: 36px;
+
+    padding: 0 12px;
+
+    background: #ffffff !important;
+    color: #12398a !important;
+
+    border: 1px solid #d8e0ee !important;
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    position: relative;
+    z-index: 20;
+
+    transition: all .2s ease;
+}
+
+.lang-switch:hover {
+    background: #12398a !important;
+    color: #ffffff !important;
+    border-color: #12398a !important;
+}
 
 }
