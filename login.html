@@ -1,1 +1,27 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BINGO Login</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script></head><body><main class="auth"><div class="box"><h1>BINGO Oman</h1><h2>Login</h2><form id="f"><input id="email" type="email" placeholder="Email" required><input id="p" type="password" placeholder="Password" required><button>Login</button></form><p id="m"></p><a href="register.html">Create account</a></div></main><script>f.onsubmit=async e=>{e.preventDefault();const{error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:p.value});if(error)m.textContent=error.message;else location.href="dashboard.html"}</script></body></html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Oman - Login</title><link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase-client.js"></script>
+</head><body><main class="auth"><div class="box">
+<h1>BINGO Oman</h1><h2>Login</h2>
+<form id="loginForm"><input id="email" type="email" placeholder="Email" required>
+<input id="password" type="password" placeholder="Password" required>
+<button id="loginBtn" type="submit">Login</button></form>
+<p id="message"></p><a href="register.html">Create account</a>
+</div></main>
+<script>
+document.getElementById('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();const m=document.getElementById('message'),b=document.getElementById('loginBtn');
+ b.disabled=true;b.textContent='Logging in...';m.textContent='Connecting...';
+ try{
+  const r=await Promise.race([
+   sb.auth.signInWithPassword({email:document.getElementById('email').value.trim(),password:document.getElementById('password').value}),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('Connection timed out after 15 seconds.')),15000))
+  ]);
+  if(r.error)throw r.error;
+  location.href='dashboard.html';
+ }catch(err){m.textContent='Login error: '+(err.message||err);b.disabled=false;b.textContent='Login';}
+});
+</script></body></html>

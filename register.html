@@ -1,1 +1,71 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BINGO Register</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script></head><body><main class="auth"><div class="box"><h1>BINGO Oman</h1><h2>Create account</h2><form id="f"><input id="name" placeholder="Full name" required><input id="username" placeholder="Username" required minlength="4"><input id="email" type="email" placeholder="Email" required><input id="phone" placeholder="Oman phone"><select id="type"><option value="individual">Individual</option><option value="company">Company</option></select><input id="city" placeholder="City"><input id="p" type="password" placeholder="Password (8+ characters)" minlength="8" required><input id="c" type="password" placeholder="Confirm password" required><button>Register</button></form><p id="m"></p><a href="login.html">Already have an account? Login</a></div></main><script>f.onsubmit=async e=>{e.preventDefault();m.textContent="Creating...";if(p.value!==c.value){m.textContent="Passwords do not match";return}const{data,error}=await sb.auth.signUp({email:email.value.trim(),password:p.value,options:{data:{full_name:name.value.trim(),username:username.value.trim().toLowerCase(),phone:phone.value.trim(),city:city.value.trim(),account_type:type.value}}});if(error){m.textContent=error.message;return}m.textContent=data.session?"Success":"Check your email to verify your account.";if(data.session)location.href="dashboard.html"}</script></body></html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Oman - Register</title><link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase-client.js"></script>
+</head>
+<body><main class="auth"><div class="box">
+<h1>BINGO Oman</h1><h2>Create account</h2>
+<form id="registerForm">
+<input id="fullName" placeholder="Full name" required>
+<input id="username" placeholder="Username" required minlength="4">
+<input id="email" type="email" placeholder="Email" required>
+<input id="phone" placeholder="Oman phone">
+<select id="accountType"><option value="individual">Individual</option><option value="company">Company</option></select>
+<input id="city" placeholder="City">
+<input id="password" type="password" placeholder="Password (8+ characters)" minlength="8" required>
+<input id="confirmPassword" type="password" placeholder="Confirm password" required>
+<button id="submitBtn" type="submit">Register</button>
+</form>
+<p id="message"></p>
+<a href="login.html">Already have an account? Login</a>
+</div></main>
+<script>
+const form=document.getElementById('registerForm');
+const msg=document.getElementById('message');
+const btn=document.getElementById('submitBtn');
+
+function show(text){msg.textContent=text;}
+
+form.addEventListener('submit', async function(e){
+  e.preventDefault();
+  btn.disabled=true; btn.textContent='Creating...'; show('Connecting to BINGO securely...');
+
+  const password=document.getElementById('password').value;
+  const confirm=document.getElementById('confirmPassword').value;
+  if(password!==confirm){show('Passwords do not match.');btn.disabled=false;btn.textContent='Register';return;}
+
+  const payload={
+    email:document.getElementById('email').value.trim().toLowerCase(),
+    password:password,
+    options:{data:{
+      full_name:document.getElementById('fullName').value.trim(),
+      username:document.getElementById('username').value.trim().toLowerCase(),
+      phone:document.getElementById('phone').value.trim(),
+      city:document.getElementById('city').value.trim(),
+      account_type:document.getElementById('accountType').value
+    }}
+  };
+
+  try{
+    const result=await Promise.race([
+      sb.auth.signUp(payload),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Connection timed out. Please check Supabase status, internet connection, or browser extensions.')),15000))
+    ]);
+    if(result.error) throw result.error;
+
+    if(result.data.session){
+      show('Account created successfully. Opening your dashboard...');
+      location.href='dashboard.html';
+    }else{
+      show('Account created. Please check your email for verification, then login.');
+      btn.disabled=false;btn.textContent='Register';
+    }
+  }catch(err){
+    console.error(err);
+    show('Registration error: '+(err.message||err));
+    btn.disabled=false;btn.textContent='Register';
+  }
+});
+</script></body></html>
