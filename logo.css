@@ -1,450 +1,329 @@
-/* ==================================================
-   BINGO LOGO SYSTEM
-   Header + Footer
-================================================== */
+/* =====================================================
+   BINGO LOGO
+===================================================== */
 
+.bingo-logo {
 
-/* ================================================
-   HEADER LOGO
-================================================ */
+    width: 150px;
+    height: 72px;
 
-.main-logo {
+    display: flex;
 
-  display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
 
-  align-items: center;
+    text-decoration: none;
 
-  justify-content: center;
-
-  width: 145px;
-
-  height: 70px;
-
-  text-decoration: none;
-
-  background: transparent;
-
-  border: none;
-
-  padding: 0;
-
-  margin: 0;
-
-  flex-shrink: 0;
+    flex-shrink: 0;
 
 }
 
 
-.main-logo .logo-image {
+.bingo-logo img {
 
-  display: block;
+    display: block;
 
-  width: 140px;
+    width: 145px;
+    height: auto;
 
-  max-width: 100%;
+    max-height: 68px;
 
-  height: auto;
+    object-fit: contain;
 
-  max-height: 62px;
+    background: transparent;
 
-  object-fit: contain;
+    border: 0;
 
-  opacity: 1;
+    outline: none;
 
-  visibility: visible;
+    box-shadow: none;
 
-  filter: none;
+    opacity: 1;
 
-  background: transparent;
+    visibility: visible;
 
-  border: none;
-
-  box-shadow: none;
-
-  mix-blend-mode: normal;
-
-  transition:
-    transform .25s ease,
-    opacity .25s ease;
+    transition:
+        transform .25s ease;
 
 }
 
 
-.main-logo:hover .logo-image {
+.bingo-logo:hover img {
 
-  transform:
-    scale(1.04);
+    transform: scale(1.04);
 
 }
 
 
-/* ================================================
+/* =====================================================
    FOOTER LOGO
-================================================ */
+===================================================== */
 
 .footer-brand {
 
-  display: flex;
+    display: flex;
 
-  flex-direction: column;
+    flex-direction: column;
 
-  align-items: flex-start;
+    align-items: flex-start;
 
 }
 
 
 .footer-logo {
 
-  display: inline-flex;
+    display: flex;
 
-  align-items: center;
+    align-items: center;
 
-  justify-content: flex-start;
+    justify-content: flex-start;
 
-  width: 160px;
+    width: 170px;
 
-  min-height: 65px;
+    height: 80px;
 
-  margin-bottom: 16px;
+    margin-bottom: 12px;
 
-  padding: 0;
+    text-decoration: none;
 
-  background: transparent !important;
-
-  border: none !important;
-
-  box-shadow: none !important;
-
-  text-decoration: none;
+    background: transparent !important;
 
 }
 
 
-.footer-logo .logo-image {
+.footer-logo img {
 
-  display: block !important;
+    display: block !important;
 
-  width: 155px !important;
+    width: 165px !important;
 
-  height: auto !important;
+    height: auto !important;
 
-  max-width: 100%;
+    max-height: 75px;
 
-  max-height: 75px;
+    object-fit: contain;
 
-  object-fit: contain;
+    background: transparent !important;
 
-  opacity: 1 !important;
+    border: none !important;
 
-  visibility: visible !important;
+    box-shadow: none !important;
 
-  filter: none !important;
+    opacity: 1 !important;
 
-  background: transparent !important;
-
-  border: none !important;
-
-  box-shadow: none !important;
-
-  mix-blend-mode: normal !important;
+    visibility: visible !important;
 
 }
 
 
-/* ================================================
-   FOOTER DESCRIPTION
-================================================ */
+/* =====================================================
+   LANGUAGE BUTTON
+===================================================== */
 
-.footer-brand p {
+.bingo-language {
 
-  margin: 0;
+    display: inline-flex;
 
-  max-width: 220px;
+    align-items: center;
 
-  color: #c5cee0;
+    justify-content: center;
 
-  font-size: 13px;
+    width: auto;
 
-  line-height: 1.7;
+    min-width: 64px;
+
+    height: 38px;
+
+    padding: 0 13px;
+
+    margin: 0;
+
+    border-radius: 10px;
+
+    border: 1px solid #d9e1ef;
+
+    background: #ffffff;
+
+    color: #123b91;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    opacity: 1;
+
+    visibility: visible;
+
+    position: relative;
+
+    z-index: 100;
+
+    transition:
+        all .2s ease;
 
 }
 
 
-/* ================================================
-   ARABIC LOGO
-================================================ */
+.bingo-language:hover {
 
-html[dir="rtl"] .main-logo {
+    background: #123b91;
 
-  direction: rtl;
+    border-color: #123b91;
+
+    color: #ffffff;
+
+}
+
+
+.bingo-language:active {
+
+    transform: scale(.96);
+
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.header .actions {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    flex-shrink: 0;
+
+}
+
+
+/* =====================================================
+   ARABIC
+===================================================== */
+
+html[dir="rtl"] .bingo-logo {
+
+    justify-content: flex-end;
 
 }
 
 
 html[dir="rtl"] .footer-brand {
 
-  align-items: flex-end;
+    align-items: flex-end;
 
 }
 
 
 html[dir="rtl"] .footer-logo {
 
-  justify-content: flex-end;
+    justify-content: flex-end;
 
 }
 
 
-/* ================================================
-   LANGUAGE BUTTON
-================================================ */
-
-.lang-switch {
-
-  appearance: none;
-
-  -webkit-appearance: none;
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  min-width: 54px;
-
-  height: 36px;
-
-  padding: 0 12px;
-
-  border-radius: 10px;
-
-  border: 1px solid #dce3ef;
-
-  background: #fff;
-
-  color: #0a2c78;
-
-  font-family: inherit;
-
-  font-size: 13px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    background .2s ease,
-    color .2s ease,
-    border-color .2s ease,
-    transform .2s ease;
-
-}
-
-
-.lang-switch:hover {
-
-  background: #0a2c78;
-
-  color: #fff;
-
-  border-color: #0a2c78;
-
-  transform: translateY(-1px);
-
-}
-
-
-.lang-switch:active {
-
-  transform:
-    translateY(0);
-
-}
-
-
-/* ================================================
-   LOGO ANIMATION
-================================================ */
-
-@keyframes bingoLogoEnter {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-      translateY(8px)
-      scale(.96);
-
-  }
-
-  to {
-
-    opacity: 1;
-
-    transform:
-      translateY(0)
-      scale(1);
-
-  }
-
-}
-
-
-.main-logo .logo-image,
-.footer-logo .logo-image {
-
-  animation:
-    bingoLogoEnter .45s ease both;
-
-}
-
-
-/* ================================================
+/* =====================================================
    MOBILE
-================================================ */
+===================================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
 
-  .main-logo {
+    .bingo-logo {
 
-    width: 125px;
+        width: 125px;
 
-    height: 60px;
+        height: 62px;
 
-  }
+    }
 
+    .bingo-logo img {
 
-  .main-logo .logo-image {
+        width: 120px;
 
-    width: 120px;
+        max-height: 58px;
 
-    max-height: 55px;
+    }
 
-  }
+    .header .actions {
 
+        gap: 7px;
 
-  .footer-logo {
+    }
 
-    width: 145px;
+    .bingo-language {
 
-  }
+        min-width: 55px;
 
+        height: 35px;
 
-  .footer-logo .logo-image {
+        padding: 0 9px;
 
-    width: 140px !important;
-
-  }
-
-
-  .footer-brand {
-
-    align-items: center;
-
-    text-align: center;
-
-  }
-
-
-  html[dir="rtl"] .footer-brand {
-
-    align-items: center;
-
-  }
+    }
 
 }
 
 
-/* ================================================
-   SMALL MOBILE
-================================================ */
+@media (max-width: 600px) {
 
-@media (max-width: 480px) {
+    .bingo-logo {
 
-  .main-logo {
+        width: 110px;
 
-    width: 110px;
+    }
 
-  }
+    .bingo-logo img {
 
+        width: 105px;
 
-  .main-logo .logo-image {
+    }
 
-    width: 105px;
+    .header .actions .login {
 
-  }
+        display: none;
 
+    }
 
-  .lang-switch {
+    .bingo-language {
 
-    min-width: 48px;
+        min-width: 52px;
 
-    padding: 0 9px;
+        font-size: 12px;
 
-  }
+    }
 
 }
 
 
-/* ================================================
-   ACCESSIBILITY
-================================================ */
+@media (max-width: 420px) {
 
-@media (
-  prefers-reduced-motion: reduce
-) {
+    .bingo-logo {
 
-  .main-logo .logo-image,
-  .footer-logo .logo-image {
+        width: 95px;
 
-    animation: none;
+    }
 
-    transition: none;
+    .bingo-logo img {
 
-  }
-   .actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+        width: 90px;
 
-.lang-switch {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
+    }
 
-    min-width: 58px;
-    height: 36px;
+    .header .actions .btn {
 
-    padding: 0 12px;
+        display: none;
 
-    background: #ffffff !important;
-    color: #12398a !important;
-
-    border: 1px solid #d8e0ee !important;
-    border-radius: 10px;
-
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    visibility: visible !important;
-    opacity: 1 !important;
-
-    position: relative;
-    z-index: 20;
-
-    transition: all .2s ease;
-}
-
-.lang-switch:hover {
-    background: #12398a !important;
-    color: #ffffff !important;
-    border-color: #12398a !important;
-}
+    }
 
 }
