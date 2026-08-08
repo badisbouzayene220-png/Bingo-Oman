@@ -62,70 +62,108 @@
        HEADER
   ========================== -->
 
-  <header class="header">
+<header class="header">
 
     <div class="container nav">
 
-      <!-- LOGO -->
-      <a class="main-logo" href="index.html" aria-label="BINGO Oman">
-
-        <img
-          id="headerLogo"
-          class="logo-image"
-          src="logo-en.png"
-          alt="BINGO Oman"
-        >
-
-      </a>
-
-
-      <!-- MOBILE MENU -->
-      <button
-        class="hamb"
-        id="hambButton"
-        type="button"
-        aria-label="Menu"
-      >
-        ☰
-      </button>
-
-
-      <!-- NAVIGATION -->
-      <nav class="navlinks" id="navlinks">
-
+        <!-- LOGO -->
         <a
-          class="active"
-          href="index.html"
-          data-i18n="home"
+            href="index.html"
+            class="bingo-logo"
         >
-          Home
+
+            <img
+                id="bingoHeaderLogo"
+                src="logo-en.png"
+                alt="BINGO Oman"
+            >
+
         </a>
 
-        <a
-          href="marketplace.html"
-          data-i18n="marketplace"
+
+        <!-- MOBILE MENU -->
+        <button
+            class="hamb"
+            id="hambButton"
+            type="button"
         >
-          Marketplace
-        </a>
+            ☰
+        </button>
 
-        <a
-          href="auctions.html"
-          data-i18n="auctions"
+
+        <!-- NAVIGATION -->
+        <nav
+            class="navlinks"
+            id="navlinks"
         >
-          Auctions
-        </a>
 
-        <a
-          href="tenders.html"
-          data-i18n="tenders"
-        >
-          Tenders
-        </a>
+            <a
+                href="index.html"
+                class="active"
+                data-lang="home"
+            >
+                Home
+            </a>
 
-      </nav>
+            <a
+                href="marketplace.html"
+                data-lang="marketplace"
+            >
+                Marketplace
+            </a>
+
+            <a
+                href="auctions.html"
+                data-lang="auctions"
+            >
+                Auctions
+            </a>
+
+            <a
+                href="tenders.html"
+                data-lang="tenders"
+            >
+                Tenders
+            </a>
+
+        </nav>
 
 
-      <!-- ACTIONS -->
+        <!-- RIGHT SIDE -->
+        <div class="actions">
+
+            <!-- LANGUAGE -->
+            <button
+                type="button"
+                id="bingoLanguageButton"
+                class="bingo-language"
+            >
+                العربية
+            </button>
+
+
+            <a
+                href="login.html"
+                class="login"
+                data-lang="login"
+            >
+                Login
+            </a>
+
+
+            <a
+                href="register.html"
+                class="btn primary small"
+                data-lang="register"
+            >
+                Register
+            </a>
+
+        </div>
+
+    </div>
+
+</header>      <!-- ACTIONS -->
       <div class="actions">
         <div class="actions">
 
