@@ -1,0 +1,408 @@
+/* ==================================================
+   BINGO LOGO SYSTEM
+   Header + Footer
+================================================== */
+
+
+/* ================================================
+   HEADER LOGO
+================================================ */
+
+.main-logo {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 145px;
+
+  height: 70px;
+
+  text-decoration: none;
+
+  background: transparent;
+
+  border: none;
+
+  padding: 0;
+
+  margin: 0;
+
+  flex-shrink: 0;
+
+}
+
+
+.main-logo .logo-image {
+
+  display: block;
+
+  width: 140px;
+
+  max-width: 100%;
+
+  height: auto;
+
+  max-height: 62px;
+
+  object-fit: contain;
+
+  opacity: 1;
+
+  visibility: visible;
+
+  filter: none;
+
+  background: transparent;
+
+  border: none;
+
+  box-shadow: none;
+
+  mix-blend-mode: normal;
+
+  transition:
+    transform .25s ease,
+    opacity .25s ease;
+
+}
+
+
+.main-logo:hover .logo-image {
+
+  transform:
+    scale(1.04);
+
+}
+
+
+/* ================================================
+   FOOTER LOGO
+================================================ */
+
+.footer-brand {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+}
+
+
+.footer-logo {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  width: 160px;
+
+  min-height: 65px;
+
+  margin-bottom: 16px;
+
+  padding: 0;
+
+  background: transparent !important;
+
+  border: none !important;
+
+  box-shadow: none !important;
+
+  text-decoration: none;
+
+}
+
+
+.footer-logo .logo-image {
+
+  display: block !important;
+
+  width: 155px !important;
+
+  height: auto !important;
+
+  max-width: 100%;
+
+  max-height: 75px;
+
+  object-fit: contain;
+
+  opacity: 1 !important;
+
+  visibility: visible !important;
+
+  filter: none !important;
+
+  background: transparent !important;
+
+  border: none !important;
+
+  box-shadow: none !important;
+
+  mix-blend-mode: normal !important;
+
+}
+
+
+/* ================================================
+   FOOTER DESCRIPTION
+================================================ */
+
+.footer-brand p {
+
+  margin: 0;
+
+  max-width: 220px;
+
+  color: #c5cee0;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+/* ================================================
+   ARABIC LOGO
+================================================ */
+
+html[dir="rtl"] .main-logo {
+
+  direction: rtl;
+
+}
+
+
+html[dir="rtl"] .footer-brand {
+
+  align-items: flex-end;
+
+}
+
+
+html[dir="rtl"] .footer-logo {
+
+  justify-content: flex-end;
+
+}
+
+
+/* ================================================
+   LANGUAGE BUTTON
+================================================ */
+
+.lang-switch {
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 54px;
+
+  height: 36px;
+
+  padding: 0 12px;
+
+  border-radius: 10px;
+
+  border: 1px solid #dce3ef;
+
+  background: #fff;
+
+  color: #0a2c78;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease,
+    transform .2s ease;
+
+}
+
+
+.lang-switch:hover {
+
+  background: #0a2c78;
+
+  color: #fff;
+
+  border-color: #0a2c78;
+
+  transform: translateY(-1px);
+
+}
+
+
+.lang-switch:active {
+
+  transform:
+    translateY(0);
+
+}
+
+
+/* ================================================
+   LOGO ANIMATION
+================================================ */
+
+@keyframes bingoLogoEnter {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(.96);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+  }
+
+}
+
+
+.main-logo .logo-image,
+.footer-logo .logo-image {
+
+  animation:
+    bingoLogoEnter .45s ease both;
+
+}
+
+
+/* ================================================
+   MOBILE
+================================================ */
+
+@media (max-width: 768px) {
+
+  .main-logo {
+
+    width: 125px;
+
+    height: 60px;
+
+  }
+
+
+  .main-logo .logo-image {
+
+    width: 120px;
+
+    max-height: 55px;
+
+  }
+
+
+  .footer-logo {
+
+    width: 145px;
+
+  }
+
+
+  .footer-logo .logo-image {
+
+    width: 140px !important;
+
+  }
+
+
+  .footer-brand {
+
+    align-items: center;
+
+    text-align: center;
+
+  }
+
+
+  html[dir="rtl"] .footer-brand {
+
+    align-items: center;
+
+  }
+
+}
+
+
+/* ================================================
+   SMALL MOBILE
+================================================ */
+
+@media (max-width: 480px) {
+
+  .main-logo {
+
+    width: 110px;
+
+  }
+
+
+  .main-logo .logo-image {
+
+    width: 105px;
+
+  }
+
+
+  .lang-switch {
+
+    min-width: 48px;
+
+    padding: 0 9px;
+
+  }
+
+}
+
+
+/* ================================================
+   ACCESSIBILITY
+================================================ */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+
+  .main-logo .logo-image,
+  .footer-logo .logo-image {
+
+    animation: none;
+
+    transition: none;
+
+  }
+
+}
