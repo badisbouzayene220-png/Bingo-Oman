@@ -1,972 +1,613 @@
 (function () {
 
-  "use strict";
+    "use strict";
 
+    /* =====================================================
+       BINGO OMAN - LANGUAGE SYSTEM
+       English / Arabic
+    ===================================================== */
 
-  /* ==========================================
-     TRANSLATIONS
-  ========================================== */
+    const translations = {
 
-  const LANG = {
+        en: {
 
-    en: {
+            home: "Home",
+            marketplace: "Marketplace",
+            auctions: "Auctions",
+            tenders: "Tenders",
+            login: "Login",
+            register: "Register",
 
-      oman_marketplace:
-        "🇴🇲 Oman's marketplace",
+            omanMarketplace: "🇴🇲 Oman's marketplace",
+            businessTenders: "Business & Tenders",
+            liveAuctions: "Live Auctions",
 
-      business_tenders:
-        "Business & Tenders",
+            heroEyebrow: "BUY • SELL • TRADE IN OMAN",
+            heroTitle1: "Everything you need.",
+            heroTitle2: "One place.",
 
-      live_auctions:
-        "Live Auctions",
+            heroDescription:
+                "Discover products, services, auctions and tenders across Oman. Find great deals or put your own listing in front of buyers.",
 
-      home:
-        "Home",
+            searchPlaceholder:
+                "What are you looking for?",
 
-      marketplace:
-        "Marketplace",
+            allOman: "All Oman",
+            muscat: "Muscat",
+            seeb: "Seeb",
+            salalah: "Salalah",
+            sohar: "Sohar",
+            nizwa: "Nizwa",
+            sur: "Sur",
 
-      auctions:
-        "Auctions",
+            search: "Search",
+            popular: "Popular:",
 
-      tenders:
-        "Tenders",
+            cars: "Cars",
+            phones: "Phones",
+            properties: "Properties",
+            furniture: "Furniture",
 
-      login:
-        "Login",
+            exploreBingo: "EXPLORE BINGO",
+            whatLookingFor: "What are you looking for?",
+            viewMarketplace: "View marketplace →",
 
-      register:
-        "Register",
+            carsVehicles: "Cars & Vehicles",
+            findNextRide: "Find your next ride",
 
-      hero_eyebrow:
-        "BUY • SELL • TRADE IN OMAN",
+            electronics: "Electronics",
+            phonesLaptops: "Phones, laptops & more",
 
-      hero_title_1:
-        "Everything you need.",
+            property: "Property",
+            homesLandOffices: "Homes, land & offices",
 
-      hero_title_2:
-        "One place.",
+            homeFurniture: "Home & Furniture",
+            makeSpaceBetter: "Make your space better",
 
-      hero_description:
-        "Discover products, services, auctions and tenders across Oman. Find great deals or put your own listing in front of buyers.",
+            jobsServices: "Jobs & Services",
+            workOpportunities: "Work and opportunities",
 
-      search_placeholder:
-        "What are you looking for?",
+            everythingElse: "Everything Else",
+            discoverMore: "Discover more",
 
-      all_oman:
-        "All Oman",
+            marketplaceKicker: "MARKETPLACE",
+            buySellEasy: "Buy & sell with ease.",
+            browseListings:
+                "Browse local listings and connect with buyers and sellers.",
 
-      muscat:
-        "Muscat",
+            liveNow: "LIVE NOW",
+            bidWinRepeat: "Bid. Win. Repeat.",
+            discoverAuctions:
+                "Discover exciting auctions and place your next winning bid.",
 
-      seeb:
-        "Seeb",
+            business: "BUSINESS",
+            opportunitiesAwait: "Opportunities await.",
+            findTenders:
+                "Find tenders and business opportunities across Oman.",
 
-      salalah:
-        "Salalah",
+            gotSomething: "GOT SOMETHING TO SELL?",
+            unusedItems:
+                "Turn unused items into opportunities.",
 
-      sohar:
-        "Sohar",
+            createListing:
+                "Create a listing and reach buyers across Oman.",
 
-      nizwa:
-        "Nizwa",
+            startSelling: "Start selling →",
 
-      sur:
-        "Sur",
+            footerDescription:
+                "Oman's marketplace to buy, sell, bid and trade.",
 
-      search:
-        "Search",
+            explore: "Explore",
+            account: "Account",
+            createAccount: "Create account",
+            dashboard: "Dashboard",
 
-      popular:
-        "Popular:",
+            buySellTrade:
+                "Buy • Sell • Trade",
 
-      cars:
-        "Cars",
+            footerCopyright:
+                "© 2026 BINGO Oman"
 
-      phones:
-        "Phones",
+        },
 
-      properties:
-        "Properties",
 
-      furniture:
-        "Furniture",
+        ar: {
 
-      explore_bingo:
-        "EXPLORE BINGO",
+            home: "الرئيسية",
+            marketplace: "السوق",
+            auctions: "المزادات",
+            tenders: "المناقصات",
+            login: "تسجيل الدخول",
+            register: "إنشاء حساب",
 
-      what_are_you_looking_for:
-        "What are you looking for?",
+            omanMarketplace:
+                "🇴🇲 منصة عُمان للبيع والشراء",
 
-      view_marketplace:
-        "View marketplace →",
+            businessTenders:
+                "الأعمال والمناقصات",
 
-      cars_vehicles:
-        "Cars & Vehicles",
+            liveAuctions:
+                "المزادات المباشرة",
 
-      find_next_ride:
-        "Find your next ride",
+            heroEyebrow:
+                "شراء • بيع • تداول في عُمان",
 
-      electronics:
-        "Electronics",
+            heroTitle1:
+                "كل ما تحتاجه.",
 
-      phones_laptops:
-        "Phones, laptops & more",
+            heroTitle2:
+                "في مكان واحد.",
 
-      property:
-        "Property",
+            heroDescription:
+                "اكتشف المنتجات والخدمات والمزادات والمناقصات في جميع أنحاء عُمان. اعثر على أفضل العروض أو أضف إعلانك للوصول إلى المشترين.",
 
-      homes_land_offices:
-        "Homes, land & offices",
+            searchPlaceholder:
+                "ما الذي تبحث عنه؟",
 
-      home_furniture:
-        "Home & Furniture",
+            allOman: "كل عُمان",
+            muscat: "مسقط",
+            seeb: "السيب",
+            salalah: "صلالة",
+            sohar: "صحار",
+            nizwa: "نزوى",
+            sur: "صور",
 
-      make_space_better:
-        "Make your space better",
+            search: "بحث",
+            popular: "الأكثر بحثاً:",
 
-      jobs_services:
-        "Jobs & Services",
+            cars: "السيارات",
+            phones: "الهواتف",
+            properties: "العقارات",
+            furniture: "الأثاث",
 
-      work_opportunities:
-        "Work and opportunities",
+            exploreBingo:
+                "استكشف BINGO",
 
-      everything_else:
-        "Everything Else",
+            whatLookingFor:
+                "ما الذي تبحث عنه؟",
 
-      discover_more:
-        "Discover more",
+            viewMarketplace:
+                "عرض السوق ←",
 
-      marketplace_kicker:
-        "MARKETPLACE",
+            carsVehicles:
+                "السيارات والمركبات",
 
-      buy_sell_easy:
-        "Buy & sell with ease.",
+            findNextRide:
+                "اعثر على سيارتك القادمة",
 
-      browse_local_listings:
-        "Browse local listings and connect with buyers and sellers.",
+            electronics:
+                "الإلكترونيات",
 
-      live_now:
-        "LIVE NOW",
+            phonesLaptops:
+                "الهواتف والحواسيب والمزيد",
 
-      bid_win_repeat:
-        "Bid. Win. Repeat.",
+            property:
+                "العقارات",
 
-      discover_auctions:
-        "Discover exciting auctions and place your next winning bid.",
+            homesLandOffices:
+                "المنازل والأراضي والمكاتب",
 
-      business:
-        "BUSINESS",
+            homeFurniture:
+                "المنزل والأثاث",
 
-      opportunities_await:
-        "Opportunities await.",
+            makeSpaceBetter:
+                "طوّر مساحتك",
 
-      find_tenders:
-        "Find tenders and business opportunities across Oman.",
+            jobsServices:
+                "الوظائف والخدمات",
 
-      got_something:
-        "GOT SOMETHING TO SELL?",
+            workOpportunities:
+                "العمل والفرص",
 
-      unused_items:
-        "Turn unused items into opportunities.",
+            everythingElse:
+                "كل ما هو آخر",
 
-      create_listing:
-        "Create a listing and reach buyers across Oman.",
+            discoverMore:
+                "اكتشف المزيد",
 
-      start_selling:
-        "Start selling →",
+            marketplaceKicker:
+                "السوق",
 
-      footer_description:
-        "Oman's marketplace to buy, sell, bid and trade.",
+            buySellEasy:
+                "اشترِ وبِع بسهولة.",
 
-      explore:
-        "Explore",
+            browseListings:
+                "تصفح الإعلانات المحلية وتواصل مباشرة مع المشترين والبائعين.",
 
-      account:
-        "Account",
+            liveNow:
+                "مباشر الآن",
 
-      create_account:
-        "Create account",
+            bidWinRepeat:
+                "زايد. اربح. كرر التجربة.",
 
-      dashboard:
-        "Dashboard",
+            discoverAuctions:
+                "اكتشف المزادات وقدم عرضك الرابح القادم.",
 
-      buy_sell_trade:
-        "Buy • Sell • Trade"
+            business:
+                "أعمال",
 
-    },
+            opportunitiesAwait:
+                "الفرص بانتظارك.",
 
+            findTenders:
+                "اعثر على المناقصات والفرص التجارية في عُمان.",
 
-    /* ==========================================
-       ARABIC
-    ========================================== */
+            gotSomething:
+                "هل لديك شيء للبيع؟",
 
-    ar: {
+            unusedItems:
+                "حوّل أغراضك غير المستخدمة إلى فرص.",
 
-      oman_marketplace:
-        "🇴🇲 منصة عُمان للبيع والشراء",
+            createListing:
+                "أنشئ إعلانك ووصل إلى المشترين في جميع أنحاء عُمان.",
 
-      business_tenders:
-        "الأعمال والمناقصات",
+            startSelling:
+                "ابدأ البيع ←",
 
-      live_auctions:
-        "المزادات المباشرة",
+            footerDescription:
+                "منصة عُمان للبيع والشراء والمزايدة والتداول.",
 
-      home:
-        "الرئيسية",
+            explore:
+                "استكشف",
 
-      marketplace:
-        "السوق",
+            account:
+                "الحساب",
 
-      auctions:
-        "المزادات",
+            createAccount:
+                "إنشاء حساب",
 
-      tenders:
-        "المناقصات",
+            dashboard:
+                "لوحة التحكم",
 
-      login:
-        "تسجيل الدخول",
+            buySellTrade:
+                "شراء • بيع • تداول",
 
-      register:
-        "إنشاء حساب",
-
-      hero_eyebrow:
-        "شراء • بيع • تداول في عُمان",
-
-      hero_title_1:
-        "كل ما تحتاجه.",
-
-      hero_title_2:
-        "في مكان واحد.",
-
-      hero_description:
-        "اكتشف المنتجات والخدمات والمزادات والمناقصات في جميع أنحاء عُمان. اعثر على أفضل العروض أو أضف إعلانك للوصول إلى المشترين.",
-
-      search_placeholder:
-        "ما الذي تبحث عنه؟",
-
-      all_oman:
-        "كل عُمان",
-
-      muscat:
-        "مسقط",
-
-      seeb:
-        "السيب",
-
-      salalah:
-        "صلالة",
-
-      sohar:
-        "صحار",
-
-      nizwa:
-        "نزوى",
-
-      sur:
-        "صور",
-
-      search:
-        "بحث",
-
-      popular:
-        "الأكثر بحثاً:",
-
-      cars:
-        "السيارات",
-
-      phones:
-        "الهواتف",
-
-      properties:
-        "العقارات",
-
-      furniture:
-        "الأثاث",
-
-      explore_bingo:
-        "استكشف BINGO",
-
-      what_are_you_looking_for:
-        "ما الذي تبحث عنه؟",
-
-      view_marketplace:
-        "عرض السوق ←",
-
-      cars_vehicles:
-        "السيارات والمركبات",
-
-      find_next_ride:
-        "اعثر على سيارتك القادمة",
-
-      electronics:
-        "الإلكترونيات",
-
-      phones_laptops:
-        "الهواتف والحواسيب والمزيد",
-
-      property:
-        "العقارات",
-
-      homes_land_offices:
-        "المنازل والأراضي والمكاتب",
-
-      home_furniture:
-        "المنزل والأثاث",
-
-      make_space_better:
-        "طوّر مساحتك",
-
-      jobs_services:
-        "الوظائف والخدمات",
-
-      work_opportunities:
-        "العمل والفرص",
-
-      everything_else:
-        "كل ما هو آخر",
-
-      discover_more:
-        "اكتشف المزيد",
-
-      marketplace_kicker:
-        "السوق",
-
-      buy_sell_easy:
-        "اشترِ وبِع بسهولة.",
-
-      browse_local_listings:
-        "تصفح الإعلانات المحلية وتواصل مباشرة مع المشترين والبائعين.",
-
-      live_now:
-        "مباشر الآن",
-
-      bid_win_repeat:
-        "زايد. اربح. كرر التجربة.",
-
-      discover_auctions:
-        "اكتشف المزادات وقدم عرضك الرابح القادم.",
-
-      business:
-        "أعمال",
-
-      opportunities_await:
-        "الفرص بانتظارك.",
-
-      find_tenders:
-        "اعثر على المناقصات والفرص التجارية في عُمان.",
-
-      got_something:
-        "هل لديك شيء للبيع؟",
-
-      unused_items:
-        "حوّل أغراضك غير المستخدمة إلى فرص.",
-
-      create_listing:
-        "أنشئ إعلانك ووصل إلى المشترين في جميع أنحاء عُمان.",
-
-      start_selling:
-        "ابدأ البيع ←",
-
-      footer_description:
-        "منصة عُمان للبيع والشراء والمزايدة والتداول.",
-
-      explore:
-        "استكشف",
-
-      account:
-        "الحساب",
-
-      create_account:
-        "إنشاء حساب",
-
-      dashboard:
-        "لوحة التحكم",
-
-      buy_sell_trade:
-        "شراء • بيع • تداول"
-
-    }
-
-  };
-
-
-  /* ==========================================
-     LOGO CONFIG
-  ========================================== */
-
-  const LOGOS = {
-
-    en: {
-      header: "logo-en.png",
-      footer: "logo-en.png",
-      alt: "BINGO Oman"
-    },
-
-    ar: {
-      header: "logo-ar.png",
-      footer: "logo-ar.png",
-      alt: "بينجو عُمان"
-    }
-
-  };
-
-
-  /* ==========================================
-     GET LANGUAGE
-  ========================================== */
-
-  function getLanguage() {
-
-    const params =
-      new URLSearchParams(window.location.search);
-
-    const urlLang =
-      params.get("lang");
-
-    if (urlLang === "ar" || urlLang === "en") {
-
-      localStorage.setItem(
-        "bingo-lang",
-        urlLang
-      );
-
-      return urlLang;
-
-    }
-
-
-    const saved =
-      localStorage.getItem("bingo-lang");
-
-    if (saved === "ar" || saved === "en") {
-      return saved;
-    }
-
-
-    return "en";
-
-  }
-
-
-  /* ==========================================
-     TRANSLATE TEXT
-  ========================================== */
-
-  function translatePage(lang) {
-
-    const dictionary =
-      LANG[lang];
-
-    if (!dictionary) return;
-
-
-    /* Normal text */
-
-    document
-      .querySelectorAll("[data-i18n]")
-      .forEach(function (element) {
-
-        const key =
-          element.getAttribute("data-i18n");
-
-        if (
-          dictionary[key] !== undefined
-        ) {
-
-          element.textContent =
-            dictionary[key];
+            footerCopyright:
+                "© 2026 BINGO عُمان"
 
         }
 
-      });
+    };
 
 
-    /* Placeholders */
+    /* =====================================================
+       LOGOS
+    ===================================================== */
 
-    document
-      .querySelectorAll("[data-i18n-placeholder]")
-      .forEach(function (element) {
+    const logos = {
 
-        const key =
-          element.getAttribute(
-            "data-i18n-placeholder"
-          );
+        en: "logo-en.png",
 
-        if (
-          dictionary[key] !== undefined
-        ) {
+        ar: "logo-ar.png"
 
-          element.placeholder =
-            dictionary[key];
+    };
+
+
+    /* =====================================================
+       GET CURRENT LANGUAGE
+    ===================================================== */
+
+    function getLanguage() {
+
+        const saved =
+            localStorage.getItem("bingo-language");
+
+        if (saved === "ar") {
+            return "ar";
+        }
+
+        return "en";
+    }
+
+
+    /* =====================================================
+       TRANSLATE ELEMENTS
+    ===================================================== */
+
+    function translatePage(language) {
+
+        const dictionary =
+            translations[language];
+
+        document
+            .querySelectorAll("[data-lang]")
+            .forEach(function (element) {
+
+                const key =
+                    element.getAttribute("data-lang");
+
+                if (
+                    dictionary[key] !== undefined
+                ) {
+
+                    element.textContent =
+                        dictionary[key];
+
+                }
+
+            });
+
+
+        /* Placeholders */
+
+        document
+            .querySelectorAll("[data-lang-placeholder]")
+            .forEach(function (element) {
+
+                const key =
+                    element.getAttribute(
+                        "data-lang-placeholder"
+                    );
+
+                if (
+                    dictionary[key] !== undefined
+                ) {
+
+                    element.placeholder =
+                        dictionary[key];
+
+                }
+
+            });
+
+    }
+
+
+    /* =====================================================
+       CHANGE LOGO
+    ===================================================== */
+
+    function changeLogo(language) {
+
+        const logoFile =
+            logos[language];
+
+
+        const headerLogo =
+            document.querySelector(
+                "#bingoHeaderLogo"
+            );
+
+
+        const footerLogo =
+            document.querySelector(
+                "#bingoFooterLogo"
+            );
+
+
+        if (headerLogo) {
+
+            headerLogo.src =
+                logoFile;
+
+            headerLogo.alt =
+                language === "ar"
+                    ? "بينجو عُمان"
+                    : "BINGO Oman";
 
         }
 
-      });
 
-  }
+        if (footerLogo) {
 
+            footerLogo.src =
+                logoFile;
 
-  /* ==========================================
-     CHANGE LOGO
-  ========================================== */
+            footerLogo.alt =
+                language === "ar"
+                    ? "بينجو عُمان"
+                    : "BINGO Oman";
 
-  function changeLogo(lang) {
-
-    const logo =
-      LOGOS[lang];
-
-    if (!logo) return;
-
-
-    const headerLogo =
-      document.getElementById("headerLogo");
-
-    const footerLogo =
-      document.getElementById("footerLogo");
-
-
-    if (headerLogo) {
-
-      headerLogo.src =
-        logo.header;
-
-      headerLogo.alt =
-        logo.alt;
+        }
 
     }
 
 
-    if (footerLogo) {
+    /* =====================================================
+       UPDATE LANGUAGE BUTTON
+    ===================================================== */
 
-      footerLogo.src =
-        logo.footer;
+    function updateLanguageButton(language) {
 
-      footerLogo.alt =
-        logo.alt;
+        const button =
+            document.querySelector(
+                "#bingoLanguageButton"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        if (language === "ar") {
+
+            button.textContent = "EN";
+
+            button.title =
+                "Switch to English";
+
+        } else {
+
+            button.textContent =
+                "العربية";
+
+            button.title =
+                "التبديل إلى العربية";
+
+        }
 
     }
 
-  }
+
+    /* =====================================================
+       APPLY LANGUAGE
+    ===================================================== */
+
+    function setLanguage(language) {
+
+        if (
+            language !== "ar" &&
+            language !== "en"
+        ) {
+
+            language = "en";
+
+        }
 
 
-  /* ==========================================
-     APPLY LANGUAGE
-  ========================================== */
+        /* Save */
 
-  function applyLanguage(lang) {
+        localStorage.setItem(
+            "bingo-language",
+            language
+        );
+
+
+        /* HTML */
+
+        document.documentElement.lang =
+            language;
+
+        document.documentElement.dir =
+            language === "ar"
+                ? "rtl"
+                : "ltr";
+
+
+        /* Body */
+
+        document.body.classList.remove(
+            "language-en",
+            "language-ar"
+        );
+
+        document.body.classList.add(
+            "language-" + language
+        );
+
+
+        /* Text */
+
+        translatePage(language);
+
+
+        /* Logo */
+
+        changeLogo(language);
+
+
+        /* Button */
+
+        updateLanguageButton(language);
+
+    }
+
+
+    /* =====================================================
+       TOGGLE
+    ===================================================== */
+
+    function toggleLanguage() {
+
+        const current =
+            getLanguage();
+
+        const next =
+            current === "en"
+                ? "ar"
+                : "en";
+
+        setLanguage(next);
+
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ===================================================== */
+
+    function setupButton() {
+
+        const button =
+            document.querySelector(
+                "#bingoLanguageButton"
+            );
+
+
+        if (!button) {
+
+            console.error(
+                "BINGO: Language button not found."
+            );
+
+            return;
+
+        }
+
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                toggleLanguage();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    function initLanguage() {
+
+        const language =
+            getLanguage();
+
+
+        setLanguage(language);
+
+
+        setupButton();
+
+    }
+
+
+    /* =====================================================
+       PUBLIC API
+    ===================================================== */
+
+    window.BingoLanguage = {
+
+        set: setLanguage,
+
+        toggle: toggleLanguage,
+
+        get: getLanguage
+
+    };
+
+
+    /* =====================================================
+       DOM READY
+    ===================================================== */
 
     if (
-      lang !== "ar" &&
-      lang !== "en"
+        document.readyState === "loading"
     ) {
 
-      lang = "en";
-
-    }
-
-
-    /* HTML direction */
-
-    document.documentElement.lang =
-      lang;
-
-    document.documentElement.dir =
-      lang === "ar"
-        ? "rtl"
-        : "ltr";
-
-
-    /* Body class */
-
-    document.body.classList.toggle(
-      "rtl",
-      lang === "ar"
-    );
-
-
-    document.body.classList.toggle(
-      "arabic",
-      lang === "ar"
-    );
-
-
-    /* Translate */
-
-    translatePage(lang);
-
-
-    /* Logo */
-
-    changeLogo(lang);
-
-
-    /* Language button */
-
-    const switchButton =
-      document.getElementById(
-        "langSwitch"
-      );
-
-    if (switchButton) {
-
-      switchButton.textContent =
-        lang === "ar"
-          ? "EN"
-          : "العربية";
-
-      switchButton.setAttribute(
-        "aria-label",
-        lang === "ar"
-          ? "Switch to English"
-          : "التبديل إلى العربية"
-      );
-
-    }
-
-
-    /* Save */
-
-    localStorage.setItem(
-      "bingo-lang",
-      lang
-    );
-
-  }
-
-
-  /* ==========================================
-     SWITCH LANGUAGE
-  ========================================== */
-
-  function toggleLanguage() {
-
-    const current =
-      localStorage.getItem(
-        "bingo-lang"
-      ) || "en";
-
-
-    const next =
-      current === "ar"
-        ? "en"
-        : "ar";
-
-
-    applyLanguage(next);
-
-  }
-
-
-  /* ==========================================
-     INIT
-  ========================================== */
-
-  function init() {
-
-    const current =
-      getLanguage();
-
-
-    applyLanguage(current);
-
-
-    const switchButton =
-      document.getElementById(
-        "langSwitch"
-      );
-
-
-    if (switchButton) {
-
-      switchButton.addEventListener(
-        "click",
-        toggleLanguage
-      );
-
-    }
-
-  }
-
-
-  /* ==========================================
-     PUBLIC API
-  ========================================== */
-
-  window.BingoLang = {
-
-    apply: applyLanguage,
-
-    toggle: toggleLanguage,
-
-    get: getLanguage
-
-  };
-
-
-  /* ==========================================
-     START
-  ========================================== */
-
-  if (
-    document.readyState === "loading"
-  ) {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      init
-    );
-
-  } else {
-
-    init();
-
-  }
-  /* ==========================================
-   LANGUAGE BUTTON
-========================================== */
-
-function setupLanguageButton() {
-
-    const actions = document.querySelector(".actions");
-
-    if (!actions) {
-        return;
-    }
-
-    let button = document.getElementById("langSwitch");
-
-    /*
-     * إذا لم يكن الزر موجوداً في HTML
-     * يتم إنشاؤه تلقائياً
-     */
-
-    if (!button) {
-
-        button = document.createElement("button");
-
-        button.id = "langSwitch";
-
-        button.type = "button";
-
-        button.className = "lang-switch";
-
-        actions.insertBefore(
-            button,
-            actions.firstChild
-        );
-
-    }
-
-    /*
-     * منع إضافة Event Listener أكثر من مرة
-     */
-
-    if (!button.dataset.languageReady) {
-
-        button.addEventListener("click", function () {
-
-            const current =
-                localStorage.getItem("bingo-lang") || "en";
-
-            const next =
-                current === "ar" ? "en" : "ar";
-
-            applyLanguage(next);
-
-        });
-
-        button.dataset.languageReady = "true";
-
-    }
-
-}
-
-
-/* ==========================================
-   UPDATE LANGUAGE BUTTON
-========================================== */
-
-function updateLanguageButton(lang) {
-
-    const button =
-        document.getElementById("langSwitch");
-
-    if (!button) {
-        return;
-    }
-
-    if (lang === "ar") {
-
-        button.textContent = "EN";
-
-        button.setAttribute(
-            "aria-label",
-            "Switch to English"
-        );
-
-        button.setAttribute(
-            "title",
-            "Switch to English"
+        document.addEventListener(
+            "DOMContentLoaded",
+            initLanguage
         );
 
     } else {
 
-        button.textContent = "العربية";
-
-        button.setAttribute(
-            "aria-label",
-            "التبديل إلى العربية"
-        );
-
-        button.setAttribute(
-            "title",
-            "التبديل إلى العربية"
-        );
+        initLanguage();
 
     }
-
-}
-
-
-/* ==========================================
-   APPLY LANGUAGE
-========================================== */
-
-function applyLanguage(lang) {
-
-    if (lang !== "ar" && lang !== "en") {
-
-        lang = "en";
-
-    }
-
-    /*
-     * HTML direction
-     */
-
-    document.documentElement.lang = lang;
-
-    document.documentElement.dir =
-        lang === "ar" ? "rtl" : "ltr";
-
-
-    /*
-     * Body
-     */
-
-    document.body.classList.toggle(
-        "rtl",
-        lang === "ar"
-    );
-
-    document.body.classList.toggle(
-        "arabic",
-        lang === "ar"
-    );
-
-
-    /*
-     * Translate text
-     */
-
-    translatePage(lang);
-
-
-    /*
-     * Change logo
-     */
-
-    changeLogo(lang);
-
-
-    /*
-     * Change language button
-     */
-
-    updateLanguageButton(lang);
-
-
-    /*
-     * Save language
-     */
-
-    localStorage.setItem(
-        "bingo-lang",
-        lang
-    );
-
-}
-
-
-/* ==========================================
-   INIT
-========================================== */
-
-function init() {
-
-    /*
-     * Create language button
-     * if it doesn't exist
-     */
-
-    setupLanguageButton();
-
-
-    /*
-     * Get saved language
-     */
-
-    const current =
-        getLanguage();
-
-
-    /*
-     * Apply language
-     */
-
-    applyLanguage(current);
-
-}
-  /* ==========================================
-   PUBLIC API
-========================================== */
-
-window.BingoLang = {
-
-    apply: applyLanguage,
-
-    toggle: function () {
-
-        const current =
-            localStorage.getItem("bingo-lang") || "en";
-
-        applyLanguage(
-            current === "ar" ? "en" : "ar"
-        );
-
-    },
-
-    get: getLanguage
-
-};
-
-
-/* ==========================================
-   START
-========================================== */
-
-if (document.readyState === "loading") {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        init
-    );
-
-} else {
-
-    init();
-
-}
 
 })();
