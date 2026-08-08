@@ -722,5 +722,211 @@
     init();
 
   }
+  /* ==========================================
+   LANGUAGE BUTTON
+========================================== */
+
+function setupLanguageButton() {
+
+    const actions = document.querySelector(".actions");
+
+    if (!actions) {
+        return;
+    }
+
+    let button = document.getElementById("langSwitch");
+
+    /*
+     * إذا لم يكن الزر موجوداً في HTML
+     * يتم إنشاؤه تلقائياً
+     */
+
+    if (!button) {
+
+        button = document.createElement("button");
+
+        button.id = "langSwitch";
+
+        button.type = "button";
+
+        button.className = "lang-switch";
+
+        actions.insertBefore(
+            button,
+            actions.firstChild
+        );
+
+    }
+
+    /*
+     * منع إضافة Event Listener أكثر من مرة
+     */
+
+    if (!button.dataset.languageReady) {
+
+        button.addEventListener("click", function () {
+
+            const current =
+                localStorage.getItem("bingo-lang") || "en";
+
+            const next =
+                current === "ar" ? "en" : "ar";
+
+            applyLanguage(next);
+
+        });
+
+        button.dataset.languageReady = "true";
+
+    }
+
+}
+
+
+/* ==========================================
+   UPDATE LANGUAGE BUTTON
+========================================== */
+
+function updateLanguageButton(lang) {
+
+    const button =
+        document.getElementById("langSwitch");
+
+    if (!button) {
+        return;
+    }
+
+    if (lang === "ar") {
+
+        button.textContent = "EN";
+
+        button.setAttribute(
+            "aria-label",
+            "Switch to English"
+        );
+
+        button.setAttribute(
+            "title",
+            "Switch to English"
+        );
+
+    } else {
+
+        button.textContent = "العربية";
+
+        button.setAttribute(
+            "aria-label",
+            "التبديل إلى العربية"
+        );
+
+        button.setAttribute(
+            "title",
+            "التبديل إلى العربية"
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   APPLY LANGUAGE
+========================================== */
+
+function applyLanguage(lang) {
+
+    if (lang !== "ar" && lang !== "en") {
+
+        lang = "en";
+
+    }
+
+    /*
+     * HTML direction
+     */
+
+    document.documentElement.lang = lang;
+
+    document.documentElement.dir =
+        lang === "ar" ? "rtl" : "ltr";
+
+
+    /*
+     * Body
+     */
+
+    document.body.classList.toggle(
+        "rtl",
+        lang === "ar"
+    );
+
+    document.body.classList.toggle(
+        "arabic",
+        lang === "ar"
+    );
+
+
+    /*
+     * Translate text
+     */
+
+    translatePage(lang);
+
+
+    /*
+     * Change logo
+     */
+
+    changeLogo(lang);
+
+
+    /*
+     * Change language button
+     */
+
+    updateLanguageButton(lang);
+
+
+    /*
+     * Save language
+     */
+
+    localStorage.setItem(
+        "bingo-lang",
+        lang
+    );
+
+}
+
+
+/* ==========================================
+   INIT
+========================================== */
+
+function init() {
+
+    /*
+     * Create language button
+     * if it doesn't exist
+     */
+
+    setupLanguageButton();
+
+
+    /*
+     * Get saved language
+     */
+
+    const current =
+        getLanguage();
+
+
+    /*
+     * Apply language
+     */
+
+    applyLanguage(current);
+
+}
 
 })();
