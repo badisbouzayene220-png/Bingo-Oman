@@ -928,5 +928,45 @@ function init() {
     applyLanguage(current);
 
 }
+  /* ==========================================
+   PUBLIC API
+========================================== */
+
+window.BingoLang = {
+
+    apply: applyLanguage,
+
+    toggle: function () {
+
+        const current =
+            localStorage.getItem("bingo-lang") || "en";
+
+        applyLanguage(
+            current === "ar" ? "en" : "ar"
+        );
+
+    },
+
+    get: getLanguage
+
+};
+
+
+/* ==========================================
+   START
+========================================== */
+
+if (document.readyState === "loading") {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        init
+    );
+
+} else {
+
+    init();
+
+}
 
 })();
