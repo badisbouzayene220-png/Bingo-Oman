@@ -176,7 +176,7 @@ function renderUsers(){
 async function loadListings(){
  const {data,error}=await sb.rpc('admin_list_listings',{p_status:listFilter});
  if(error){console.error(error);return}
- const a=data||[];$('listingTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.city||'')}</small></td><td>${esc(x.seller_name||x.seller_email||'User')}</td><td>${money(x.price)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.created_at)}</td><td class="actions-cell">${x.status==='pending'?`<button class="mini-btn primary" onclick="moderateListing('${x.id}','published')">Publish</button><button class="mini-btn danger" onclick="moderateListing('${x.id}','rejected')">Reject</button>`:''}<button class="mini-btn danger" onclick="deleteListing('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No listings found.</div>';
+ const a=data||[];$('listingTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.city||'')}</small></td><td>${esc(x.seller_name||x.seller_email||'User')}</td><td>${money(x.price)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.created_at)}</td><td class="actions-cell">${x.status==='pending'?`<button class="mini-btn primary" onclick="moderateListing('${x.id}','published')">✓ Approve</button><button class="mini-btn danger" onclick="moderateListing('${x.id}','rejected')">✕ Reject</button>`:x.status==='published'?`<button class="mini-btn danger" onclick="moderateListing('${x.id}','rejected')">Reject</button>`:x.status==='rejected'?`<button class="mini-btn primary" onclick="moderateListing('${x.id}','published')">Approve</button>`:''}<button class="mini-btn danger" onclick="deleteListing('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No listings found.</div>';
 }
 
 async function loadAds(){
@@ -224,7 +224,16 @@ async function chooseWinner(id){const x=opps.find(o=>o.id===id);if(!x)return;con
 function showBid(id){const b=bids.find(x=>x.id===id);if(!b)return;$('bidDetail').innerHTML=`<div class="form-grid"><div><label>Opportunity</label><b>${esc(b.opportunity_title)}</b></div><div><label>Type</label><b>${esc(b.bid_type)}</b></div><div><label>Bidder</label><b>${esc(b.bidder_name||'User')}</b><br><small>${esc(b.bidder_email||'')}</small></div><div><label>Amount</label><b>${money(b.amount)}</b></div><div><label>Submitted</label><b>${fmt(b.created_at)}</b></div><div><label>Winner</label><b>${b.is_winner?'Yes':'No'}</b></div></div>`;openModal('bidModal')}
 async function toggleUser(id,active){if(!confirm(active?'Deactivate this user?':'Activate this user?'))return;const {error}=await sb.rpc('admin_set_user_active',{p_user_id:id,p_active:!active});if(error)msg(error.message,'err');else{msg('User status updated.');await loadUsers();await loadStats()}}
 async function roleUser(id,role){if(!confirm(`Change this user role to ${role}?`))return;const {error}=await sb.rpc('admin_set_user_role',{p_user_id:id,p_role:role});if(error)msg(error.message,'err');else{msg('User role updated.');await loadUsers()}}
-async function moderateListing(id,status){const {error}=await sb.rpc('admin_moderate_listing',{p_listing_id:id,p_decision:status});if(error)msg(error.message,'err');else{msg('Listing updated.');await loadListings();await loadStats()}}
+async function moderateListing(id,status){
+  const {data:listing}=await sb.from('listings').select('id,title').eq('id',id).maybeSingle();
+  const title=listing?.title||'this listing';
+  if(status==='published'&&!confirm(`Approve "${title}" and publish it to the marketplace?`)) return;
+  if(status==='rejected'&&!confirm(`Reject "${title}"? It will remain hidden from the marketplace.`)) return;
+  const {error}=await sb.rpc('admin_moderate_listing',{p_listing_id:id,p_decision:status});
+  if(error){msg(error.message,'err');return}
+  msg(status==='published'?'Listing approved and published.':'Listing rejected and kept hidden.');
+  await loadListings();await loadStats();
+}
 async function deleteListing(id){if(!confirm('Delete this listing?'))return;const {error}=await sb.rpc('admin_delete_listing',{p_listing_id:id});if(error)msg(error.message,'err');else{msg('Listing deleted.');await loadListings();await loadStats()}}
 
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.style.display='none');$('tab-'+b.dataset.tab).style.display='block'});
