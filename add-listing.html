@@ -28,7 +28,15 @@
   <div class="upload-box" id="dropzone"><input id="images" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden><div class="upload-icon">📷</div><h3>Upload photos</h3><p>Choose up to 8 images. JPG, PNG or WEBP, max 5 MB each.</p><button type="button" class="btn" id="chooseImages">Choose photos</button></div>
   <div class="preview-grid" id="previewGrid"></div>
   <div class="form-actions"><a class="btn" href="dashboard.html">Cancel</a><button class="btn primary" id="submitBtn" type="submit">Publish listing</button></div>
-  <div id="message" class="form-message"></div>
+  <div class="form-section" style="margin-top:20px"><h3>Detailed information</h3><p class="muted">These fields make your listing easier to find. They can be used for cars, property, electronics and other categories.</p>
+<div class="form-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+<div><label>Brand / Make</label><input id="brand" placeholder="Toyota, Apple, Samsung…"></div>
+<div><label>Model</label><input id="model" placeholder="Land Cruiser, iPhone 15…"></div>
+<div><label>Year</label><input id="year" type="number" min="1900" max="2100" placeholder="2024"></div>
+<div><label>Extra details</label><input id="extraDetails" placeholder="Mileage, size, color, etc."></div>
+</div>
+<div style="margin-top:14px"><label style="font-weight:700">📍 Exact item location</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:7px"><input id="latitude" type="number" step="any" placeholder="Latitude" style="flex:1;min-width:150px"><input id="longitude" type="number" step="any" placeholder="Longitude" style="flex:1;min-width:150px"><button type="button" class="btn outline" id="locateBtn">Use my current location</button></div><small class="muted">Only the location of the item is stored. The buyer can use “Near me” to find it.</small></div></div>
+<div id="message" class="form-message"></div>
 </form>
 <aside class="panel tips"><h3>Tips for a better ad</h3><ul><li>Use a clear, specific title.</li><li>Add several bright photos from different angles.</li><li>Describe the condition honestly.</li><li>Choose the correct city and category.</li><li>Set a realistic OMR price.</li></ul><div class="mini-3d">BINGO<br><span>BUY • SELL • TRADE</span></div></aside>
 </div></div></section>
@@ -43,9 +51,11 @@ function addFiles(list){const incoming=[...list].filter(f=>/^image\/(jpeg|png|we
 function removeFile(i){files.splice(i,1);render();}
 $('chooseImages').onclick=()=>$('images').click(); $('images').onchange=e=>addFiles(e.target.files);
 $('dropzone').addEventListener('dragover',e=>{e.preventDefault();$('dropzone').classList.add('drag')}); $('dropzone').addEventListener('dragleave',()=>$('dropzone').classList.remove('drag')); $('dropzone').addEventListener('drop',e=>{e.preventDefault();$('dropzone').classList.remove('drag');addFiles(e.dataTransfer.files)});
+$('locateBtn').onclick=()=>{if(!navigator.geolocation){alert('Location is not supported by this browser.');return}navigator.geolocation.getCurrentPosition(p=>{$('latitude').value=p.coords.latitude.toFixed(7);$('longitude').value=p.coords.longitude.toFixed(7);},()=>alert('Please allow location access.'))};
 $('listingForm').onsubmit=async e=>{e.preventDefault(); const user=await requireUser(); if(!user)return; if(!files.length){msg('Please add at least one photo.','error');return} const btn=$('submitBtn'); btn.disabled=true; btn.textContent='Publishing…'; msg('');
  try{
-  const payload={user_id:user.id,category_id:$('category').value,title:$('title').value.trim(),description:$('description').value.trim(),price:Number($('price').value),city:$('city').value,condition:$('condition').value||null,status:'pending'};
+  const attributes={brand:$('brand').value.trim(),make:$('brand').value.trim(),model:$('model').value.trim(),year:Number($('year').value)||null,details:$('extraDetails').value.trim()};
+  const payload={user_id:user.id,category_id:$('category').value,title:$('title').value.trim(),description:$('description').value.trim(),price:Number($('price').value),city:$('city').value,condition:$('condition').value||null,status:'pending',attributes,latitude:Number($('latitude').value)||null,longitude:Number($('longitude').value)||null};
   const {data:listing,error:le}=await sb.from('listings').insert(payload).select('id').single(); if(le)throw le;
   for(let i=0;i<files.length;i++){
     const f=files[i], ext=f.name.split('.').pop().toLowerCase(), path=`${user.id}/${listing.id}/${crypto.randomUUID()}.${ext}`;

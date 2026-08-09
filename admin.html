@@ -44,7 +44,7 @@
 <button data-tab="opportunities">🔨 Auctions & Tenders</button>
 <button data-tab="bids">💰 Bids & Offers</button>
 <button data-tab="users">👥 Users</button>
-<button data-tab="listings">📦 Marketplace</button>
+<button data-tab="listings">📦 Marketplace</button><button data-tab="ads">📣 Company Ads</button>
 </aside>
 
 <div class="admin-main">
@@ -72,6 +72,12 @@
 <section class="tab" id="tab-listings" style="display:none">
 <div class="admin-card"><div class="admin-toolbar"><div class="admin-tabs"><button class="active list-filter" data-filter="pending">Pending</button><button class="list-filter" data-filter="published">Published</button><button class="list-filter" data-filter="rejected">Rejected</button><button class="list-filter" data-filter="all">All</button></div></div><div id="listingTable"></div></div>
 </section>
+<section class="tab" id="tab-ads" style="display:none">
+<div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Company advertisements</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Create sponsored banners and publish them on the marketplace.</p></div><button class="btn primary" id="newAd">＋ New company ad</button></div>
+<div class="admin-tabs" style="margin-bottom:12px"><button class="active ad-filter" data-filter="all">All</button><button class="ad-filter" data-filter="draft">Draft</button><button class="ad-filter" data-filter="published">Published</button><button class="ad-filter" data-filter="expired">Expired</button></div>
+<div id="adTable"></div></div>
+</section>
+
 </div></div>
 </section>
 </div></main>
@@ -90,6 +96,16 @@
 </div><div id="oppMsg"></div><button class="btn primary" style="margin-top:15px">Save opportunity</button></form>
 </div></div>
 
+
+<div class="modal" id="adModal"><div class="modalbox"><div class="modalhead"><h2 id="adModalTitle">New company advertisement</h2><button class="close" onclick="closeModal('adModal')">×</button></div>
+<form id="adForm"><input type="hidden" id="adId"><div class="form-grid">
+<div><label>Company / ad title</label><input id="adTitle" required></div><div><label>Status</label><select id="adStatus"><option value="draft">Draft</option><option value="published">Published</option><option value="paused">Paused</option></select></div>
+<div><label>Placement</label><select id="adPlacement"><option value="marketplace_top">Marketplace top</option><option value="home_top">Home top</option><option value="marketplace_inline">Marketplace inline</option></select></div><div><label>Sort order</label><input id="adSort" type="number" value="0"></div>
+<div class="full"><label>Banner image URL</label><input id="adImage" required placeholder="https://…"></div>
+<div class="full"><label>Destination URL</label><input id="adLink" placeholder="https://company.com"></div>
+<div><label>Start date</label><input id="adStart" type="datetime-local"></div><div><label>End date</label><input id="adEnd" type="datetime-local"></div>
+<div class="full"><label>Notes</label><textarea id="adNotes" placeholder="Optional internal notes"></textarea></div></div><div id="adMsg"></div><button class="btn primary" style="margin-top:15px">Save advertisement</button></form>
+</div></div>
 <div class="modal" id="bidModal"><div class="modalbox"><div class="modalhead"><h2>Bid / offer details</h2><button class="close" onclick="closeModal('bidModal')">×</button></div><div id="bidDetail"></div></div></div>
 
 <script>
@@ -98,7 +114,7 @@ const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=v=>Number(v||0).toLocaleString('en-OM',{minimumFractionDigits:3,maximumFractionDigits:3})+' OMR';
 const fmt=d=>d?new Date(d).toLocaleString():'—';
 const localInput=d=>{if(!d)return '';const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,16)};
-let opps=[], bids=[], users=[], listFilter='pending', oppFilter='all', bidFilter='all', adminUser=null;
+let opps=[], bids=[], users=[], ads=[], listFilter='pending', oppFilter='all', bidFilter='all', adFilter='all', adminUser=null;
 
 function msg(text,type='ok'){ $('globalMsg').innerHTML=text?`<div class="notice ${type}">${esc(text)}</div>`:''; if(text)setTimeout(()=>{$('globalMsg').innerHTML=''},4500)}
 function closeModal(id){$(id).classList.remove('open')}
@@ -117,7 +133,7 @@ async function init(){
  adminUser=user; $('adminApp').style.display='block';
  await refreshAll();
 }
-async function refreshAll(){await Promise.all([loadOpps(),loadBids(),loadUsers(),loadStats(),loadListings(),loadOverview()]);}
+async function refreshAll(){await Promise.all([loadOpps(),loadBids(),loadUsers(),loadStats(),loadListings(),loadAds(),loadOverview()]);}
 
 async function loadStats(){
  const {data,error}=await sb.rpc('admin_dashboard_stats');
@@ -162,13 +178,35 @@ async function loadListings(){
  if(error){console.error(error);return}
  const a=data||[];$('listingTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.city||'')}</small></td><td>${esc(x.seller_name||x.seller_email||'User')}</td><td>${money(x.price)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.created_at)}</td><td class="actions-cell">${x.status==='pending'?`<button class="mini-btn primary" onclick="moderateListing('${x.id}','published')">Publish</button><button class="mini-btn danger" onclick="moderateListing('${x.id}','rejected')">Reject</button>`:''}<button class="mini-btn danger" onclick="deleteListing('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No listings found.</div>';
 }
+
+async function loadAds(){
+ const {data,error}=await sb.rpc('admin_list_company_ads');
+ if(error){console.error(error);return}
+ ads=data||[]; renderAds();
+}
+function renderAds(){
+ const a=ads.filter(x=>adFilter==='all'||x.status===adFilter);
+ $('adTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Company / Ad</th><th>Placement</th><th>Status</th><th>Schedule</th><th>Clicks</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.image_url)}</small></td><td>${esc(x.placement)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.starts_at)} → ${fmt(x.ends_at)}</td><td>${x.clicks||0}</td><td class="actions-cell"><button class="mini-btn primary" onclick="editAd('${x.id}')">Edit</button>${x.status==='published'?`<button class="mini-btn" onclick="setAd('${x.id}','paused')">Pause</button>`:`<button class="mini-btn" onclick="setAd('${x.id}','published')">Publish</button>`}<button class="mini-btn danger" onclick="deleteAd('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No company advertisements.</div>';
+}
+function fillAd(x){
+ $('adId').value=x?.id||'';$('adTitle').value=x?.title||'';$('adStatus').value=x?.status||'draft';$('adPlacement').value=x?.placement||'marketplace_top';$('adSort').value=x?.sort_order||0;$('adImage').value=x?.image_url||'';$('adLink').value=x?.link_url||'';$('adStart').value=localInput(x?.starts_at||new Date());$('adEnd').value=localInput(x?.ends_at||new Date(Date.now()+30*86400000));$('adNotes').value=x?.notes||'';
+}
+function newAd(){fillAd(null);$('adModalTitle').textContent='New company advertisement';openModal('adModal')}
+function editAd(id){fillAd(ads.find(x=>x.id===id));$('adModalTitle').textContent='Edit company advertisement';openModal('adModal')}
+async function saveAd(e){
+ e.preventDefault();const payload={id:$('adId').value||null,title:$('adTitle').value.trim(),status:$('adStatus').value,placement:$('adPlacement').value,sort_order:Number($('adSort').value||0),image_url:$('adImage').value.trim(),link_url:$('adLink').value.trim()||null,starts_at:new Date($('adStart').value).toISOString(),ends_at:new Date($('adEnd').value).toISOString(),notes:$('adNotes').value.trim()};
+ const {error}=await sb.rpc('admin_upsert_company_ad',{p_ad:payload});if(error){$('adMsg').innerHTML='<div class="notice err">'+esc(error.message)+'</div>';return}closeModal('adModal');msg('Company advertisement saved.');await loadAds();
+}
+async function setAd(id,status){const {error}=await sb.rpc('admin_set_company_ad_status',{p_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Advertisement status updated.');await loadAds()}}
+async function deleteAd(id){if(!confirm('Delete this company advertisement?'))return;const {error}=await sb.rpc('admin_delete_company_ad',{p_id:id});if(error)msg(error.message,'err');else{msg('Advertisement deleted.');await loadAds()}}
+
 async function loadOverview(){
  const a=opps.slice(0,6), b=bids.slice(0,8);
  $('overviewBox').innerHTML=`<h3 style="margin:0 0 10px">Latest opportunities</h3>${a.length?`<table class="admin-table"><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.kind)} · ${esc(x.city||'')}</small></td><td>${statusPill(x.status)}</td><td>${fmt(x.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No opportunities.</div>'}<h3 style="margin:25px 0 10px">Latest bids / offers</h3>${b.length?`<table class="admin-table"><tbody>${b.map(x=>`<tr><td><b>${esc(x.opportunity_title)}</b><br><small>${esc(x.bidder_name||x.bidder_email||'User')}</small></td><td>${money(x.amount)}</td><td>${fmt(x.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No bids yet.</div>'}`;
 }
 
 function fillOpp(x){
- $('oppId').value=x?.id||'';$('oppKind').value=x?.kind||'auction';$('oppStatus').value=x?.status||'draft';$('oppTitle').value=x?.title||'';$('oppRef').value=x?.reference||'';$('oppCity').value=x?.city||'Muscat';$('oppImage').value=x?.image_url||'';$('oppStartingAmount').value=localInput(x?.starts_at||new Date());$('oppCloses').value=localInput(x?.closes_at||new Date(Date.now()+86400000));$('oppStartingAmount').value=localInput(x?.starts_at||new Date());$('oppDesc').value=x?.description||'';$('oppStartingAmount').value=localInput(x?.starts_at);$('oppCloses').value=localInput(x?.closes_at);$('oppStart').required=true;$('oppCloses').required=true;$('oppStartingAmount').value=$('oppStartingAmount').value||localInput(new Date());$('oppCloses').value=$('oppCloses').value||localInput(new Date(Date.now()+86400000));$('oppStart').dataset.orig=x?.starts_at||'';$('oppCurrent').value=x?.current_amount??x?.starting_amount??0;$('oppStartingAmount').value=localInput(x?.starts_at||new Date());$('oppCloses').value=localInput(x?.closes_at||new Date(Date.now()+86400000));
+ $('oppId').value=x?.id||'';$('oppKind').value=x?.kind||'auction';$('oppStatus').value=x?.status||'draft';$('oppTitle').value=x?.title||'';$('oppRef').value=x?.reference||'';$('oppCity').value=x?.city||'Muscat';$('oppImage').value=x?.image_url||'';$('oppStartingAmount').value=x?.starting_amount??0;$('oppCurrent').value=x?.current_amount??x?.starting_amount??0;$('oppStarts').value=localInput(x?.starts_at||new Date());$('oppCloses').value=localInput(x?.closes_at||new Date(Date.now()+86400000));$('oppDesc').value=x?.description||'';
 }
 function editOpp(id){const x=opps.find(o=>o.id===id);if(!x)return;fillOpp(x);$('oppModalTitle').textContent='Edit opportunity';openModal('oppModal')}
 function newOpp(){fillOpp(null);$('oppModalTitle').textContent='New opportunity';openModal('oppModal')}
@@ -186,14 +224,14 @@ async function chooseWinner(id){const x=opps.find(o=>o.id===id);if(!x)return;con
 function showBid(id){const b=bids.find(x=>x.id===id);if(!b)return;$('bidDetail').innerHTML=`<div class="form-grid"><div><label>Opportunity</label><b>${esc(b.opportunity_title)}</b></div><div><label>Type</label><b>${esc(b.bid_type)}</b></div><div><label>Bidder</label><b>${esc(b.bidder_name||'User')}</b><br><small>${esc(b.bidder_email||'')}</small></div><div><label>Amount</label><b>${money(b.amount)}</b></div><div><label>Submitted</label><b>${fmt(b.created_at)}</b></div><div><label>Winner</label><b>${b.is_winner?'Yes':'No'}</b></div></div>`;openModal('bidModal')}
 async function toggleUser(id,active){if(!confirm(active?'Deactivate this user?':'Activate this user?'))return;const {error}=await sb.rpc('admin_set_user_active',{p_user_id:id,p_active:!active});if(error)msg(error.message,'err');else{msg('User status updated.');await loadUsers();await loadStats()}}
 async function roleUser(id,role){if(!confirm(`Change this user role to ${role}?`))return;const {error}=await sb.rpc('admin_set_user_role',{p_user_id:id,p_role:role});if(error)msg(error.message,'err');else{msg('User role updated.');await loadUsers()}}
-async function moderateListing(id,status){const {error}=await sb.rpc('admin_set_listing_status',{p_listing_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Listing updated.');await loadListings();await loadStats()}}
+async function moderateListing(id,status){const {error}=await sb.rpc('admin_moderate_listing',{p_listing_id:id,p_decision:status});if(error)msg(error.message,'err');else{msg('Listing updated.');await loadListings();await loadStats()}}
 async function deleteListing(id){if(!confirm('Delete this listing?'))return;const {error}=await sb.rpc('admin_delete_listing',{p_listing_id:id});if(error)msg(error.message,'err');else{msg('Listing deleted.');await loadListings();await loadStats()}}
 
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.style.display='none');$('tab-'+b.dataset.tab).style.display='block'});
 document.querySelectorAll('.opp-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.opp-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');oppFilter=b.dataset.filter;renderOpps()});
 document.querySelectorAll('.bid-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.bid-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');bidFilter=b.dataset.filter;renderBids()});
 document.querySelectorAll('.list-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.list-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');listFilter=b.dataset.filter;loadListings()});
-$('oppSearch').oninput=renderOpps;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
+$('oppSearch').oninput=renderOpps;document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </body></html>
