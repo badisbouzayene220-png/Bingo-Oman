@@ -44,15 +44,40 @@
 </div></section>
 <footer><div class="container footergrid"><div><img src="logo-en.png" alt="BINGO Oman"><p>Oman’s marketplace to buy, sell, bid and trade.</p></div><div><h4>Explore</h4><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></div><div><h4>Account</h4><a href="login.html">Login</a><a href="register.html">Create account</a><a href="dashboard.html">Dashboard</a></div><div><h4>BINGO Oman</h4><p class="orangeText">Buy • Sell • Trade</p><small>© 2026 BINGO Oman</small></div></div></footer>
 <script>
+const $ = id => document.getElementById(id);
 let categories=[], allListings=[], myLat=null,myLng=null;
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const km=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=(c-a)*p,y=(d-b)*p;return R*2*Math.atan2(Math.sqrt(Math.sin(x/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2),Math.sqrt(1-Math.sin(x/2)**2-Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2))};
 function attrs(x){return x.attributes||{}}
-async function loadAds(){const {data}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','marketplace_top').order('sort_order').limit(3);$('ads').innerHTML=(data||[]).map(a=>`<a href="${esc(a.link_url||'#')}" target="_blank" rel="noopener"><img src="${esc(a.image_url)}" alt="${esc(a.title||'Advertisement')}"></a>`).join('')}
-async function load(){const [{data:c,error:ce},{data:l,error:le}]=await Promise.all([
-sb.from('categories').select('id,name_en,name_ar').eq('is_active',true).order('name_en'),
-sb.from('listings').select('id,title,description,price,city,condition,created_at,category_id,latitude,longitude,attributes,listing_images(image_url,sort_order)').eq('status','published').order('created_at',{ascending:false})
-]);if(ce||le){$('status').textContent=(ce||le).message;return}categories=c||[];const sel=$('cat');sel.innerHTML='<option value="">All categories</option>'+categories.map(x=>`<option value="${x.id}">${esc(x.name_en)}</option>`).join('');allListings=l||[];await loadAds();render()}
+async function loadAds(){
+  try{
+    const {data,error}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','marketplace_top').order('sort_order').limit(3);
+    if(error){console.warn('Company ads load error:',error);return}
+    $('ads').innerHTML=(data||[]).map(a=>`<a href="${esc(a.link_url||'#')}" target="_blank" rel="noopener"><img src="${esc(a.image_url)}" alt="${esc(a.title||'Advertisement')}"></a>`).join('');
+  }catch(err){console.warn('Company ads load error:',err)}
+}
+async function load(){
+  $('status').textContent='Loading listings…';
+  try{
+    const [{data:c,error:ce},{data:l,error:le}]=await Promise.all([
+      sb.from('categories').select('id,name_en,name_ar').eq('is_active',true).order('name_en'),
+      sb.from('listings').select('id,title,description,price,city,condition,created_at,category_id,latitude,longitude,attributes,listing_images(image_url,sort_order)').eq('status','published').order('created_at',{ascending:false})
+    ]);
+    if(ce) throw ce;
+    if(le) throw le;
+    categories=c||[];
+    const sel=$('cat');
+    sel.innerHTML='<option value="">All categories</option>'+categories.map(x=>`<option value="${x.id}">${esc(x.name_en)}</option>`).join('');
+    allListings=l||[];
+    await loadAds();
+    render();
+  }catch(err){
+    console.error('Marketplace load error:',err);
+    $('status').textContent='Could not load listings: '+(err?.message||err);
+    $('listings').innerHTML='<div class="empty-state"><h3>Could not load listings</h3><p>Open the browser console for the exact error.</p></div>';
+  }
+}
+
 function render(){const q=$('search').value.trim().toLowerCase(),cat=$('cat').value,city=$('city').value,cond=$('condition').value,brand=$('brand').value.trim().toLowerCase(),model=$('model').value.trim().toLowerCase(),year=Number($('year').value)||null,min=Number($('minPrice').value),max=Number($('maxPrice').value),sort=$('sort').value;
 let d=allListings.map(x=>{const a=attrs(x),text=Object.values(a).join(' ').toLowerCase();return {...x,_a:a,_text:text,_dist:(myLat!=null&&x.latitude!=null)?km(myLat,myLng,Number(x.latitude),Number(x.longitude)):Infinity}})
 .filter(x=>(!q||`${x.title} ${x.description||''} ${x._text}`.toLowerCase().includes(q))&&(!cat||x.category_id===cat)&&(!city||x.city===city)&&(!cond||x.condition===cond)&&(!brand||String(x._a.brand||x._a.make||'').toLowerCase().includes(brand))&&(!model||String(x._a.model||'').toLowerCase().includes(model))&&(!year||Number(x._a.year)===year)&&(!min||Number(x.price)>=min)&&(!max||Number(x.price)<=max));
