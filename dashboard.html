@@ -9,6 +9,26 @@ const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;',
 const money = value => Number(value || 0).toLocaleString('en-OM',{minimumFractionDigits:3,maximumFractionDigits:3}) + ' OMR';
 const statusLabel = s => ({pending:'Pending review',published:'Published',draft:'Draft',rejected:'Rejected',sold:'Sold',archived:'Archived'}[s] || s || '—');
 
+async function deleteMyListing(id,title){
+  const name = title || 'this listing';
+  if(!confirm(`Delete "${name}"?\n\nThis action cannot be undone.`)) return;
+
+  const {data,error} = await sb.rpc('user_delete_listing',{p_listing_id:id});
+
+  if(error){
+    alert('Could not delete the listing: ' + error.message);
+    return;
+  }
+
+  if(data !== true){
+    alert('The listing could not be deleted.');
+    return;
+  }
+
+  alert('Listing deleted successfully.');
+  await go();
+}
+
 async function go(){
   const user = await BingoAuth.getUser();
   if(!user){ location.href='login.html?next=dashboard.html'; return; }
@@ -48,7 +68,7 @@ async function go(){
       <a class="my-ad-image" href="listing.html?id=${encodeURIComponent(a.id)}">${img?`<img src="${esc(img)}" alt="${esc(a.title)}">`:'<span>📦</span>'}</a>
       <div class="my-ad-body"><div class="my-ad-top"><span class="ad-status ${esc(a.status)}">${esc(statusLabel(a.status))}</span><small>${new Date(a.created_at).toLocaleDateString()}</small></div>
       <h3>${esc(a.title)}</h3><p>${esc(a.city||'Oman')} · ${money(a.price)}</p>
-      <div class="my-ad-actions"><a class="btn small" href="listing.html?id=${encodeURIComponent(a.id)}">View ad</a>${a.status==='published'?'<span class="live">● Live</span>':''}</div></div>
+      <div class="my-ad-actions"><a class="btn small" href="listing.html?id=${encodeURIComponent(a.id)}">View ad</a>${a.status==='published'?'<span class="live">● Live</span>':''}<button type="button" class="btn small" onclick="deleteMyListing('${a.id}',${JSON.stringify(a.title)})">🗑 Delete</button></div></div>
     </article>`;
   }).join('');
 }
