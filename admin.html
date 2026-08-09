@@ -44,7 +44,7 @@
 <button data-tab="opportunities">🔨 Auctions & Tenders</button>
 <button data-tab="bids">💰 Bids & Offers</button>
 <button data-tab="users">👥 Users</button>
-<button data-tab="listings">📦 Marketplace <span id="pendingListingBadge" style="display:none;margin-left:5px;padding:2px 6px;border-radius:999px;font-size:10px;background:#dc2626;color:#fff">0</span></button><button data-tab="ads">📣 Company Ads</button>
+<button data-tab="listings">📦 Marketplace</button><button data-tab="ads">📣 Company Ads</button>
 </aside>
 
 <div class="admin-main">
@@ -174,23 +174,9 @@ function renderUsers(){
  $('userTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.full_name||x.username||'User')}</b><br><small>${esc(x.email||'')}</small></td><td>${statusPill(x.role||'user')}</td><td>${x.is_active!==false?statusPill('active'):statusPill('closed')}</td><td>${fmt(x.created_at)}</td><td class="actions-cell"><button class="mini-btn" onclick="toggleUser('${x.id}',${x.is_active!==false})">${x.is_active!==false?'Deactivate':'Activate'}</button><button class="mini-btn" onclick="roleUser('${x.id}','${x.role==='admin'?'user':'admin'}')">${x.role==='admin'?'Remove admin':'Make admin'}</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No users found.</div>';
 }
 async function loadListings(){
-  const box=$('listingTable');
-  box.innerHTML='<div class="empty">Loading marketplace listings…</div>';
-
-  // Use the dedicated moderation RPC. It reads pending listings with SECURITY DEFINER,
-  // so the admin page does not depend on client-side listings RLS.
-  let {data,error}=await sb.rpc('admin_pending_listings');
-
-  if(error){
-    box.innerHTML=`<div class="empty"><b>Could not load pending listings.</b><br><small>${esc(error.message||'Unknown error')}</small><br><button class="btn" style="margin-top:10px" onclick="loadListings()">Retry</button></div>`;
-    return;
-  }
-
-  const a=data||[];
-  const badge=$('pendingListingBadge');
-  if(badge){badge.textContent=a.length;badge.style.display=a.length?'inline-block':'none'}
-
-  box.innerHTML=a.length?`<div style="margin-bottom:10px;font-size:12px;color:#7b8798">${a.length} listing${a.length===1?'':'s'} waiting for moderation</div><table class="admin-table"><thead><tr><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title||'Untitled')}</b><br><small>${esc(x.city||'')}</small></td><td>${esc(x.seller_name||x.seller_email||'User')}<br><small>${esc(x.seller_email||'')}</small></td><td>${money(x.price)}</td><td>${statusPill('pending')}</td><td>${fmt(x.created_at)}</td><td class="actions-cell"><button class="mini-btn primary" onclick="moderateListing('${x.id}','published')">✓ Approve</button><button class="mini-btn danger" onclick="moderateListing('${x.id}','rejected')">✕ Reject</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No user listings are waiting for approval.</div>';
+ const {data,error}=await sb.rpc('admin_list_listings',{p_status:listFilter});
+ if(error){console.error(error);return}
+ const a=data||[];$('listingTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.city||'')}</small></td><td>${esc(x.seller_name||x.seller_email||'User')}</td><td>${money(x.price)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.created_at)}</td><td class="actions-cell">${x.status==='pending'?`<button class="mini-btn primary" onclick="moderateListing('${x.id}','published')">Publish</button><button class="mini-btn danger" onclick="moderateListing('${x.id}','rejected')">Reject</button>`:''}<button class="mini-btn danger" onclick="deleteListing('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No listings found.</div>';
 }
 
 async function loadAds(){
@@ -200,7 +186,7 @@ async function loadAds(){
 }
 function renderAds(){
  const a=ads.filter(x=>adFilter==='all'||x.status===adFilter);
- $('adTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Company / Ad</th><th>Placement</th><th>Status</th><th>Schedule</th><th>Clicks</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.image_url)}</small></td><td>${esc(x.placement)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.starts_at)} → ${fmt(x.ends_at)}</td><td>${x.clicks||0}</td><td class="actions-cell"><button class="mini-btn primary" onclick="editAd('${x.id}')">Edit</button>${x.status==='published'?`<button class="mini-btn" onclick="setAd('${x.id}','paused')">Pause</button>`:`<button class="mini-btn" onclick="setAd('${x.id}','published')">Publish</button>`}<button class="mini-btn danger" onclick="deleteAd('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No company advertisements.</div>';
+ $('adTable').innerHTML=a.length?`<table class="admin-table"><thead><tr><th>Company / Ad</th><th>Placement</th><th>Status</th><th>Schedule</th><th>Clicks</th><th>Actions</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.image_url)}</small></td><td>${esc(x.placement)}</td><td>${statusPill(x.status)}</td><td>${fmt(x.starts_at)} → ${fmt(x.ends_at)}</td><td>${x.clicks||0}</td><td class="actions-cell"><button class="mini-btn primary" onclick="editAd('${x.id}')">Edit</button>${x.status==='published'?`<button class="mini-btn" onclick="setAd('${x.id}','paused')">Pause</button>`:`<button class="mini-btn" onclick="setAd('${x.id}','published')">Publish</button>`}<button type="button" class="mini-btn danger" onclick="deleteAd('${x.id}')">🗑 Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No company advertisements.</div>';
 }
 function fillAd(x){
  $('adId').value=x?.id||'';$('adTitle').value=x?.title||'';$('adStatus').value=x?.status||'draft';$('adPlacement').value=x?.placement||'marketplace_top';$('adSort').value=x?.sort_order||0;$('adImage').value=x?.image_url||'';$('adLink').value=x?.link_url||'';$('adStart').value=localInput(x?.starts_at||new Date());$('adEnd').value=localInput(x?.ends_at||new Date(Date.now()+30*86400000));$('adNotes').value=x?.notes||'';
@@ -212,7 +198,14 @@ async function saveAd(e){
  const {error}=await sb.rpc('admin_upsert_company_ad',{p_ad:payload});if(error){$('adMsg').innerHTML='<div class="notice err">'+esc(error.message)+'</div>';return}closeModal('adModal');msg('Company advertisement saved.');await loadAds();
 }
 async function setAd(id,status){const {error}=await sb.rpc('admin_set_company_ad_status',{p_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Advertisement status updated.');await loadAds()}}
-async function deleteAd(id){if(!confirm('Delete this company advertisement?'))return;const {error}=await sb.rpc('admin_delete_company_ad',{p_id:id});if(error)msg(error.message,'err');else{msg('Advertisement deleted.');await loadAds()}}
+async function deleteAd(id){
+  if(!confirm('Delete this company advertisement?\n\nThis action cannot be undone.')) return;
+  const {data,error}=await sb.rpc('admin_delete_company_ad',{p_id:id});
+  if(error){msg('Delete failed: '+error.message,'err');return}
+  if(data!==true){msg('Delete failed: the database did not confirm deletion.','err');return}
+  msg('Advertisement deleted.');
+  await loadAds();
+}
 
 async function loadOverview(){
  const a=opps.slice(0,6), b=bids.slice(0,8);
@@ -238,29 +231,13 @@ async function chooseWinner(id){const x=opps.find(o=>o.id===id);if(!x)return;con
 function showBid(id){const b=bids.find(x=>x.id===id);if(!b)return;$('bidDetail').innerHTML=`<div class="form-grid"><div><label>Opportunity</label><b>${esc(b.opportunity_title)}</b></div><div><label>Type</label><b>${esc(b.bid_type)}</b></div><div><label>Bidder</label><b>${esc(b.bidder_name||'User')}</b><br><small>${esc(b.bidder_email||'')}</small></div><div><label>Amount</label><b>${money(b.amount)}</b></div><div><label>Submitted</label><b>${fmt(b.created_at)}</b></div><div><label>Winner</label><b>${b.is_winner?'Yes':'No'}</b></div></div>`;openModal('bidModal')}
 async function toggleUser(id,active){if(!confirm(active?'Deactivate this user?':'Activate this user?'))return;const {error}=await sb.rpc('admin_set_user_active',{p_user_id:id,p_active:!active});if(error)msg(error.message,'err');else{msg('User status updated.');await loadUsers();await loadStats()}}
 async function roleUser(id,role){if(!confirm(`Change this user role to ${role}?`))return;const {error}=await sb.rpc('admin_set_user_role',{p_user_id:id,p_role:role});if(error)msg(error.message,'err');else{msg('User role updated.');await loadUsers()}}
-async function moderateListing(id,status){
-  const {data:listing}=await sb.from('listings').select('id,title,status').eq('id',id).maybeSingle();
-  const title=listing?.title||'this listing';
-  const action=status==='published'?'approve and publish':'reject';
-  if(!confirm(`Are you sure you want to ${action} \"${title}\"?`)) return;
-
-  let {error}=await sb.rpc('admin_moderate_listing',{p_listing_id:id,p_decision:status});
-  if(error){
-    const fallback=await sb.rpc('admin_set_listing_status',{p_listing_id:id,p_status:status});
-    error=fallback.error;
-  }
-  if(error){msg(error.message,'err');return}
-  msg(status==='published'?'Listing approved and published.':'Listing rejected and hidden.');
-  await loadListings();
-  await loadStats();
-}
+async function moderateListing(id,status){const {error}=await sb.rpc('admin_moderate_listing',{p_listing_id:id,p_decision:status});if(error)msg(error.message,'err');else{msg('Listing updated.');await loadListings();await loadStats()}}
 async function deleteListing(id){if(!confirm('Delete this listing?'))return;const {error}=await sb.rpc('admin_delete_listing',{p_listing_id:id});if(error)msg(error.message,'err');else{msg('Listing deleted.');await loadListings();await loadStats()}}
 
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.style.display='none');$('tab-'+b.dataset.tab).style.display='block'});
 document.querySelectorAll('.opp-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.opp-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');oppFilter=b.dataset.filter;renderOpps()});
 document.querySelectorAll('.bid-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.bid-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');bidFilter=b.dataset.filter;renderBids()});
 document.querySelectorAll('.list-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.list-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');listFilter=b.dataset.filter;loadListings()});
-document.querySelector('[data-tab="listings"]').addEventListener('click',()=>loadListings());
 $('oppSearch').oninput=renderOpps;document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
 document.addEventListener('DOMContentLoaded',init);
 </script>
