@@ -107,22 +107,30 @@ const BINGO_STICKERS={
   bingo_success:{src:'assets/bingo_deal.png',alt:'BINGO — تم الاتفاق!'}
 };
 function stickerToken(type){return `[[BINGO_STICKER:${type}]]`;}
+function getBingoStickerType(message){
+  const value=String(message??'').trim();
+  const prefix='[[BINGO_STICKER:';
+  const suffix=']]';
+  if(!value.startsWith(prefix) || !value.endsWith(suffix)) return null;
+  const type=value.slice(prefix.length,-suffix.length);
+  return Object.prototype.hasOwnProperty.call(BINGO_STICKERS,type) ? type : null;
+}
 function renderMessageContent(message){
   const value=String(message??'');
-  const match=value.match(/^\\[\\[BINGO_STICKER:(bingo_no_deal|bingo_success)\\]\\]$/);
-  if(match){
-    const sticker=BINGO_STICKERS[match[1]];
+  const type=getBingoStickerType(value);
+  if(type){
+    const sticker=BINGO_STICKERS[type];
     return `<div class="bingo-sticker-bubble"><img src="${sticker.src}" alt="${esc(sticker.alt)}"></div>`;
   }
   return esc(value);
 }
 function conversationPreview(message){
   const value=String(message??'');
-  const match=value.match(/^\\[\\[BINGO_STICKER:(bingo_no_deal|bingo_success)\\]\\]$/);
-  if(match)return match[1]==='bingo_success'?'🎟️ BINGO — تم الاتفاق!':'🎟️ BINGO — لم نتفق هذه المرة!';
+  const type=getBingoStickerType(value);
+  if(type)return type==='bingo_success'?'🎟️ BINGO — تم الاتفاق!':'🎟️ BINGO — لم نتفق هذه المرة!';
   return value;
 }
-async function loadMessages(){if(!currentConversation)return;const {data,error}=await sb.from('messages').select('id,sender_id,message,is_read,created_at').eq('conversation_id',currentConversation).order('created_at',{ascending:true});if(error){$('chatMessages').innerHTML='<div class="empty-chat">'+esc(error.message)+'</div>';return;}if(!data?.length){$('chatMessages').innerHTML='<div class="empty-chat">No messages yet. Say hello 👋</div>';return;}$('chatMessages').innerHTML=data.map(m=>{const mine=m.sender_id===currentUser.id;return `<div class="bubble ${mine?'mine':''} ${String(m.message||'').startsWith('[[BINGO_STICKER:')?'bingo-sticker-wrapper':''} ${!mine?'theirs':''}">${renderMessageContent(m.message)}<time>${formatTime(m.created_at)}</time></div>`;}).join('');const box=$('chatMessages');box.scrollTop=box.scrollHeight;}
+async function loadMessages(){if(!currentConversation)return;const {data,error}=await sb.from('messages').select('id,sender_id,message,is_read,created_at').eq('conversation_id',currentConversation).order('created_at',{ascending:true});if(error){$('chatMessages').innerHTML='<div class="empty-chat">'+esc(error.message)+'</div>';return;}if(!data?.length){$('chatMessages').innerHTML='<div class="empty-chat">No messages yet. Say hello 👋</div>';return;}$('chatMessages').innerHTML=data.map(m=>{const mine=m.sender_id===currentUser.id;return `<div class="bubble ${mine?'mine':''} ${getBingoStickerType(m.message)?'bingo-sticker-wrapper':''} ${!mine?'theirs':''}">${renderMessageContent(m.message)}<time>${formatTime(m.created_at)}</time></div>`;}).join('');const box=$('chatMessages');box.scrollTop=box.scrollHeight;}
 async function markMessagesRead(){if(!currentConversation)return;await sb.from('messages').update({is_read:true}).eq('conversation_id',currentConversation).neq('sender_id',currentUser.id).eq('is_read',false);}
 async function sendMessage(text){if(!currentConversation||!text.trim())return;const {error}=await sb.from('messages').insert({conversation_id:currentConversation,sender_id:currentUser.id,message:text.trim()});if(error){alert('Could not send message: '+error.message);return;}$('messageInput').value='';closeEmojiPicker();await loadMessages();await loadConversations();}
 async function sendBingoSticker(type){if(!currentConversation)return;const token=stickerToken(type);const {error}=await sb.from('messages').insert({conversation_id:currentConversation,sender_id:currentUser.id,message:token});if(error){alert('Could not send BINGO sticker: '+error.message);return;}closeEmojiPicker();await loadMessages();await loadConversations();}
