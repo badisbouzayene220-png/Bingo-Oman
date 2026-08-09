@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Oman | Messages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="logo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script src="language.js"></script>
+<style>
+.messages-page{padding:28px 0 50px}
+.messages-layout{display:grid;grid-template-columns:330px 1fr;gap:18px;min-height:620px}
+.messages-list,.chat-panel{background:#fff;border:1px solid #e7eaf0;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,.05)}
+.messages-list-head,.chat-head{padding:18px 20px;border-bottom:1px solid #edf0f4}
+.messages-list-head h2,.chat-head h2{margin:0;font-size:20px}
+.conversation-items{max-height:570px;overflow:auto}
+.conversation-item{display:block;width:100%;border:0;border-bottom:1px solid #f0f2f5;background:#fff;text-align:left;padding:15px 17px;cursor:pointer}
+.conversation-item:hover,.conversation-item.active{background:#f7f9fc}
+.conversation-item strong{display:block;color:#172033;margin-bottom:4px}
+.conversation-item small{display:block;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conversation-item .preview{margin-top:6px;font-size:13px}
+.chat-panel{display:flex;flex-direction:column;min-width:0}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.chat-title{min-width:0}.chat-title h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-title p{margin:4px 0 0;color:#667085;font-size:13px}
+.chat-messages{flex:1;padding:22px;overflow:auto;background:#f8fafc;min-height:430px;display:flex;flex-direction:column;gap:10px}
+.bubble{max-width:min(72%,620px);padding:10px 14px;border-radius:16px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.bubble.mine{align-self:flex-end;background:#ff6b00;color:#fff;border-bottom-right-radius:5px}
+.bubble.theirs{align-self:flex-start;background:#fff;color:#172033;border:1px solid #e7eaf0;border-bottom-left-radius:5px}
+.bubble time{display:block;font-size:10px;opacity:.7;margin-top:4px}
+.chat-form{display:flex;gap:10px;padding:15px;border-top:1px solid #edf0f4;background:#fff}
+.chat-form textarea{flex:1;resize:none;min-height:46px;max-height:120px;border:1px solid #d8dde6;border-radius:12px;padding:12px;font:inherit}
+.chat-form button{align-self:stretch;min-width:90px}
+.empty-chat{margin:auto;text-align:center;color:#667085;padding:30px}
+@media(max-width:800px){.messages-layout{grid-template-columns:1fr}.messages-list{max-height:260px}.conversation-items{max-height:190px}.chat-panel{min-height:620px}.bubble{max-width:85%}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="container nav">
+    <a class="logo" href="index.html"><img src="logo-en.png" alt="BINGO Oman"></a>
+    <button class="hamb" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
+    <nav class="navlinks" id="navlinks">
+      <a href="index.html">Home</a><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a>
+    </nav>
+    <div class="actions"></div>
+  </div>
+</header>
+
+<main class="messages-page">
+<div class="container">
+  <div class="messages-layout">
+    <section class="messages-list">
+      <div class="messages-list-head"><h2>Messages</h2></div>
+      <div id="conversationList" class="conversation-items">
+        <div class="empty-chat">Loading conversations…</div>
+      </div>
+    </section>
+
+    <section class="chat-panel">
+      <div id="chatHead" class="chat-head">
+        <div class="chat-title"><h2>Select a conversation</h2><p>Your messages will appear here.</p></div>
+      </div>
+      <div id="chatMessages" class="chat-messages">
+        <div class="empty-chat">Choose a conversation from the left.</div>
+      </div>
+      <form id="chatForm" class="chat-form" style="display:none">
+        <textarea id="messageInput" placeholder="Write a message…" rows="1" maxlength="4000"></textarea>
+        <button class="btn primary" type="submit">Send</button>
+      </form>
+    </section>
+  </div>
+</div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const params = new URLSearchParams(location.search);
+let currentUser = null;
+let currentConversation = null;
+let realtimeChannel = null;
+let conversationCache = [];
+
+function formatTime(value){
+  if(!value) return '';
+  return new Date(value).toLocaleString('en-OM',{dateStyle:'medium',timeStyle:'short'});
+}
+
+async function loadConversations(){
+  const {data, error} = await sb
+    .from('conversations')
+    .select('id,listing_id,auction_id,buyer_id,seller_id,created_at')
+    .order('created_at',{ascending:false});
+
+  if(error){
+    $('conversationList').innerHTML = '<div class="empty-chat">Could not load messages.<br><small>'+esc(error.message)+'</small></div>';
+    return;
+  }
+
+  conversationCache = data || [];
+  if(!conversationCache.length){
+    $('conversationList').innerHTML = '<div class="empty-chat">No conversations yet.<br>Open an ad and click “Contact seller”.</div>';
+    return;
+  }
+
+  const otherIds = [...new Set(conversationCache.map(c => c.buyer_id === currentUser.id ? c.seller_id : c.buyer_id).filter(Boolean))];
+
+  let profiles = [];
+  if(otherIds.length){
+    const {data:p} = await sb.from('public_profiles').select('id,full_name,username,avatar_url').in('id',otherIds);
+    profiles = p || [];
+  }
+
+  const profileMap = Object.fromEntries(profiles.map(p=>[p.id,p]));
+  const conversationIds = conversationCache.map(c=>c.id);
+
+  let lastMessages = [];
+  if(conversationIds.length){
+    const {data:m} = await sb.from('messages').select('conversation_id,message,created_at,sender_id').in('conversation_id',conversationIds).order('created_at',{ascending:false});
+    lastMessages = m || [];
+  }
+
+  const lastMap = {};
+  lastMessages.forEach(m=>{ if(!lastMap[m.conversation_id]) lastMap[m.conversation_id]=m; });
+
+  $('conversationList').innerHTML = conversationCache.map(c=>{
+    const otherId = c.buyer_id === currentUser.id ? c.seller_id : c.buyer_id;
+    const p = profileMap[otherId] || {};
+    const last = lastMap[c.id];
+    const name = p.full_name || p.username || 'User';
+    const active = currentConversation === c.id ? ' active' : '';
+    return `<button class="conversation-item${active}" data-id="${esc(c.id)}">
+      <strong>${esc(name)}</strong>
+      <small>${c.listing_id ? 'Listing conversation' : c.auction_id ? 'Auction conversation' : 'Conversation'}</small>
+      <small class="preview">${esc(last?.message || 'No messages yet')}</small>
+    </button>`;
+  }).join('');
+
+  document.querySelectorAll('.conversation-item').forEach(btn=>{
+    btn.addEventListener('click',()=>openConversation(btn.dataset.id));
+  });
+}
+
+async function openConversation(id){
+  const conversation = conversationCache.find(c=>c.id===id);
+  if(!conversation) return;
+
+  currentConversation = id;
+  history.replaceState(null,'','messages.html?conversation='+encodeURIComponent(id));
+
+  const otherId = conversation.buyer_id === currentUser.id ? conversation.seller_id : conversation.buyer_id;
+  const {data:profile} = await sb.from('public_profiles').select('full_name,username').eq('id',otherId).maybeSingle();
+  const name = profile?.full_name || profile?.username || 'User';
+
+  $('chatHead').innerHTML = `<div class="chat-title"><h2>${esc(name)}</h2><p>${conversation.listing_id ? 'Listing conversation' : conversation.auction_id ? 'Auction conversation' : 'Conversation'}</p></div>`;
+  $('chatForm').style.display='flex';
+
+  await loadMessages();
+  await markMessagesRead();
+  await loadConversations();
+  subscribeToMessages();
+}
+
+async function loadMessages(){
+  if(!currentConversation) return;
+  const {data,error} = await sb.from('messages').select('id,sender_id,message,is_read,created_at').eq('conversation_id',currentConversation).order('created_at',{ascending:true});
+  if(error){
+    $('chatMessages').innerHTML='<div class="empty-chat">'+esc(error.message)+'</div>';
+    return;
+  }
+
+  if(!data?.length){
+    $('chatMessages').innerHTML='<div class="empty-chat">No messages yet. Say hello 👋</div>';
+    return;
+  }
+
+  $('chatMessages').innerHTML=data.map(m=>{
+    const mine=m.sender_id===currentUser.id;
+    return `<div class="bubble ${mine?'mine':'theirs'}">${esc(m.message)}<time>${formatTime(m.created_at)}</time></div>`;
+  }).join('');
+
+  const box=$('chatMessages');
+  box.scrollTop=box.scrollHeight;
+}
+
+async function markMessagesRead(){
+  if(!currentConversation) return;
+  await sb.from('messages')
+    .update({is_read:true})
+    .eq('conversation_id',currentConversation)
+    .neq('sender_id',currentUser.id)
+    .eq('is_read',false);
+}
+
+async function sendMessage(text){
+  if(!currentConversation || !text.trim()) return;
+
+  const {error}=await sb.from('messages').insert({
+    conversation_id:currentConversation,
+    sender_id:currentUser.id,
+    message:text.trim()
+  });
+
+  if(error){ alert('Could not send message: '+error.message); return; }
+  $('messageInput').value='';
+  await loadMessages();
+  await loadConversations();
+}
+
+function subscribeToMessages(){
+  if(realtimeChannel) sb.removeChannel(realtimeChannel);
+  realtimeChannel=sb.channel('messages-'+currentConversation)
+    .on('postgres_changes',
+      {event:'*',schema:'public',table:'messages',filter:'conversation_id=eq.'+currentConversation},
+      async payload=>{
+        await loadMessages();
+        await markMessagesRead();
+        await loadConversations();
+      })
+    .subscribe();
+}
+
+$('chatForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  await sendMessage($('messageInput').value);
+});
+
+$('messageInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    $('chatForm').requestSubmit();
+  }
+});
+
+(async()=>{
+  currentUser=await BingoAuth.getUser();
+  if(!currentUser){
+    location.href='login.html?next='+encodeURIComponent(location.href);
+    return;
+  }
+
+  await loadConversations();
+
+  const requested=params.get('conversation');
+  if(requested && conversationCache.some(c=>c.id===requested)){
+    await openConversation(requested);
+  }
+})();
+</script>
+</body>
+</html>
