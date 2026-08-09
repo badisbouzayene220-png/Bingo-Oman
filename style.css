@@ -199,3 +199,6 @@ html[dir="rtl"] .eyebrow i {
   .header-messages{width:38px;height:38px;border-radius:11px}
   .header-message-icon{font-size:18px}
 }
+
+/* BINGO dynamic offers */
+.home-ads{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.home-ad{position:relative;display:block;min-height:150px;border-radius:18px;overflow:hidden;background:#eef2f7;box-shadow:0 8px 24px #092a8210}.home-ad img{width:100%;height:170px;object-fit:cover;display:block}.home-ad span{position:absolute;left:12px;right:12px;bottom:12px;background:#fff;padding:9px 12px;border-radius:10px;font-weight:800;font-size:13px;box-shadow:0 4px 14px #0002}@media(max-width:800px){.home-ads{grid-template-columns:1fr}.home-ad img{height:150px}}

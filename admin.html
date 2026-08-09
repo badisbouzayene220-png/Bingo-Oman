@@ -44,7 +44,7 @@
 <button data-tab="opportunities">🔨 Auctions & Tenders</button>
 <button data-tab="bids">💰 Bids & Offers</button>
 <button data-tab="users">👥 Users</button>
-<button data-tab="listings">📦 Marketplace</button><button data-tab="ads">📣 Company Ads</button>
+<button data-tab="listings">📦 Marketplace</button><button data-tab="orders">🛒 Store Orders</button><button data-tab="products">Products</button><button class="tab-btn" data-tab="ads">📣 Company Ads</button>
 </aside>
 
 <div class="admin-main">
@@ -72,6 +72,10 @@
 <section class="tab" id="tab-listings" style="display:none">
 <div class="admin-card"><div class="admin-toolbar"><div class="admin-tabs"><button class="active list-filter" data-filter="pending">Pending</button><button class="list-filter" data-filter="published">Published</button><button class="list-filter" data-filter="rejected">Rejected</button><button class="list-filter" data-filter="all">All</button></div></div><div id="listingTable"></div></div>
 </section>
+<section class="tab" id="tab-orders" style="display:none"><div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Store orders</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Review customer orders and update fulfillment status.</p></div></div><div class="admin-tabs" style="margin-bottom:12px"><button class="active order-filter" data-filter="all">All</button><button class="order-filter" data-filter="pending">Pending</button><button class="order-filter" data-filter="processing">Processing</button><button class="order-filter" data-filter="shipped">Shipped</button><button class="order-filter" data-filter="delivered">Delivered</button><button class="order-filter" data-filter="cancelled">Cancelled</button></div><div id="orderTable"></div></div></section>
+<section class="tab" id="tab-products" style="display:none">
+<div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Store products</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Manage products displayed on the public Store page.</p></div><button class="btn primary" id="newProduct">＋ New product</button></div>
+<div id="productTable"></div></div></section>
 <section class="tab" id="tab-ads" style="display:none">
 <div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Company advertisements</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Create sponsored banners and publish them on the marketplace.</p></div><button class="btn primary" id="newAd">＋ New company ad</button></div>
 <div class="admin-tabs" style="margin-bottom:12px"><button class="active ad-filter" data-filter="all">All</button><button class="ad-filter" data-filter="draft">Draft</button><button class="ad-filter" data-filter="published">Published</button><button class="ad-filter" data-filter="expired">Expired</button></div>
@@ -106,6 +110,13 @@
 <div><label>Start date</label><input id="adStart" type="datetime-local"></div><div><label>End date</label><input id="adEnd" type="datetime-local"></div>
 <div class="full"><label>Notes</label><textarea id="adNotes" placeholder="Optional internal notes"></textarea></div></div><div id="adMsg"></div><button class="btn primary" style="margin-top:15px">Save advertisement</button></form>
 </div></div>
+<div class="modal" id="productModal"><div class="modalbox"><div class="modalhead"><h2 id="productModalTitle">New store product</h2><button class="close" onclick="closeModal('productModal')">×</button></div>
+<form id="productForm"><input type="hidden" id="productId"><div class="form-grid">
+<div><label>Title</label><input id="productTitle" required></div><div><label>Category</label><input id="productCategory" placeholder="BINGO Gear"></div>
+<div><label>Price (OMR)</label><input id="productPrice" type="number" min="0" step="0.001" value="0"></div><div><label>Stock</label><input id="productStock" type="number" min="0" step="1" value="0"></div>
+<div><label>Status</label><select id="productActive"><option value="true">Active</option><option value="false">Hidden</option></select></div><div><label>Sort order</label><input id="productSort" type="number" value="0"></div>
+<div class="full"><label>Image URL</label><input id="productImage" placeholder="https://…"></div><div class="full"><label>Description</label><textarea id="productDesc"></textarea></div>
+</div><div id="productMsg"></div><button class="btn primary" style="margin-top:15px">Save product</button></form></div></div>
 <div class="modal" id="bidModal"><div class="modalbox"><div class="modalhead"><h2>Bid / offer details</h2><button class="close" onclick="closeModal('bidModal')">×</button></div><div id="bidDetail"></div></div></div>
 
 <script>
@@ -114,7 +125,7 @@ const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const money=v=>Number(v||0).toLocaleString('en-OM',{minimumFractionDigits:3,maximumFractionDigits:3})+' OMR';
 const fmt=d=>d?new Date(d).toLocaleString():'—';
 const localInput=d=>{if(!d)return '';const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,16)};
-let opps=[], bids=[], users=[], ads=[], listFilter='pending', oppFilter='all', bidFilter='all', adFilter='all', adminUser=null;
+let opps=[], bids=[], users=[], products=[], ads=[], orders=[], listFilter='pending', oppFilter='all', bidFilter='all', adFilter='all', orderFilter='all', adminUser=null;
 
 function msg(text,type='ok'){ $('globalMsg').innerHTML=text?`<div class="notice ${type}">${esc(text)}</div>`:''; if(text)setTimeout(()=>{$('globalMsg').innerHTML=''},4500)}
 function closeModal(id){$(id).classList.remove('open')}
@@ -133,7 +144,7 @@ async function init(){
  adminUser=user; $('adminApp').style.display='block';
  await refreshAll();
 }
-async function refreshAll(){await Promise.all([loadOpps(),loadBids(),loadUsers(),loadStats(),loadListings(),loadAds(),loadOverview()]);}
+async function refreshAll(){await loadProducts();await Promise.all([loadOpps(),loadBids(),loadUsers(),loadStats(),loadListings(),loadAds(),loadOverview(),loadOrders()]);}
 
 async function loadStats(){
  const {data,error}=await sb.rpc('admin_dashboard_stats');
@@ -200,6 +211,16 @@ async function saveAd(e){
 async function setAd(id,status){const {error}=await sb.rpc('admin_set_company_ad_status',{p_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Advertisement status updated.');await loadAds()}}
 async function deleteAd(id){if(!confirm('Delete this company advertisement?'))return;const {error}=await sb.rpc('admin_delete_company_ad',{p_id:id});if(error)msg(error.message,'err');else{msg('Advertisement deleted.');await loadAds()}}
 
+async function loadOrders(){const {data,error}=await sb.rpc('admin_list_store_orders');if(error){console.error(error);$('orderTable').innerHTML='<div class="empty">Run the latest setup_store.sql first.</div>';return}orders=data||[];renderOrders()}
+function renderOrders(){let d=orders.filter(o=>orderFilter==='all'||o.status===orderFilter);$('orderTable').innerHTML=d.length?`<table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Contact</th><th>Total</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody>${d.map(o=>`<tr><td><b>${esc(o.order_number)}</b></td><td>${esc(o.customer_name)}<br><small>${esc(o.address)}</small></td><td>${esc(o.phone)}<br><small>${esc(o.email||'')}</small></td><td>${money(o.total)}</td><td>${statusPill(o.status)}</td><td>${fmt(o.created_at)}</td><td><select onchange="updateOrderStatus('${o.id}',this.value)"><option value="pending" ${o.status==='pending'?'selected':''}>Pending</option><option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="shipped" ${o.status==='shipped'?'selected':''}>Shipped</option><option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No orders in this filter.</div>'}
+window.updateOrderStatus=async(id,status)=>{const {error}=await sb.rpc('admin_update_store_order_status',{p_order_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Order status updated.');await loadOrders()}};
+async function loadProducts(){const {data,error}=await sb.rpc('admin_list_store_products');if(error){console.error(error);$('productTable').innerHTML='<div class="empty">Run setup_store.sql first.</div>';return}products=data||[];renderProducts()}
+function renderProducts(){ $('productTable').innerHTML=products.length?`<table class="admin-table"><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody>${products.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.description||'')}</small></td><td>${esc(x.category||'—')}</td><td>${money(x.price)}</td><td>${x.stock}</td><td>${x.is_active?'Active':'Hidden'}</td><td class="actions-cell"><button class="mini-btn primary" onclick="editProduct('${x.id}')">Edit</button><button class="mini-btn danger" onclick="deleteProduct('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No store products.</div>'}
+function fillProduct(x){$('productId').value=x?.id||'';$('productTitle').value=x?.title||'';$('productCategory').value=x?.category||'';$('productPrice').value=x?.price??0;$('productStock').value=x?.stock??0;$('productActive').value=String(x?.is_active??true);$('productSort').value=x?.sort_order??0;$('productImage').value=x?.image_url||'';$('productDesc').value=x?.description||''}
+function newProduct(){fillProduct(null);$('productModalTitle').textContent='New store product';openModal('productModal')}
+function editProduct(id){const x=products.find(p=>p.id===id);if(x){fillProduct(x);$('productModalTitle').textContent='Edit store product';openModal('productModal')}}
+async function saveProduct(e){e.preventDefault();const payload={id:$('productId').value||null,title:$('productTitle').value.trim(),category:$('productCategory').value.trim(),price:Number($('productPrice').value||0),stock:Number($('productStock').value||0),is_active:$('productActive').value==='true',sort_order:Number($('productSort').value||0),image_url:$('productImage').value.trim()||null,description:$('productDesc').value.trim()||null};if(!payload.title){$('productMsg').innerHTML='<div class="notice err">Title is required.</div>';return}const {error}=await sb.rpc('admin_upsert_store_product',{p_product:payload});if(error){$('productMsg').innerHTML='<div class="notice err">'+esc(error.message)+'</div>';return}closeModal('productModal');msg('Product saved.');await loadProducts()}
+async function deleteProduct(id){if(!confirm('Delete this store product?'))return;const {error}=await sb.rpc('admin_delete_store_product',{p_id:id});if(error)msg(error.message,'err');else{msg('Product deleted.');await loadProducts()}}
 async function loadOverview(){
  const a=opps.slice(0,6), b=bids.slice(0,8);
  $('overviewBox').innerHTML=`<h3 style="margin:0 0 10px">Latest opportunities</h3>${a.length?`<table class="admin-table"><tbody>${a.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.kind)} · ${esc(x.city||'')}</small></td><td>${statusPill(x.status)}</td><td>${fmt(x.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No opportunities.</div>'}<h3 style="margin:25px 0 10px">Latest bids / offers</h3>${b.length?`<table class="admin-table"><tbody>${b.map(x=>`<tr><td><b>${esc(x.opportunity_title)}</b><br><small>${esc(x.bidder_name||x.bidder_email||'User')}</small></td><td>${money(x.amount)}</td><td>${fmt(x.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No bids yet.</div>'}`;
@@ -233,5 +254,5 @@ document.querySelectorAll('.bid-filter').forEach(b=>b.onclick=()=>{document.quer
 document.querySelectorAll('.list-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.list-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');listFilter=b.dataset.filter;loadListings()});
 $('oppSearch').oninput=renderOpps;document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
 document.addEventListener('DOMContentLoaded',init);
-</script>
+document.querySelectorAll('.order-filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.order-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');orderFilter=b.dataset.filter;renderOrders()}));document.getElementById('newProduct')?.addEventListener('click',newProduct);document.getElementById('productForm')?.addEventListener('submit',saveProduct);</script>
 </body></html>

@@ -108,6 +108,8 @@
           Marketplace
         </a>
 
+        <a href="store.html">Store</a>
+
         <a
           href="auctions.html"
           data-i18n="auctions"
@@ -858,6 +860,8 @@
           Marketplace
         </a>
 
+        <a href="store.html">Store</a>
+
         <a
           href="auctions.html"
           data-i18n="auctions"
@@ -1030,5 +1034,17 @@
 
   </script>
 
+<script>
+async function loadHomeAds(){
+  const box=document.getElementById('homeAds'); if(!box||!window.sb)return;
+  try{
+    const {data,error}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','home_top').order('sort_order').limit(3);
+    if(error) throw error;
+    box.innerHTML=(data||[]).map(a=>`<a class="home-ad" href="${String(a.link_url||'#').replace(/"/g,'&quot;')}" target="_blank" rel="noopener"><img src="${String(a.image_url||'').replace(/"/g,'&quot;')}" alt="${String(a.title||'Offer').replace(/"/g,'&quot;')}" loading="lazy"><span>${String(a.title||'Featured offer')}</span></a>`).join('');
+    if(!data?.length) box.closest('.home-offers').style.display='none';
+  }catch(e){console.warn('Home ads:',e)}
+}
+document.addEventListener('DOMContentLoaded',loadHomeAds);
+</script>
 </body>
 </html>
