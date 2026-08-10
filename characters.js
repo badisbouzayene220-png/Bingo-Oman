@@ -16,7 +16,7 @@
   function mount(){
     if(document.getElementById('bingoCharacterSystem')) return;
     document.body.insertAdjacentHTML('beforeend',html);
-    const root=document.getElementById('bingoCharacterSystem'),img=document.getElementById('bingoCharacterImg'),name=document.getElementById('bingoCharacterName'),role=document.getElementById('bingoCharacterRole'),msg=document.getElementById('bingoCharacterMessage');
+    const root=document.getElementById('bingoCharacterSystem'),img=document.getElementById('bingoCharacterImg'),name=document.getElementById('bingoCharacterName'),role=document.getElementById('bingoCharacterRole'),msg=document.getElementById('bingoCharacterMessage');    root.classList.add('minimized');
     function setCharacter(k){const c=C[k]; if(!c)return; current=k; img.classList.add('is-switching'); setTimeout(()=>{img.src=c.img;img.alt=c.name;name.textContent=c.name;role.textContent=c.role;msg.textContent=c.message;img.classList.remove('is-switching')},180);root.querySelectorAll('.bingo-character-btn').forEach(b=>b.classList.toggle('active',b.dataset.character===k));}
     setCharacter(current);
     root.querySelectorAll('.bingo-character-btn').forEach(b=>b.addEventListener('click',()=>setCharacter(b.dataset.character)));
