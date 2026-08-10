@@ -15,18 +15,18 @@
 </style>
 </head>
 <body>
-<div class="topbar"><div class="container topbar-inner"><span>🇴🇲 BINGO Oman Store</span><div class="top-links"><a href="marketplace.html">Marketplace</a><b>•</b><a href="auctions.html">Live Auctions</a></div></div></div>
+<div class="topbar"><div class="container topbar-inner"><span data-i18n="bingo_store">🇴🇲 BINGO Oman Store</span><div class="top-links"><a href="marketplace.html">Marketplace</a><b>•</b><a href="auctions.html">Live Auctions</a></div></div></div>
 <header class="header"><div class="container nav">
 <a class="main-logo" href="index.html"><img id="headerLogo" class="logo-image" src="logo-en.png" alt="BINGO Oman"></a>
 <button class="hamb" id="hambButton" type="button">☰</button>
 <nav class="navlinks" id="navlinks"><a href="index.html">Home</a><a href="marketplace.html">Marketplace</a><a class="active" href="store.html">Store</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a><a href="orders.html">My Orders</a></nav>
 <div class="actions"><a class="btn primary small" href="checkout.html">🛒 Cart <span id="cartCount">0</span></a><button id="langSwitch" class="lang-switch" type="button">العربية</button><a class="login" href="login.html">Login</a><a class="btn primary small" href="register.html">Register</a></div>
 </div></header>
-<section class="store-hero"><div class="container"><div class="kicker">BINGO STORE</div><h1>Products made for your marketplace.</h1><p>Browse official BINGO products and offers in one dedicated store.</p></div></section>
+<section class="store-hero"><div class="container"><div class="kicker" data-i18n="bingo_store_kicker">BINGO STORE</div><h1 data-i18n="store_title">Products made for your marketplace.</h1><p data-i18n="store_description">Browse official BINGO products and offers in one dedicated store.</p></div></section>
 <main class="pagebody"><div class="container">
 <div id="ads" class="ad-strip" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px"></div>
-<div class="store-toolbar"><input id="q" placeholder="Search products…"><select id="cat"><option value="">All categories</option></select><select id="sort"><option value="featured">Featured</option><option value="price_low">Price: low to high</option><option value="price_high">Price: high to low</option><option value="newest">Newest</option></select></div>
-<div id="status" class="market-status">Loading products…</div><div id="products" class="product-grid"></div>
+<div class="store-toolbar"><input id="q" data-i18n-placeholder="search_products" placeholder="Search products…"><select id="cat"><option value="" data-i18n="all_categories">All categories</option></select><select id="sort"><option value="featured" data-i18n="featured">Featured</option><option value="price_low" data-i18n="price_low_high">Price: low to high</option><option value="price_high" data-i18n="price_high_low">Price: high to low</option><option value="newest" data-i18n="newest">Newest</option></select></div>
+<div id="status" class="market-status" data-i18n="loading_products">Loading products…</div><div id="products" class="product-grid"></div>
 </div></main>
 <footer><div class="container footergrid"><div><img src="logo-en.png" alt="BINGO Oman"><p>Oman’s marketplace to buy, sell, bid and trade.</p></div><div><h4>Explore</h4><a href="marketplace.html">Marketplace</a><a href="store.html">Store</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a><a href="orders.html">My Orders</a></div><div><h4>Account</h4><a href="login.html">Login</a><a href="register.html">Create account</a><a href="dashboard.html">Dashboard</a></div><div><h4>BINGO Oman</h4><p class="orangeText">Buy • Sell • Trade</p><small>© 2026 BINGO Oman</small></div></div></footer>
 <script>
@@ -34,6 +34,35 @@ const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>'"]/g
 let products=[]; function updateCartCount(){const c=JSON.parse(localStorage.getItem('bingo_cart')||'[]');$('cartCount').textContent=c.reduce((n,x)=>n+Number(x.quantity||0),0)} window.addEventListener('storage',updateCartCount);
 async function loadAds(){try{const {data}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','home_top').order('sort_order').limit(3);$('ads').innerHTML=(data||[]).map(a=>`<a href="${esc(a.link_url||'#')}" target="_blank" rel="noopener" style="display:block;border-radius:15px;overflow:hidden;background:#eef2f7"><img src="${esc(a.image_url)}" alt="${esc(a.title||'Advertisement')}" style="width:100%;height:110px;object-fit:cover"></a>`).join('')}catch(e){console.warn(e)}}
 async function load(){try{const [{data:p,error:pe},{data:c,error:ce}]=await Promise.all([sb.from('store_products').select('id,title,description,price,image_url,category,stock,is_active,sort_order,created_at').eq('is_active',true).order('sort_order').order('created_at',{ascending:false}),sb.from('store_products').select('category').eq('is_active',true)]);if(pe)throw pe;products=p||[];const cats=[...new Set((c||[]).map(x=>x.category).filter(Boolean))].sort();$('cat').innerHTML='<option value="">All categories</option>'+cats.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');await loadAds();render()}catch(e){console.error(e);$('status').textContent='Could not load store products.';$('products').innerHTML='<div class="store-empty"><h3>Store is being prepared</h3><p>Please try again shortly.</p></div>'}}
-function render(){let d=[...products],q=$('q').value.trim().toLowerCase(),cat=$('cat').value,sort=$('sort').value;d=d.filter(x=>(!q||`${x.title} ${x.description||''} ${x.category||''}`.toLowerCase().includes(q))&&(!cat||x.category===cat));if(sort==='price_low')d.sort((a,b)=>a.price-b.price);if(sort==='price_high')d.sort((a,b)=>b.price-a.price);if(sort==='newest')d.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));$('status').textContent=`${d.length} product${d.length===1?'':'s'}`;$('products').innerHTML=d.map(x=>`<article class="product-card"><div class="product-img">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.title)}" loading="lazy">`:'<div style="height:100%;display:grid;place-items:center;font-size:48px">🛍️</div>'}</div><div class="product-body"><div class="product-cat">${esc(x.category||'Store')}</div><h3>${esc(x.title)}</h3><p class="product-desc">${esc(x.description||'')}</p><div class="product-price">${Number(x.price||0).toLocaleString('en-OM',{minimumFractionDigits:3})} OMR</div><a class="btn primary small" href="product.html?id=${encodeURIComponent(x.id)}">View product</a><div class="stock">${Number(x.stock||0)>0?`${Number(x.stock)} available`:'Out of stock'}</div></div></article>`).join('')||'<div class="store-empty"><h3>No products found</h3><p>Try another search or category.</p></div>'}
-['q','cat','sort'].forEach(id=>$(id).addEventListener('input',render));$('hambButton').onclick=()=>$('navlinks').classList.toggle('open');updateCartCount();load();
+function render(){
+  const ar=(window.BingoLanguage&&window.BingoLanguage.get()==='ar')||(document.documentElement.lang==='ar');
+  const t=ar?{product:'منتج',products:'منتجات',view:'عرض المنتج',available:'متوفر',out:'غير متوفر',emptyTitle:'لم يتم العثور على منتجات',emptyText:'جرّب بحثاً أو تصنيفاً آخر.'}:{product:'product',products:'products',view:'View product',available:'available',out:'Out of stock',emptyTitle:'No products found',emptyText:'Try another search or category.'};
+  let d=[...products],q=$('q').value.trim().toLowerCase(),cat=$('cat').value,sort=$('sort').value;
+  d=d.filter(x=>(!q||`${x.title} ${x.description||''} ${x.category||''}`.toLowerCase().includes(q))&&(!cat||x.category===cat));
+  if(sort==='price_low')d.sort((a,b)=>a.price-b.price);
+  if(sort==='price_high')d.sort((a,b)=>b.price-a.price);
+  if(sort==='newest')d.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  $('status').textContent=`${d.length} ${d.length===1?t.product:t.products}`;
+  $('products').innerHTML=d.map(x=>`<article class="product-card"><div class="product-img">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.title)}" loading="lazy">`:'<div style="height:100%;display:grid;place-items:center;font-size:48px">🛍️</div>'}</div><div class="product-body"><div class="product-cat">${esc(x.category||'Store')}</div><h3>${esc(x.title)}</h3><p class="product-desc">${esc(x.description||'')}</p><div class="product-price">${Number(x.price||0).toLocaleString('en-OM',{minimumFractionDigits:3})} OMR</div><a class="btn primary small" href="product.html?id=${encodeURIComponent(x.id)}">${t.view}</a><div class="stock">${Number(x.stock||0)>0?`${Number(x.stock)} ${t.available}`:t.out}</div></div></article>`).join('')||`<div class="store-empty"><h3>${t.emptyTitle}</h3><p>${t.emptyText}</p></div>`
+}
+['q','cat','sort'].forEach(id=>$(id).addEventListener('input',render));
+$('hambButton').onclick=()=>$('navlinks').classList.toggle('open');
+document.addEventListener('bingo:language-changed',()=>{ updateStoreTexts(); render(); });
+function updateStoreTexts(){
+  const ar = (window.BingoLanguage && window.BingoLanguage.get() === 'ar') ||
+             (document.documentElement.lang === 'ar');
+  const t = {
+    ar:{all:'كل التصنيفات',featured:'مميزة',low:'السعر: من الأقل إلى الأعلى',high:'السعر: من الأعلى إلى الأقل',newest:'الأحدث',loading:'جارٍ تحميل المنتجات…',search:'ابحث عن المنتجات…',product:'منتج',products:'منتجات',view:'عرض المنتج',available:'متوفر',out:'غير متوفر',emptyTitle:'لم يتم العثور على منتجات',emptyText:'جرّب بحثاً أو تصنيفاً آخر.'},
+    en:{all:'All categories',featured:'Featured',low:'Price: low to high',high:'Price: high to low',newest:'Newest',loading:'Loading products…',search:'Search products…',product:'product',products:'products',view:'View product',available:'available',out:'Out of stock',emptyTitle:'No products found',emptyText:'Try another search or category.'}
+  }[ar?'ar':'en'];
+  const q=$('q'), cat=$('cat'), sort=$('sort');
+  if(q) q.placeholder=t.search;
+  if(cat && cat.options.length) cat.options[0].textContent=t.all;
+  if(sort && sort.options.length>=4){
+    sort.options[0].textContent=t.featured; sort.options[1].textContent=t.low;
+    sort.options[2].textContent=t.high; sort.options[3].textContent=t.newest;
+  }
+  const st=$('status'); if(st && !products.length) st.textContent=t.loading;
+}
+updateCartCount(); updateStoreTexts(); load();
 </script></body></html>

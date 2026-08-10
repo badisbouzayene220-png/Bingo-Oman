@@ -76,7 +76,18 @@
       account: "Account",
       create_account: "Create account",
       dashboard: "Dashboard",
-      buy_sell_trade: "Buy • Sell • Trade"
+      buy_sell_trade: "Buy • Sell • Trade",
+      bingo_store: "🇴🇲 BINGO Oman Store",
+      bingo_store_kicker: "BINGO STORE",
+      store_title: "Products made for your marketplace.",
+      store_description: "Browse official BINGO products and offers in one dedicated store.",
+      search_products: "Search products…",
+      all_categories: "All categories",
+      featured: "Featured",
+      price_low_high: "Price: low to high",
+      price_high_low: "Price: high to low",
+      newest: "Newest",
+      loading_products: "Loading products…"
     },
 
     ar: {
@@ -144,7 +155,18 @@
       account: "الحساب",
       create_account: "إنشاء حساب",
       dashboard: "لوحة التحكم",
-      buy_sell_trade: "شراء • بيع • تداول"
+      buy_sell_trade: "شراء • بيع • تداول",
+      bingo_store: "🇴🇲 متجر BINGO عُمان",
+      bingo_store_kicker: "متجر BINGO",
+      store_title: "منتجات مصممة لسوقك.",
+      store_description: "تصفح منتجات وعروض BINGO الرسمية في متجر واحد مخصص.",
+      search_products: "ابحث عن المنتجات…",
+      all_categories: "كل التصنيفات",
+      featured: "مميزة",
+      price_low_high: "السعر: من الأقل إلى الأعلى",
+      price_high_low: "السعر: من الأعلى إلى الأقل",
+      newest: "الأحدث",
+      loading_products: "جارٍ تحميل المنتجات…"
     }
   };
 
@@ -154,6 +176,27 @@
    * Keeping this map lets the new switch work on those pages too.
    */
   const LEGACY_EN_AR = {
+    "Store": "المتجر",
+    "My Orders": "طلباتي",
+    "Cart": "السلة",
+    "BINGO Oman Store": "متجر BINGO عُمان",
+    "BINGO STORE": "متجر BINGO",
+    "Products made for your marketplace.": "منتجات مصممة لسوقك.",
+    "Browse official BINGO products and offers in one dedicated store.": "تصفح منتجات وعروض BINGO الرسمية في متجر واحد مخصص.",
+    "Search products…": "ابحث عن المنتجات…",
+    "All categories": "كل التصنيفات",
+    "Featured": "مميزة",
+    "Price: low to high": "السعر: من الأقل إلى الأعلى",
+    "Price: high to low": "السعر: من الأعلى إلى الأقل",
+    "Newest": "الأحدث",
+    "Loading products…": "جارٍ تحميل المنتجات…",
+    "View product": "عرض المنتج",
+    "Out of stock": "غير متوفر",
+    "available": "متوفر",
+    "No products found": "لم يتم العثور على منتجات",
+    "Try another search or category.": "جرّب بحثاً أو تصنيفاً آخر.",
+    "Store is being prepared": "المتجر قيد التجهيز",
+    "Please try again shortly.": "يرجى المحاولة مرة أخرى بعد قليل.",
     "Home": "الرئيسية",
     "Marketplace": "السوق",
     "Auctions": "المزادات",
@@ -569,6 +612,7 @@
     }
 
     changeLogos(lang);
+    document.dispatchEvent(new CustomEvent("bingo:language-changed", { detail: { lang: lang } }));
     addSwitch();
     updateButton(lang);
   }

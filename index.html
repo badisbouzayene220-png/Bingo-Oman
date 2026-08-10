@@ -27,45 +27,71 @@
 
   <!-- Language -->
   <script src="language.js" defer></script>
+
+  <style id="bingo-intro-style">
+    #bingoIntro{
+      position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+      background:radial-gradient(circle at 50% 42%,#173f9d 0%,#092a82 48%,#061a50 100%);
+      opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease;
+      overflow:hidden;
+    }
+    #bingoIntro.hidden{opacity:0;visibility:hidden;pointer-events:none}
+    #bingoIntro .intro-glow{position:absolute;width:60vmin;height:60vmin;border-radius:50%;background:#ff790022;filter:blur(12px)}
+    #bingoIntro .intro-card{position:relative;z-index:2;text-align:center;color:#fff;padding:24px}
+    #bingoIntro img{display:block;width:min(330px,70vw);height:auto;margin:0 auto 18px;filter:drop-shadow(0 18px 35px #00113d66)}
+    #bingoIntro .intro-title{font-size:13px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;margin:0 0 18px}
+    #bingoIntro .intro-progress{width:min(260px,65vw);height:4px;background:#ffffff26;border-radius:99px;overflow:hidden;margin:0 auto 16px}
+    #bingoIntro .intro-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb15c,#ff7900);border-radius:99px;animation:bingoIntroProgress 5s linear forwards}
+    #bingoIntro .intro-skip{border:1px solid #ffffff55;background:#ffffff12;color:#fff;border-radius:10px;padding:9px 18px;font-weight:800;font-size:12px;cursor:pointer}
+    #bingoIntro .intro-skip:hover{background:#ffffff22}
+    @keyframes bingoIntroProgress{to{width:100%}}
+    body.bingo-intro-lock{overflow:hidden}
+  </style>
+
 </head>
 
 <body>
-  <!-- BINGO INTRO FAIL-SAFE: the current build has no intro screen.
-       This guard also neutralizes any stale/injected intro overlay so the
-       homepage can never get stuck before the main content becomes usable. -->
+
+  <div id="bingoIntro" role="dialog" aria-modal="true" aria-label="BINGO intro">
+    <div class="intro-glow"></div>
+    <div class="intro-card">
+      <img src="assets/bingo-mascot-intro.gif" alt="BINGO Oman">
+      <p class="intro-title" id="introTitle">BINGO Oman</p>
+      <div class="intro-progress" aria-hidden="true"><span></span></div>
+      <button type="button" class="intro-skip" id="introSkip">Skip</button>
+    </div>
+  </div>
   <script>
-    (function () {
-      "use strict";
-      function unlockBingo() {
-        try {
-          document.documentElement.classList.remove("intro", "intro-active", "splash", "loading", "is-loading");
-          if (document.body) {
-            document.body.classList.remove("intro", "intro-active", "splash", "loading", "is-loading");
-            document.body.style.removeProperty("overflow");
-            document.body.style.removeProperty("visibility");
-            document.body.style.removeProperty("opacity");
-          }
-          var nodes = document.querySelectorAll(
-            '[id*="intro" i], [id*="splash" i], [class*="intro" i], [class*="splash" i]'
-          );
-          nodes.forEach(function (el) {
-            if (el === document.body || el === document.documentElement) return;
-            el.remove();
-          });
-        } catch (e) {
-          console.warn("BINGO intro guard:", e);
-        }
+    (function(){
+      var intro=document.getElementById('bingoIntro');
+      var skip=document.getElementById('introSkip');
+      var title=document.getElementById('introTitle');
+      var start=Date.now(), timer;
+      function applyIntroLanguage(){
+        var ar=localStorage.getItem('bingo-language')==='ar';
+        if(title) title.textContent=ar?'BINGO عُمان':'BINGO Oman';
+        if(skip) skip.textContent=ar?'تخطي':'Skip';
+        if(intro) intro.setAttribute('aria-label',ar?'مقدمة BINGO':'BINGO intro');
       }
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", unlockBingo, { once: true });
-      } else {
-        unlockBingo();
+      function closeIntro(){
+        if(!intro || intro.classList.contains('hidden')) return;
+        clearTimeout(timer);
+        intro.classList.add('hidden');
+        document.body.classList.remove('bingo-intro-lock');
+        window.setTimeout(function(){if(intro.parentNode)intro.parentNode.removeChild(intro)},500);
       }
-      window.addEventListener("load", unlockBingo, { once: true });
-      setTimeout(unlockBingo, 50);
-      setTimeout(unlockBingo, 500);
+      function finish(){
+        var remaining=Math.max(0,5000-(Date.now()-start));
+        if(remaining<=0) closeIntro(); else timer=setTimeout(closeIntro,remaining);
+      }
+      document.body.classList.add('bingo-intro-lock');
+      applyIntroLanguage();
+      if(skip) skip.addEventListener('click',closeIntro);
+      document.addEventListener('bingo:language-changed',applyIntroLanguage);
+      timer=setTimeout(closeIntro,5000);
     })();
   </script>
+
 
 
   <!-- =========================
