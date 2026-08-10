@@ -70,6 +70,10 @@
       unused_items: "Turn unused items into opportunities.",
       create_listing: "Create a listing and reach buyers across Oman.",
       start_selling: "Start selling →",
+      discover_oman_kicker: "DISCOVER OMAN",
+      discover_oman_title: "Real places. Real photos. Oman as it is.",
+      discover_oman_desc: "Explore the cities, governorates and landmarks that make every BINGO listing feel closer to your community.",
+      explore_local: "Explore local marketplace ←",
 
       footer_description: "Oman's marketplace to buy, sell, bid and trade.",
       explore: "Explore",
@@ -138,6 +142,10 @@
       unused_items: "حوّل أغراضك غير المستخدمة إلى فرص.",
       create_listing: "أنشئ إعلانك ووصل إلى المشترين في جميع أنحاء عُمان.",
       start_selling: "ابدأ البيع ←",
+      discover_oman_kicker: "اكتشف عُمان",
+      discover_oman_title: "أماكن حقيقية. صور حقيقية. عُمان كما هي.",
+      discover_oman_desc: "استكشف المدن والمحافظات والمعالم التي تجعل كل إعلان في BINGO أقرب إلى مجتمعك.",
+      explore_local: "استكشف السوق المحلي ←",
 
       footer_description: "منصة عُمان للبيع والشراء والمزايدة والتداول.",
       explore: "استكشف",

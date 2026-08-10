@@ -204,3 +204,431 @@ html[dir="rtl"] .eyebrow i {
 .home-ads{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.home-ad{position:relative;display:block;min-height:150px;border-radius:18px;overflow:hidden;background:#eef2f7;box-shadow:0 8px 24px #092a8210}.home-ad img{width:100%;height:170px;object-fit:cover;display:block}.home-ad span{position:absolute;left:12px;right:12px;bottom:12px;background:#fff;padding:9px 12px;border-radius:10px;font-weight:800;font-size:13px;box-shadow:0 4px 14px #0002}@media(max-width:800px){.home-ads{grid-template-columns:1fr}.home-ad img{height:150px}}
 
 body.bingo-intro-lock{overflow:hidden!important;height:100vh!important}
+
+/* =========================================================
+   BINGO OMAN — FULL HOMEPAGE PHOTO REDESIGN
+   ========================================================= */
+:root{
+  --oman-navy:#06204f;
+  --oman-blue:#0879bb;
+  --oman-cyan:#1ca8d4;
+  --oman-orange:#ef6c18;
+  --oman-sand:#f5eee3;
+}
+
+body{background:#f8fafc;color:#17243b}
+.header{border-bottom:1px solid #e7edf3;box-shadow:0 7px 30px rgba(6,32,79,.06)}
+.topbar{background:linear-gradient(90deg,#04183b,#07356e,#0879bb)}
+.top-links a,.topbar{color:#eaf5ff}
+.nav{height:82px}
+.navlinks a{font-size:12px;color:#4e6179}
+.navlinks a:hover,.navlinks a.active{color:var(--oman-navy)}
+.navlinks a.active:after{background:var(--oman-orange);height:3px;bottom:18px}
+.btn.primary{background:linear-gradient(135deg,#ef771d,#e85208);box-shadow:0 10px 24px rgba(239,108,24,.2)}
+
+.hero{background:linear-gradient(180deg,#f4f9fd 0%,#fff 100%);overflow:hidden}
+.hero-grid{min-height:630px;padding:52px 0 58px;gap:55px}
+.hero-content{position:relative;z-index:3}
+.eyebrow,.kicker{color:var(--oman-orange)}
+.hero h1{font-size:clamp(44px,5.3vw,68px);letter-spacing:-.06em;color:#061e49;margin:17px 0 16px;line-height:1.04}
+.hero h1 span:first-child{color:#061e49}
+.hero h1 span:last-child{color:var(--oman-orange)}
+.lead{font-size:15px;line-height:1.9;color:#607087;max-width:610px}
+.searchbar{margin-top:27px;max-width:735px;border-radius:17px;padding:7px;background:#fff;border:1px solid #d9e5ee;box-shadow:0 20px 50px rgba(6,38,80,.11)}
+.searchbar input{font-size:13px}
+.searchbar select{font-size:12px;color:#34465e}
+.popular a{color:#075d96}
+
+/* Hero photography */
+.oman-hero-photo{height:500px;position:relative;isolation:isolate}
+.hero-photo-main{position:absolute;inset:0 0 20px 30px;border-radius:32px;overflow:hidden;box-shadow:0 30px 70px rgba(4,35,74,.22);background:#dfeaf2}
+.hero-photo-main img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.1s ease}
+.hero-photo-main:hover img{transform:scale(1.04)}
+.hero-photo-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,23,54,.02) 20%,rgba(3,20,49,.68) 100%)}
+.hero-photo-copy{position:absolute;left:26px;right:26px;bottom:24px;color:#fff;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.hero-photo-copy .photo-location{font-size:9px;font-weight:900;letter-spacing:.16em;background:rgba(3,26,59,.62);padding:7px 10px;border-radius:99px;backdrop-filter:blur(8px)}
+.hero-photo-copy strong{font-family:"Noto Kufi Arabic",sans-serif;font-size:23px;text-shadow:0 5px 20px rgba(0,0,0,.3)}
+.hero-photo-copy small{font-size:10px;color:#e6eff8}
+.hero-photo-mini{position:absolute;width:168px;height:110px;border-radius:18px;overflow:hidden;border:4px solid #fff;box-shadow:0 18px 40px rgba(4,35,74,.2);z-index:5;background:#fff}
+.hero-photo-mini img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo-mini span{position:absolute;left:8px;right:8px;bottom:7px;color:#fff;text-shadow:0 2px 8px #000;display:flex;flex-direction:column}
+.hero-photo-mini span b{font-size:12px}.hero-photo-mini span small{font-size:8px}
+.mini-nizwa{left:0;bottom:0;transform:rotate(-3deg)}
+.mini-salalah{right:-4px;top:25px;transform:rotate(3deg)}
+.hero-stat{position:absolute;right:18px;bottom:0;z-index:7;background:#fff;border-radius:16px;padding:11px 15px;box-shadow:0 14px 35px rgba(4,35,74,.16);display:flex;align-items:baseline;gap:8px}
+.hero-stat b{font-size:22px;color:var(--oman-navy)}.hero-stat span{font-family:"Noto Kufi Arabic",sans-serif;font-size:8px;color:#708096;font-weight:800}
+
+/* Destination section */
+.oman-destinations{padding:85px 0 75px;background:#fff}
+.destinations-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:26px}
+.destinations-head h2{font-family:"Noto Kufi Arabic",sans-serif;font-size:29px;line-height:1.45;color:#06204f;margin:6px 0 7px}
+.destinations-head p{margin:0;color:#718096;font-size:12px;max-width:620px;line-height:1.9}
+.destinations-link{font-size:11px;font-weight:900;color:#06204f;white-space:nowrap}
+.destination-grid{display:grid;grid-template-columns:1.35fr .85fr .85fr;grid-auto-rows:225px;gap:14px}
+.destination-card{position:relative;overflow:hidden;border-radius:21px;background:#dce8ef;box-shadow:0 10px 28px rgba(4,35,74,.07);min-width:0}
+.destination-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+.destination-card:hover img{transform:scale(1.06)}
+.destination-large{grid-row:span 2}
+.destination-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,25,57,0) 28%,rgba(3,22,48,.82) 100%)}
+.destination-content{position:absolute;left:18px;right:18px;bottom:16px;color:#fff}
+.destination-content span{font-size:8px;letter-spacing:.1em;font-weight:900;text-transform:uppercase;color:#dcecf7}
+.destination-content h3{font-family:"Noto Kufi Arabic",sans-serif;font-size:17px;margin:5px 0 3px;text-shadow:0 3px 14px #0005}
+.destination-content small{font-size:9px;color:#e4edf5}
+.oman-strip{display:grid;grid-template-columns:repeat(6,1fr);margin-top:16px;border:1px solid #e4ebf1;border-radius:17px;overflow:hidden;background:#fff}
+.oman-strip div{padding:13px 12px;text-align:center;border-left:1px solid #edf1f5}.oman-strip div:first-child{border-left:0}
+.oman-strip b{display:block;font-family:"Noto Kufi Arabic",sans-serif;color:#17345e;font-size:11px}.oman-strip span{font-size:8px;color:#9aa6b6;letter-spacing:.05em}
+
+/* Categories: cleaner photo-led cards */
+.section{padding:72px 0}
+.sectiontitle{margin-bottom:24px}
+.sectiontitle h2{font-family:"Noto Kufi Arabic",sans-serif;font-size:27px;color:#06204f}
+.grid{gap:14px}
+.card{border-radius:19px;border-color:#e2eaf1;box-shadow:0 7px 22px rgba(6,32,79,.045)}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 38px rgba(6,32,79,.11)}
+.thumb.category-photo{height:190px;overflow:hidden}
+.thumb.category-photo img{transition:transform .55s ease}
+.card:hover .thumb.category-photo img{transform:scale(1.05)}
+.cardbody{padding:15px 16px 17px}
+.cardbody h3{font-family:"Noto Kufi Arabic",sans-serif;font-size:13px;color:#142b4e}
+
+.featuregrid{gap:14px}
+.feature{min-height:235px;border-radius:21px;box-shadow:0 8px 25px rgba(6,32,79,.05)}
+.feature h2{font-family:"Noto Kufi Arabic",sans-serif;font-size:21px}
+.cta .container{border-radius:24px;background:linear-gradient(120deg,#04183b,#0a4c91);box-shadow:0 24px 55px rgba(4,32,72,.18)}
+footer{background:#03152f}
+
+@media(max-width:1000px){
+  .hero-grid{grid-template-columns:1fr;min-height:0;padding-top:38px}
+  .hero-content{text-align:center}.lead{margin-inline:auto}.searchbar{margin-inline:auto}.popular{justify-content:center}
+  .oman-hero-photo{max-width:720px;width:100%;margin:0 auto;height:440px}
+  .destination-grid{grid-template-columns:1fr 1fr}.destination-large{grid-row:span 2}
+}
+@media(max-width:700px){
+  .nav{height:68px}.main-logo{width:128px}.actions .login{display:none}
+  .hero-grid{padding:32px 0 48px}.hero h1{font-size:42px}
+  .searchbar{display:grid;grid-template-columns:34px 1fr;gap:2px}.searchbar input{width:100%}.searchbar select{grid-column:1/2;width:auto;border:0;border-top:1px solid #edf1f5;padding:0 6px}.searchbar .btn{grid-column:2/3;grid-row:2}
+  .oman-hero-photo{height:340px}.hero-photo-main{left:0;bottom:12px;border-radius:24px}.hero-photo-copy{left:18px;right:18px;bottom:18px}.hero-photo-copy strong{font-size:17px}.hero-photo-mini{width:122px;height:84px}.mini-salalah{right:3px;top:8px}.mini-nizwa{left:-4px;bottom:0}.hero-stat{right:8px;bottom:-3px;padding:8px 10px}.hero-stat b{font-size:17px}
+  .oman-destinations{padding:55px 0}.destinations-head{display:block}.destinations-head h2{font-size:22px}.destinations-link{display:inline-block;margin-top:14px}
+  .destination-grid{grid-template-columns:1fr 1fr;grid-auto-rows:190px;gap:10px}.destination-large{grid-column:span 2;grid-row:span 1}.destination-content{left:12px;right:12px;bottom:11px}.destination-content h3{font-size:13px}.destination-content small{font-size:8px}
+  .oman-strip{grid-template-columns:repeat(3,1fr)}.oman-strip div:nth-child(4){border-left:0;border-top:1px solid #edf1f5}.oman-strip div:nth-child(5),.oman-strip div:nth-child(6){border-top:1px solid #edf1f5}
+  .section{padding:55px 0}.grid{grid-template-columns:1fr 1fr}.thumb.category-photo{height:155px}
+}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.thumb.category-photo{height:190px}.destination-grid{grid-template-columns:1fr}.destination-large{grid-column:auto}.destination-card{grid-row:auto}.oman-strip{grid-template-columns:repeat(2,1fr)}.oman-strip div{border-top:1px solid #edf1f5;border-left:0}.oman-strip div:nth-child(1),.oman-strip div:nth-child(2){border-top:0}}
+
+html[dir="rtl"] .destination-content{text-align:right}
+html[dir="rtl"] .destinations-head{text-align:right}
+html[dir="rtl"] .oman-strip div{border-left:0;border-right:1px solid #edf1f5}
+html[dir="rtl"] .oman-strip div:first-child{border-right:0}
+@media(max-width:700px){html[dir="rtl"] .oman-strip div{border-right:0}}
+
+
+/* =========================================================
+   REAL OMAN PLACES — INFORMATION PAGES
+   ========================================================= */
+.place-page{
+  background:#f6f9fc;
+  min-height:100vh;
+}
+.place-hero{
+  position:relative;
+  min-height:460px;
+  overflow:hidden;
+  display:flex;
+  align-items:end;
+}
+.place-hero img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.place-hero:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(3,25,58,.06) 20%,rgba(3,25,58,.84) 100%);
+}
+.place-hero-content{
+  position:relative;
+  z-index:2;
+  width:min(1120px,calc(100% - 36px));
+  margin:0 auto;
+  padding:70px 0 48px;
+  color:#fff;
+}
+.place-breadcrumb{
+  display:inline-flex;
+  padding:8px 12px;
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:999px;
+  background:rgba(2,23,52,.45);
+  backdrop-filter:blur(10px);
+  font-size:11px;
+  font-weight:800;
+  margin-bottom:15px;
+}
+.place-hero h1{
+  margin:0;
+  font-size:clamp(38px,6vw,66px);
+  letter-spacing:-.035em;
+}
+.place-hero p{
+  max-width:760px;
+  margin:12px 0 0;
+  color:rgba(255,255,255,.88);
+  font-size:15px;
+  line-height:1.9;
+}
+.place-wrap{
+  width:min(1120px,calc(100% - 36px));
+  margin:0 auto;
+  padding:34px 0 80px;
+}
+.place-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.7fr) minmax(260px,.8fr);
+  gap:22px;
+  align-items:start;
+}
+.place-card{
+  background:#fff;
+  border:1px solid #e0e9f1;
+  border-radius:22px;
+  padding:26px;
+  box-shadow:0 12px 35px rgba(4,43,86,.06);
+}
+.place-card + .place-card{margin-top:18px}
+.place-card h2{
+  margin:0 0 12px;
+  color:#082b62;
+  font-size:24px;
+}
+.place-card h3{
+  color:#0a5f9d;
+  font-size:16px;
+  margin:22px 0 7px;
+}
+.place-card p,.place-card li{
+  color:#53657b;
+  line-height:1.95;
+  font-size:14px;
+}
+.place-card ul{padding-right:20px;margin:8px 0 0}
+.place-facts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.place-fact{
+  border:1px solid #e5edf4;
+  border-radius:15px;
+  padding:14px;
+  background:linear-gradient(135deg,#f7fbff,#fff);
+}
+.place-fact strong{
+  display:block;
+  color:#082b62;
+  font-size:12px;
+}
+.place-fact span{
+  display:block;
+  color:#6c7d91;
+  font-size:11px;
+  margin-top:4px;
+}
+.place-source{
+  border:1px solid #dbe9f2;
+  background:#eef8fd;
+}
+.place-source a{
+  color:#056aa5;
+  font-weight:900;
+  text-decoration:none;
+}
+.place-source a:hover{text-decoration:underline}
+.place-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:20px;
+}
+.place-back{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:0 16px;
+  border-radius:12px;
+  background:#06255f;
+  color:#fff;
+  text-decoration:none;
+  font-weight:900;
+  font-size:12px;
+}
+.place-market{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:0 16px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ff7b00,#f35b00);
+  color:#fff;
+  text-decoration:none;
+  font-weight:900;
+  font-size:12px;
+}
+.place-nav{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:16px;
+}
+.place-nav a{
+  color:#426078;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:900;
+}
+.place-notfound{
+  text-align:center;
+  padding:100px 20px;
+}
+.place-notfound h1{color:#082b62}
+.place-photo-link{display:block;text-decoration:none;color:inherit}
+.hero-photo-main.place-photo-link{height:100%}
+.hero-photo-mini.place-photo-link{cursor:pointer}
+.hero-photo-main.place-photo-link:hover img,
+.hero-photo-mini.place-photo-link:hover img{transform:scale(1.035)}
+.hero-photo-main img,.hero-photo-mini img{transition:transform .45s ease}
+@media(max-width:850px){
+  .place-grid{grid-template-columns:1fr}
+  .place-hero{min-height:410px}
+  .place-hero-content{padding-bottom:35px}
+}
+@media(max-width:560px){
+  .place-wrap{width:min(100% - 24px,1120px)}
+  .place-card{padding:20px;border-radius:18px}
+  .place-facts{grid-template-columns:1fr}
+  .place-hero h1{font-size:40px}
+}
+
+.place-page .header{position:relative;z-index:20}
+.place-page .lang-switch{margin-inline-start:4px}
+.place-page .navlinks{flex-wrap:wrap}
+@media(max-width:900px){.place-page .navlinks{display:none}.place-page .actions{margin-inline-start:auto}}
+
+
+/* =========================================================
+   INTERACTIVE CATEGORY CARDS
+   ========================================================= */
+.interactive-categories{
+  position:relative;
+  padding:70px 0 76px;
+  background:
+    radial-gradient(circle at 4% 8%,rgba(11,131,198,.07),transparent 25%),
+    #f7fafc;
+}
+.interactive-title{
+  align-items:flex-end;
+  margin-bottom:22px;
+}
+.interactive-title h2{margin-top:5px}
+.interactive-title p{
+  margin:7px 0 0;
+  color:#6a7b8f;
+  font-size:13px;
+}
+.categories-all{
+  display:inline-flex;
+  align-items:center;
+  min-height:40px;
+  padding:0 14px;
+  border-radius:11px;
+  background:#fff;
+  border:1px solid #dce7ef;
+  color:#075d9d;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:900;
+}
+.interactive-category-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+.interactive-category-card{
+  position:relative;
+  min-height:126px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:20px;
+  border-radius:20px;
+  border:1px solid #e0e9f1;
+  background:#fff;
+  color:inherit;
+  text-decoration:none;
+  overflow:hidden;
+  box-shadow:0 10px 28px rgba(4,43,86,.055);
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.interactive-category-card:before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:linear-gradient(180deg,#0b83c6,#ff7a00);
+  opacity:.0;
+  transition:opacity .2s ease;
+}
+.interactive-category-card:hover{
+  transform:translateY(-5px);
+  border-color:#c9deeb;
+  box-shadow:0 20px 42px rgba(4,43,86,.12);
+}
+.interactive-category-card:hover:before{opacity:1}
+.category-icon{
+  flex:0 0 52px;
+  width:52px;height:52px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  background:linear-gradient(135deg,#eef8fd,#fff5ea);
+  font-size:25px;
+}
+.interactive-category-card h3{
+  margin:0;
+  color:#082b62;
+  font-size:14px;
+}
+.interactive-category-card p{
+  margin:6px 0 0;
+  color:#728297;
+  font-size:10px;
+  line-height:1.55;
+}
+.category-arrow{
+  margin-inline-start:auto;
+  color:#0b70aa;
+  font-size:19px;
+  font-weight:900;
+  transition:transform .2s ease;
+}
+html[dir="rtl"] .category-arrow{transform:rotate(180deg)}
+.interactive-category-card:hover .category-arrow{transform:translateX(3px)}
+html[dir="rtl"] .interactive-category-card:hover .category-arrow{transform:rotate(180deg) translateX(3px)}
+.category-opening{
+  transform:scale(.98) translateY(0)!important;
+  box-shadow:0 6px 18px rgba(4,43,86,.09)!important;
+}
+@media(max-width:1050px){
+  .interactive-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  .interactive-categories{padding:50px 0 58px}
+  .interactive-title{align-items:flex-start;gap:12px;flex-direction:column}
+  .interactive-category-grid{grid-template-columns:1fr}
+  .interactive-category-card{min-height:108px}
+}

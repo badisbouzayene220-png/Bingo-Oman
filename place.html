@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BINGO Oman — اكتشف عُمان</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="logo.css">
+</head>
+<body class="place-page">
+
+<header class="header">
+  <nav class="nav container">
+    <a class="main-logo" href="index.html" aria-label="BINGO Oman">
+      <img class="logo-image" src="logo-ar.png" alt="BINGO Oman">
+    </a>
+    <div class="navlinks">
+      <a href="index.html" data-i18n="home">الرئيسية</a>
+      <a href="marketplace.html" data-i18n="marketplace">السوق</a>
+      <a href="store.html" data-i18n="store">المتجر</a>
+      <a href="auctions.html" data-i18n="auctions">المزادات</a>
+      <a href="tenders.html" data-i18n="tenders">المناقصات</a>
+    </div>
+    <div class="actions">
+      <a class="login" href="login.html" data-i18n="login">تسجيل الدخول</a>
+      <button id="langSwitch" class="lang-switch" type="button">EN</button>
+    </div>
+  </nav>
+</header>
+
+<main id="placeApp"></main>
+
+<footer>
+  <div class="container">
+    <p id="footerText">© BINGO Oman — معلومات الأماكن مبنية على مصادر رسمية موثوقة.</p>
+  </div>
+</footer>
+
+<script src="language.js"></script>
+<script>
+const places = {
+  muscat: {
+    ar:{
+      title:"مسقط", subtitle:"العاصمة وواجهة عُمان البحرية والتاريخية", region:"محافظة مسقط", type:"مدينة / محافظة",
+      facts:["العاصمة السياسية والإدارية","واجهة بحرية وميناء تاريخي","مواقع تراثية وثقافية بارزة","تجمع بين التراث والعمارة الحديثة"],
+      intro:"مسقط هي عاصمة سلطنة عُمان ومركز مهم للنشاط الإداري والاقتصادي والتجاري. وتتميز بتاريخ بحري عريق، وبمزيج واضح بين المعالم التاريخية والعمارة الحديثة والواجهة البحرية.",
+      highlights:["تضم معالم ثقافية وتراثية بارزة، من بينها المتحف الوطني ودار الأوبرا السلطانية.","تنتشر فيها الأسواق التقليدية والممرات البحرية والمواقع التاريخية.","تُعد نقطة مهمة لاستكشاف الساحل والوجهات البحرية القريبة."],
+      source:"المتحف الوطني العُماني + تجربة عُمان"
+    },
+    en:{
+      title:"Muscat", subtitle:"Oman's capital and historic maritime gateway", region:"Muscat Governorate", type:"City / Governorate",
+      facts:["Political and administrative capital","Historic maritime waterfront","Major cultural and heritage sites","A blend of heritage and modern architecture"],
+      intro:"Muscat is the capital of the Sultanate of Oman and an important administrative, economic and commercial centre. It is known for its long maritime history and for combining historic landmarks with modern architecture and a distinctive waterfront.",
+      highlights:["It is home to major cultural and heritage sites, including the National Museum and Royal Opera House Muscat.","Traditional markets, historic quarters and waterfront areas form an important part of the city.","Muscat is also a gateway to nearby coastal and marine destinations."],
+      source:"National Museum of Oman + Experience Oman"
+    },
+    image:"assets/oman/muscat-grand-mosque.jpg",
+    sourceUrl:"https://experienceoman.om/en/destinations/muscat",
+    museumUrl:"https://www.nm.gov.om/en/collection/gift/architectural-heritage"
+  },
+  nizwa: {
+    ar:{
+      title:"نزوى", subtitle:"مدينة التاريخ والعلم والأسواق التراثية", region:"محافظة الداخلية", type:"ولاية / مدينة تاريخية",
+      facts:["مركز تاريخي في عُمان الداخلية","قلعة نزوى وبرجها الدائري من أبرز المعالم","سوق تراثي وحرف ومنتجات محلية","ارتباط قوي بالتاريخ السياسي والفكري"],
+      intro:"تُعد نزوى من أهم المدن التاريخية في عُمان. ويبرز فيها مجمع القلعة والحصن بوصفه شاهدًا على الدور السياسي والإداري والفكري الذي لعبته المدينة عبر فترات طويلة.",
+      highlights:["يذكر المتحف الوطني أن قلعة نزوى وحصنها كيانان معماريان متجاوران ومختلفان.","كان الحصن مركزًا للحكم والإقامة الرسمية ومركزًا سياسيًا وإداريًا وفكريًا لنزوى لأكثر من ألف عام.","بُني البرج الدائري الضخم في القرن السابع عشر، واستغرق إنجازه قرابة 12 عامًا."],
+      source:"المتحف الوطني العُماني — التراث المعماري"
+    },
+    en:{
+      title:"Nizwa", subtitle:"A historic centre of knowledge, heritage and traditional markets", region:"Al Dakhiliyah Governorate", type:"Wilayat / Historic city",
+      facts:["Historic centre in inland Oman","Nizwa Fort and its circular tower are key landmarks","Traditional souq, crafts and local products","Strong political and intellectual heritage"],
+      intro:"Nizwa is one of Oman's most important historic cities. Its fort and castle complex reflects the city's long political, administrative and intellectual role across many periods of Omani history.",
+      highlights:["The National Museum describes Nizwa Fort and Castle as two adjacent but distinct architectural entities.","The castle served as a centre of rule and official residence, as well as a political, administrative and intellectual centre of Nizwa for more than a thousand years.","Its massive circular tower was built in the 17th century and took about 12 years to complete."],
+      source:"National Museum of Oman — Architectural Heritage"
+    },
+    image:"assets/oman/nizwa-fort.jpg",
+    sourceUrl:"https://www.nm.gov.om/en/collection/gift/architectural-heritage",
+    museumUrl:"https://www.nm.gov.om/about-the-museum"
+  },
+  salalah: {
+    ar:{
+      title:"صلالة", subtitle:"بوابة ظفار وأرض اللبان والخريف", region:"محافظة ظفار", type:"مدينة / عاصمة ظفار",
+      facts:["عاصمة محافظة ظفار","مرتبطة بتاريخ اللبان وتجارته","موسم الخريف من أبرز خصائصها","شواطئ وطبيعة متنوعة"],
+      intro:"صلالة هي عاصمة محافظة ظفار في جنوب عُمان، وتشتهر بتاريخ اللبان وبطبيعتها التي تتغير بشكل واضح خلال موسم الخريف، عندما تتحول أجزاء واسعة من المنطقة إلى مشاهد خضراء.",
+      highlights:["ترتبط المنطقة بإنتاج وتجارة اللبان، وتوجد فيها شجرة اللبان وموائلها الطبيعية.","من يونيو إلى سبتمبر يحول موسم الخريف المشهد الطبيعي إلى واحات خضراء، مع أجواء أكثر اعتدالًا.","خارج موسم الخريف توفر صلالة شواطئ وأنشطة طبيعية وثقافية متنوعة."],
+      source:"تجربة عُمان — صلالة"
+    },
+    en:{
+      title:"Salalah", subtitle:"The gateway to Dhofar, frankincense and Khareef", region:"Dhofar Governorate", type:"City / Capital of Dhofar",
+      facts:["Capital of Dhofar Governorate","Deeply connected to frankincense history and trade","Khareef season is a defining feature","Diverse beaches and natural landscapes"],
+      intro:"Salalah is the capital of Dhofar Governorate in southern Oman. It is renowned for its frankincense heritage and for the dramatic transformation of its landscape during the Khareef season, when parts of the region become green and misty.",
+      highlights:["The region is closely associated with frankincense production and trade and its natural habitats.","From June to September, Khareef transforms the landscape into green scenery with milder conditions.","Outside Khareef, Salalah offers beaches and a wide range of natural and cultural experiences."],
+      source:"Experience Oman — Salalah"
+    },
+    image:"assets/oman/salalah-beach.jpg",
+    sourceUrl:"https://booking.experienceoman.om/en/destination/sll/salalah",
+    museumUrl:"https://www.nm.gov.om/en/about-the-museum"
+  },
+  sur: {
+    ar:{
+      title:"صور", subtitle:"مدينة ساحلية عريقة مرتبطة بصناعة السفن", region:"محافظة جنوب الشرقية", type:"مدينة ساحلية",
+      facts:["مدينة ساحلية تاريخية","معروفة بصناعة السفن التقليدية","قريبة من وجهات طبيعية وساحلية","صلة قوية بالموروث البحري العُماني"],
+      intro:"صور مدينة ساحلية في جنوب الشرقية، وتشتهر بحرفة بناء السفن التقليدية. وتجمع المنطقة بين الموروث البحري والوجهات الطبيعية والساحلية.",
+      highlights:["تشتهر صور تقليديًا بصناعة السفن.","من الوجهات المرتبطة بالمنطقة رأس الجنز ووادي شاب وجزيرة مصيرة.","يمثل الموروث البحري جزءًا مهمًا من هوية المنطقة."],
+      source:"تجربة عُمان — صور"
+    },
+    en:{
+      title:"Sur", subtitle:"A historic coastal city shaped by shipbuilding", region:"South Al Sharqiyah Governorate", type:"Coastal city",
+      facts:["Historic coastal city","Known for traditional shipbuilding","Close to natural and coastal destinations","Strong maritime heritage"],
+      intro:"Sur is a historic coastal city in South Al Sharqiyah and is especially known for traditional shipbuilding. The area combines maritime heritage with a rich range of natural and coastal destinations.",
+      highlights:["Sur has a long-standing tradition of building wooden boats and ships.","Nearby destinations include Ras Al Jinz, Wadi Shab and Masirah Island.","Maritime heritage remains an important part of the identity of the region."],
+      source:"Experience Oman — Sur"
+    },
+    image:"assets/oman/sur.jpg",
+    sourceUrl:"https://experienceoman.om/de/destinationen/al-sharqiyah-south/sur",
+    museumUrl:"https://www.nm.gov.om/en/about-the-museum"
+  },
+  "jabal-akhdar": {
+    ar:{
+      title:"الجبل الأخضر", subtitle:"مرتفعات الحجر ومدرجات زراعية ومناخ مميز", region:"محافظة الداخلية", type:"منطقة جبلية",
+      facts:["جزء من سلسلة جبال الحجر","ارتفاع يصل إلى 2,980 مترًا","هضبة سيق على ارتفاع 2,000 متر","مدرجات وبساتين للرمان والمشمش والورد"],
+      intro:"الجبل الأخضر جزء من سلسلة جبال الحجر في محافظة الداخلية، ويشتهر بالمدرجات الزراعية والوديان والبساتين، إضافة إلى مناخه الأكثر اعتدالًا مقارنة بالمناطق المنخفضة.",
+      highlights:["يصل ارتفاع الجبل الأخضر إلى 2,980 مترًا، بينما تقع هضبة سيق على نحو 2,000 متر فوق مستوى البحر.","تشتهر المنطقة بالوديان والمدرجات الزراعية.","تنمو فيها محاصيل مثل الرمان والمشمش والورد."],
+      source:"تجربة عُمان — الجبل الأخضر"
+    },
+    en:{
+      title:"Jabal Akhdar", subtitle:"The Al Hajar highlands, terraces and mountain orchards", region:"Al Dakhiliyah Governorate", type:"Mountain region",
+      facts:["Part of the Al Hajar Mountains","Reaches 2,980 metres","Saiq Plateau sits around 2,000 metres","Terraces and orchards of pomegranate, apricot and rose"],
+      intro:"Jabal Akhdar forms part of the Al Hajar Mountains in Al Dakhiliyah. It is known for its agricultural terraces, valleys and orchards, as well as a cooler climate than Oman's lowlands.",
+      highlights:["Jabal Akhdar reaches 2,980 metres, while Saiq Plateau is around 2,000 metres above sea level.","The area is known for valleys and terraced agriculture.","Crops include pomegranates, apricots and roses."],
+      source:"Experience Oman — Jabal Akhdar"
+    },
+    image:"assets/oman/jabal-akhdar.jpg",
+    sourceUrl:"https://booking.experienceoman.om/en/destination/jak",
+    museumUrl:"https://www.nm.gov.om/en/about-the-museum"
+  }
+};
+
+const key = new URLSearchParams(location.search).get("place") || "muscat";
+const place = places[key];
+const app = document.getElementById("placeApp");
+
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function lang(){return (window.BingoLang && window.BingoLang.get()) || localStorage.getItem("bingo-language") || "ar";}
+
+function render(){
+  if(!place){
+    app.innerHTML=`<section class="place-notfound place-wrap"><h1>${lang()==="ar"?"المكان غير موجود":"Place not found"}</h1><p>${lang()==="ar"?"اختر وجهة من الصفحة الرئيسية.":"Choose a destination from the homepage."}</p><a class="place-back" href="index.html">${lang()==="ar"?"العودة للرئيسية":"Back to home"}</a></section>`;
+    return;
+  }
+  const l=lang(), d=place[l];
+  document.documentElement.lang=l;
+  document.documentElement.dir=l==="ar"?"rtl":"ltr";
+  document.title=`BINGO Oman — ${d.title}`;
+
+  app.innerHTML=`
+  <section class="place-hero">
+    <img src="${esc(place.image)}" alt="${esc(d.title)}">
+    <div class="place-hero-content">
+      <span class="place-breadcrumb">🇴🇲 ${esc(d.region)} • ${esc(d.type)}</span>
+      <h1>${esc(d.title)}</h1>
+      <p>${esc(d.subtitle)}</p>
+    </div>
+  </section>
+  <section class="place-wrap">
+    <div class="place-nav">
+      <a href="index.html">${l==="ar"?"← العودة إلى اكتشف عُمان":"← Back to Discover Oman"}</a>
+      <a href="marketplace.html">${l==="ar"?"اذهب إلى السوق المحلي →":"Go to local marketplace →"}</a>
+    </div>
+    <div class="place-grid">
+      <div>
+        <article class="place-card">
+          <h2>${l==="ar"?"عن ":"About "}${esc(d.title)}</h2>
+          <p>${esc(d.intro)}</p>
+          <h3>${l==="ar"?"أبرز ما يميز المكان":"Highlights"}</h3>
+          <ul>${d.highlights.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+        </article>
+        <article class="place-card">
+          <h2>${l==="ar"?"معلومات موثوقة":"Trusted information"}</h2>
+          <p>${l==="ar"
+            ?"نريد في BINGO Oman أن تكون صفحة المكان أكثر من مجرد صورة؛ لذلك نعرض معلومات مختصرة قابلة للتحقق، مع إسنادها إلى مصادر رسمية أو سياحية موثوقة."
+            :"At BINGO Oman, a place page should be more than a photo. We present concise, verifiable information and attribute it to official or trusted tourism sources."}</p>
+        </article>
+      </div>
+      <aside>
+        <article class="place-card">
+          <h2>${l==="ar"?"حقائق سريعة":"Quick facts"}</h2>
+          <div class="place-facts">${d.facts.map((x,i)=>`<div class="place-fact"><strong>${i+1}</strong><span>${esc(x)}</span></div>`).join("")}</div>
+        </article>
+        <article class="place-card place-source">
+          <h2>${l==="ar"?"المصادر":"Sources"}</h2>
+          <p><strong>${l==="ar"?"المصدر الرئيسي:":"Primary source:"}</strong><br>${esc(d.source)}</p>
+          <p><a href="${esc(place.sourceUrl)}" target="_blank" rel="noopener">${l==="ar"?"قراءة المصدر الأصلي ↗":"Read original source ↗"}</a></p>
+          <p><a href="${esc(place.museumUrl)}" target="_blank" rel="noopener">${l==="ar"?"المتحف الوطني العُماني ↗":"National Museum of Oman ↗"}</a></p>
+        </article>
+        <div class="place-actions">
+          <a class="place-market" href="marketplace.html">${l==="ar"?"تصفح السوق في عُمان":"Browse the Oman marketplace"}</a>
+          <a class="place-back" href="index.html">${l==="ar"?"العودة":"Back"}</a>
+        </div>
+      </aside>
+    </div>
+  </section>`;
+  document.getElementById("footerText").textContent=l==="ar"
+    ?"© BINGO Oman — معلومات الأماكن مبنية على مصادر رسمية موثوقة."
+    :"© BINGO Oman — Place information is based on trusted official sources.";
+}
+function refreshAfterLanguage(){
+  setTimeout(render,20);
+}
+document.addEventListener("DOMContentLoaded",()=>{
+  render();
+  const old=window.BingoLang && window.BingoLang.toggle;
+  const btn=document.getElementById("langSwitch");
+  if(btn) btn.onclick=()=>{ if(window.BingoLang) window.BingoLang.toggle(); refreshAfterLanguage(); };
+});
+</script>
+</body>
+</html>
