@@ -11,6 +11,7 @@
 .advanced{background:#fff;border:1px solid #e4e8ef;border-radius:18px;padding:18px;margin-bottom:22px;box-shadow:0 6px 20px #092a8208}
 .filters{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:9px}.filters input,.filters select{width:100%;box-sizing:border-box;padding:11px;border:1px solid #d9e0ea;border-radius:10px;background:#fff}.filter-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:11px}.near-btn{border:1px solid #d9e0ea;background:#fff;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.near-btn.active{background:#092a82;color:#fff}.extra{display:none;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:10px}.extra.show{display:grid}.range{display:grid;grid-template-columns:1fr 1fr;gap:7px}.resultsbar{display:flex;justify-content:space-between;align-items:center;margin:12px 0}.distance{font-size:10px;color:#69778b}.ad-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}.ad-strip a{border-radius:15px;overflow:hidden;min-height:90px;background:#eef2f7;display:block}.ad-strip img{width:100%;height:100%;min-height:90px;object-fit:cover}@media(max-width:900px){.filters{grid-template-columns:1fr 1fr}.extra.show{grid-template-columns:1fr 1fr}.ad-strip{grid-template-columns:1fr}}@media(max-width:550px){.filters,.extra.show{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="characters.css">
 </head>
 <body>
 <div class="topbar"><div class="container"><span>🇴🇲 Oman’s marketplace</span><div><a href="tenders.html">Business & Tenders</a><b>•</b><a href="auctions.html">Live Auctions</a></div></div></div>
@@ -88,4 +89,5 @@ $('cat').onchange=()=>{const c=categories.find(x=>x.id===$('cat').value);$('extr
 $('nearBtn').onclick=()=>{if(!navigator.geolocation){alert('Location is not supported by this browser.');return}navigator.geolocation.getCurrentPosition(p=>{myLat=p.coords.latitude;myLng=p.coords.longitude;$('nearBtn').classList.add('active');$('nearText').textContent='Location enabled';$('sort').value='near';render()},e=>alert('Please allow location access in your browser to find nearby listings.'));};
 load();
 </script>
+<script src="characters.js"></script>
 </body></html>

@@ -15,6 +15,7 @@
 @media(max-width:1000px){.admin-stats{grid-template-columns:repeat(3,1fr)}.admin-layout{grid-template-columns:1fr}.admin-side{position:static;display:flex;overflow:auto;gap:5px}.admin-side button{white-space:nowrap;width:auto}.admin-table{display:block;overflow:auto;white-space:nowrap}}
 @media(max-width:600px){.admin-stats{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.admin-hero{align-items:flex-start;flex-direction:column}}
 </style>
+<link rel="stylesheet" href="characters.css">
 </head>
 <body>
 <header class="header"><div class="container nav">
@@ -255,4 +256,5 @@ document.querySelectorAll('.list-filter').forEach(b=>b.onclick=()=>{document.que
 $('oppSearch').oninput=renderOpps;document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
 document.addEventListener('DOMContentLoaded',init);
 document.querySelectorAll('.order-filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.order-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');orderFilter=b.dataset.filter;renderOrders()}));document.getElementById('newProduct')?.addEventListener('click',newProduct);document.getElementById('productForm')?.addEventListener('submit',saveProduct);</script>
+<script src="characters.js"></script>
 </body></html>

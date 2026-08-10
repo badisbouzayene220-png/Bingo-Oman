@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="logo.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script><script src="supabase-client.js"></script><script src="auth.js"></script><script src="language.js"></script>
+<link rel="stylesheet" href="characters.css">
 </head>
 <body>
 <div class="topbar"><div class="container"><span>🇴🇲 Oman’s marketplace</span><div><a href="tenders.html">Business & Tenders</a><b>•</b><a href="auctions.html">Live Auctions</a></div></div></div>
@@ -39,4 +40,5 @@ const money=v=>Number(v||0).toLocaleString('en-OM',{minimumFractionDigits:3,maxi
     <a class="btn primary" style="width:100%;margin-top:18px" href="opportunity.html?type=tender&id=${encodeURIComponent(x.id)}">View & submit offer</a></div></article>`).join('');
 })();
 </script>
+<script src="characters.js"></script>
 </body></html>

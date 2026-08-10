@@ -49,6 +49,7 @@
   .sticker-choice img{height:115px}
 }
 </style>
+<link rel="stylesheet" href="characters.css">
 </head>
 <body>
 <header class="header"><div class="container nav"><a class="logo" href="index.html"><img src="logo-en.png" alt="BINGO Oman"></a><button class="hamb" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button><nav class="navlinks" id="navlinks"><a href="index.html">Home</a><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></nav><div class="actions"></div></div></header>
@@ -148,4 +149,5 @@ document.addEventListener('click',e=>{if($('emojiPicker').classList.contains('op
 function subscribeToMessages(){if(globalChannel)sb.removeChannel(globalChannel);globalChannel=sb.channel('user-messages-'+currentUser.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},async payload=>{if(payload.new?.conversation_id===currentConversation){await loadMessages();await markMessagesRead();}await loadConversations();}).subscribe();}
 $('chatForm').addEventListener('submit',async e=>{e.preventDefault();await sendMessage($('messageInput').value);});$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('chatForm').requestSubmit();}});
 (async()=>{currentUser=await BingoAuth.getUser();if(!currentUser){location.href='login.html?next='+encodeURIComponent(location.href);return;}await loadConversations();subscribeToMessages();const requested=params.get('conversation');if(requested&&conversationCache.some(c=>c.id===requested))await openConversation(requested);})();
-</script></body></html>
+</script><script src="characters.js"></script>
+</body></html>
