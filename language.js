@@ -80,7 +80,33 @@
       account: "Account",
       create_account: "Create account",
       dashboard: "Dashboard",
-      buy_sell_trade: "Buy • Sell • Trade"
+      buy_sell_trade: "Buy • Sell • Trade",
+      store: "Store",
+      cart_label: "Cart",
+      all_categories: "All categories",
+      featured: "Featured",
+      price_low: "Price: low to high",
+      price_high: "Price: high to low",
+      newest: "Newest",
+      view_place: "View place",
+      dest_muscat_meta: "Muscat • Capital",
+      dest_muscat_title: "Sultan Qaboos Grand Mosque",
+      dest_muscat_desc: "Capital • Business • Shopping • Services",
+      dest_nizwa_meta: "Al Dakhiliyah • Nizwa",
+      dest_nizwa_title: "Nizwa Fort",
+      dest_nizwa_desc: "Heritage • Souq • Property • Opportunities",
+      dest_muttrah_meta: "Muscat • Muttrah",
+      dest_muttrah_title: "Muttrah Souq",
+      dest_muttrah_desc: "Trade • Gifts • Local products",
+      dest_salalah_meta: "Dhofar • Salalah",
+      dest_salalah_title: "Salalah",
+      dest_salalah_desc: "Sea • Khareef • Tourism",
+      dest_sur_meta: "South Al Sharqiyah • Sur",
+      dest_sur_title: "Sur",
+      dest_sur_desc: "Sea • Boats • Trade",
+      dest_jabal_meta: "Al Dakhiliyah • Jabal Akhdar",
+      dest_jabal_title: "Jabal Akhdar",
+      dest_jabal_desc: "Mountains • Farms • Local experiences"
     },
 
     ar: {
@@ -152,7 +178,33 @@
       account: "الحساب",
       create_account: "إنشاء حساب",
       dashboard: "لوحة التحكم",
-      buy_sell_trade: "شراء • بيع • تداول"
+      buy_sell_trade: "شراء • بيع • تداول",
+      store: "المتجر",
+      cart_label: "السلة",
+      all_categories: "كل التصنيفات",
+      featured: "مميز",
+      price_low: "السعر: من الأقل إلى الأعلى",
+      price_high: "السعر: من الأعلى إلى الأقل",
+      newest: "الأحدث",
+      view_place: "عرض المكان",
+      dest_muscat_meta: "مسقط • العاصمة",
+      dest_muscat_title: "جامع السلطان قابوس الأكبر",
+      dest_muscat_desc: "العاصمة • الأعمال • التسوق • الخدمات",
+      dest_nizwa_meta: "الداخلية • نزوى",
+      dest_nizwa_title: "قلعة نزوى",
+      dest_nizwa_desc: "تراث • سوق • عقارات • فرص",
+      dest_muttrah_meta: "مسقط • مطرح",
+      dest_muttrah_title: "سوق مطرح",
+      dest_muttrah_desc: "تجارة • هدايا • منتجات محلية",
+      dest_salalah_meta: "ظفار • صلالة",
+      dest_salalah_title: "صلالة",
+      dest_salalah_desc: "البحر • الخريف • السياحة",
+      dest_sur_meta: "جنوب الشرقية • صور",
+      dest_sur_title: "صور",
+      dest_sur_desc: "البحر • القوارب • التجارة",
+      dest_jabal_meta: "الداخلية • الجبل الأخضر",
+      dest_jabal_title: "الجبل الأخضر",
+      dest_jabal_desc: "جبال • مزارع • تجارب محلية"
     }
   };
 
@@ -361,7 +413,82 @@
     "↻ Refresh": "↻ تحديث",
 
     "Home": "الرئيسية",
-    "New to BINGO?": "جديد في BINGO؟"
+    "New to BINGO?": "جديد في BINGO؟",
+    "Products made for your marketplace.": "منتجات مصممة لسوقك.",
+    "Search by category, specifications and location across Oman.": "ابحث حسب التصنيف والمواصفات والموقع في جميع أنحاء عُمان.",
+    "Your messages will appear here.": "ستظهر رسائلك هنا.",
+    "Select a conversation": "اختر محادثة",
+    "Send": "إرسال",
+    "Shop": "تسوق",
+    "Place order": "تأكيد الطلب",
+    "Open an auction to see the full details and place your bid.": "افتح المزاد لرؤية التفاصيل الكاملة وتقديم مزايدتك.",
+    "Open a tender to read its requirements and submit your offer.": "افتح المناقصة لقراءة المتطلبات وتقديم عرضك.",
+    "Use my current location": "استخدم موقعي الحالي",
+    "Nearest": "الأقرب",
+    "Search by category": "البحث حسب التصنيف",
+    "View marketplace →": "عرض السوق ←",
+    "Real places. Local people. Better deals.": "أماكن حقيقية. أشخاص محليون. عروض أفضل.",
+    "All Oman areas": "جميع مناطق عُمان",
+    "Store": "المتجر",
+    "My Orders": "طلباتي",
+    "Continue shopping": "متابعة التسوق",
+    "Checkout": "إتمام الطلب",
+    "Your cart": "سلة المشتريات",
+    "Cart": "السلة",
+    "View product": "عرض المنتج",
+    "Add to cart": "أضف إلى السلة",
+    "Added to cart.": "تمت الإضافة إلى السلة.",
+    "Go to checkout": "الانتقال إلى إتمام الطلب",
+    "Quantity": "الكمية",
+    "available": "متوفر",
+    "Out of stock": "غير متوفر",
+    "Search products…": "ابحث عن المنتجات…",
+    "All categories": "كل التصنيفات",
+    "Featured": "مميز",
+    "Price: low to high": "السعر: من الأقل إلى الأعلى",
+    "Price: high to low": "السعر: من الأعلى إلى الأقل",
+    "Newest": "الأحدث",
+    "Loading products…": "جارٍ تحميل المنتجات…",
+    "No products found": "لم يتم العثور على منتجات",
+    "Browse products": "تصفح المنتجات",
+    "Remove": "حذف",
+    "Place order": "تأكيد الطلب",
+    "Phone number": "رقم الهاتف",
+    "Email (optional)": "البريد الإلكتروني (اختياري)",
+    "Delivery address": "عنوان التوصيل",
+    "Cash on delivery": "الدفع عند الاستلام",
+    "Bank transfer": "تحويل بنكي",
+    "Contact me before payment": "تواصل معي قبل الدفع",
+    "Order notes (optional)": "ملاحظات الطلب (اختياري)",
+    "Your cart is empty.": "سلة المشتريات فارغة.",
+    "Total:": "الإجمالي:",
+    "Discover Oman": "اكتشف عُمان",
+    "Back": "رجوع",
+    "Read original source ↗": "قراءة المصدر الأصلي ↗",
+    "National Museum of Oman ↗": "المتحف الوطني العُماني ↗",
+    "Primary source:": "المصدر الرئيسي:",
+    "Sources": "المصادر",
+    "Quick facts": "حقائق سريعة",
+    "Trusted information": "معلومات موثوقة",
+    "Highlights": "أبرز ما يميز المكان",
+    "Browse the Oman marketplace": "تصفح السوق في عُمان",
+    "Next areas": "المناطق التالية",
+    "All Oman areas": "جميع مناطق عُمان",
+    "Explore area": "استكشف المنطقة",
+    "Muscat Governorate": "محافظة مسقط",
+    "Al Batinah North Governorate": "محافظة شمال الباطنة",
+    "Al Batinah South Governorate": "محافظة جنوب الباطنة",
+    "Al Dakhiliyah Governorate": "محافظة الداخلية",
+    "Al Dhahirah Governorate": "محافظة الظاهرة",
+    "Al Buraimi Governorate": "محافظة البريمي",
+    "Dhofar Governorate": "محافظة ظفار",
+    "North Al Sharqiyah Governorate": "محافظة شمال الشرقية",
+    "South Al Sharqiyah Governorate": "محافظة جنوب الشرقية",
+    "Musandam Governorate": "محافظة مسندم",
+    "Al Wusta Governorate": "محافظة الوسطى",
+    "See area": "عرض المنطقة",
+    "Visit area": "زيارة المنطقة",
+    "View place": "عرض المكان"
   };
 
   const TITLE_MAP = {
@@ -531,15 +658,13 @@
       }
     }
 
-    if (!existing && document.querySelector(".auth")) {
+    if (!existing) {
       existing = document.createElement("button");
       existing.id = "langSwitch";
       existing.type = "button";
       existing.className = "lang-switch floating-language";
       document.body.appendChild(existing);
     }
-
-    if (!existing) return;
 
     if (!existing.dataset.bingoLanguageBound) {
       existing.addEventListener("click", function (event) {
@@ -579,6 +704,7 @@
     changeLogos(lang);
     addSwitch();
     updateButton(lang);
+    document.dispatchEvent(new CustomEvent("bingo-language-changed", {detail:{language:lang}}));
   }
 
   function toggle() {
@@ -594,10 +720,16 @@
      * A small observer re-adds the language button without
      * interfering with the authentication code.
      */
+    let translateTimer = null;
     const observer = new MutationObserver(function () {
       addSwitch();
       updateButton(currentLanguage());
       changeLogos(currentLanguage());
+      clearTimeout(translateTimer);
+      translateTimer = setTimeout(function () {
+        translateDataAttributes(currentLanguage());
+        translateLegacyText(currentLanguage());
+      }, 40);
     });
 
     observer.observe(document.body, {

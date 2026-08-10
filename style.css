@@ -275,7 +275,7 @@ body{background:#f8fafc;color:#17243b}
 .destination-content h3{font-family:"Noto Kufi Arabic",sans-serif;font-size:17px;margin:5px 0 3px;text-shadow:0 3px 14px #0005}
 .destination-content small{font-size:9px;color:#e4edf5}
 .oman-strip{display:grid;grid-template-columns:repeat(6,1fr);margin-top:16px;border:1px solid #e4ebf1;border-radius:17px;overflow:hidden;background:#fff}
-.oman-strip div{padding:13px 12px;text-align:center;border-left:1px solid #edf1f5}.oman-strip div:first-child{border-left:0}
+.oman-strip a{padding:13px 12px;text-align:center;border-left:1px solid #edf1f5;text-decoration:none;display:block}.oman-strip a:first-child{border-left:0}.oman-strip a:hover{background:#f6f8fc}
 .oman-strip b{display:block;font-family:"Noto Kufi Arabic",sans-serif;color:#17345e;font-size:11px}.oman-strip span{font-size:8px;color:#9aa6b6;letter-spacing:.05em}
 
 /* Categories: cleaner photo-led cards */
@@ -632,3 +632,58 @@ html[dir="rtl"] .interactive-category-card:hover .category-arrow{transform:rotat
   .interactive-category-grid{grid-template-columns:1fr}
   .interactive-category-card{min-height:108px}
 }
+
+/* Universal language switch */
+.floating-language{position:fixed;top:16px;right:16px;z-index:10050;box-shadow:0 8px 24px rgba(9,42,130,.14)}
+html[dir="rtl"] .floating-language{right:auto;left:16px}
+
+/* Interactive destination buttons */
+.destination-card{position:relative}
+.destination-button{display:inline-flex;align-items:center;justify-content:center;margin-top:10px;padding:9px 15px;border-radius:10px;background:#fff;color:#092a82;font-size:12px;font-weight:900;box-shadow:0 5px 18px rgba(0,0,0,.12);position:relative;z-index:3}
+.destination-button:hover{transform:translateY(-1px);background:#092a82;color:#fff}
+
+/* Cart drawer */
+.bingo-cart-overlay{position:fixed;inset:0;background:rgba(6,19,43,.42);z-index:10000;opacity:0;visibility:hidden;transition:.2s ease}
+.bingo-cart-overlay.open{opacity:1;visibility:visible}
+.bingo-cart-drawer{position:fixed;top:0;right:0;width:min(410px,92vw);height:100vh;background:#fff;z-index:10001;box-shadow:-12px 0 40px rgba(0,0,0,.18);transform:translateX(105%);transition:.25s ease;display:flex;flex-direction:column}
+.bingo-cart-overlay.open .bingo-cart-drawer{transform:translateX(0)}
+html[dir="rtl"] .bingo-cart-drawer{right:auto;left:0;transform:translateX(-105%)}
+html[dir="rtl"] .bingo-cart-overlay.open .bingo-cart-drawer{transform:translateX(0)}
+.bingo-cart-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #e8edf3}
+.bingo-cart-head h2{margin:0;font-size:20px}
+.bingo-cart-close{border:0;background:#f3f6fa;border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:20px}
+.bingo-cart-items{padding:14px 20px;overflow:auto;flex:1}
+.bingo-cart-item{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #edf0f4}
+.bingo-cart-item img{width:58px;height:58px;border-radius:10px;object-fit:cover}
+.bingo-cart-item-title{font-weight:800;font-size:13px}
+.bingo-cart-item-meta{font-size:12px;color:#697589;margin-top:4px}
+.bingo-cart-remove{border:0;background:none;color:#c33;font-size:12px;cursor:pointer}
+.bingo-cart-foot{padding:18px 20px;border-top:1px solid #e8edf3;background:#fff}
+.bingo-cart-total{display:flex;justify-content:space-between;font-weight:900;font-size:18px;margin-bottom:12px}
+.bingo-cart-empty{text-align:center;color:#697589;padding:40px 10px}
+.bingo-cart-empty a{display:inline-block;margin-top:12px}
+
+.place-all-areas{margin-top:28px;padding:24px;border:1px solid #e4eaf1;border-radius:20px;background:#fff}
+.place-all-areas-head{margin-bottom:16px}
+.place-all-areas-head h2{margin:0 0 6px;color:#06204f}
+.place-all-areas-head p{margin:0;color:#697589}
+.place-area-links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.place-area-links a{padding:12px;border:1px solid #e3e8ef;border-radius:12px;text-decoration:none;background:#fbfcfe;transition:.18s}
+.place-area-links a:hover,.place-area-links a.active{border-color:#092a82;background:#f4f7ff}
+.place-area-links b{display:block;color:#17345e;font-size:13px}
+.place-area-links span{display:block;color:#8995a6;font-size:10px;margin-top:3px}
+html[dir="rtl"] .place-area-links a{text-align:right}
+@media(max-width:900px){.place-area-links{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.place-area-links{grid-template-columns:1fr}}
+
+/* Destination cards: clear image + action button below */
+.destination-card{display:flex;flex-direction:column}
+.destination-card img{height:220px;flex:none}
+.destination-shade{display:none}
+.destination-content{position:static;padding:13px 16px 15px;color:#17345e}
+.destination-content span{color:#7a8798}
+.destination-content h3{color:#092a82;text-shadow:none}
+.destination-content small{display:block;color:#697589;min-height:20px}
+.destination-button{margin-top:10px;width:max-content}
+.destination-large{grid-row:auto}
+@media(max-width:600px){.destination-card img{height:190px}}

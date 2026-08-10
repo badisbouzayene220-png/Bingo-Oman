@@ -133,6 +133,41 @@ const places = {
     image:"assets/oman/jabal-akhdar.jpg",
     sourceUrl:"https://booking.experienceoman.om/en/destination/jak",
     museumUrl:"https://www.nm.gov.om/en/about-the-museum"
+  },
+  "al-batinah-north": {
+    ar:{title:"شمال الباطنة",subtitle:"ساحل نابض بالتجارة والصناعة والمجتمع",region:"محافظة شمال الباطنة",type:"محافظة"},
+    en:{title:"North Al Batinah",subtitle:"A vibrant coastal governorate shaped by trade and industry",region:"Al Batinah North Governorate",type:"Governorate"},
+    image:"assets/oman/mutrah-souq.jpg",sourceUrl:"https://experienceoman.om/"
+  },
+  "al-batinah-south": {
+    ar:{title:"جنوب الباطنة",subtitle:"ساحل وقرى ومواقع طبيعية في شمال عُمان",region:"محافظة جنوب الباطنة",type:"محافظة"},
+    en:{title:"South Al Batinah",subtitle:"Coast, villages and natural landscapes in northern Oman",region:"Al Batinah South Governorate",type:"Governorate"},
+    image:"assets/oman/mutrah-souq.jpg",sourceUrl:"https://experienceoman.om/"
+  },
+  "al-dhahirah": {
+    ar:{title:"الظاهرة",subtitle:"منطقة داخلية تجمع التاريخ والطبيعة والطرق التجارية",region:"محافظة الظاهرة",type:"محافظة"},
+    en:{title:"Al Dhahirah",subtitle:"An inland region shaped by history, nature and trade routes",region:"Al Dhahirah Governorate",type:"Governorate"},
+    image:"assets/oman/nizwa-fort.jpg",sourceUrl:"https://experienceoman.om/"
+  },
+  "al-buraimi": {
+    ar:{title:"البريمي",subtitle:"بوابة شمال غرب عُمان ومركز تاريخي وتجاري",region:"محافظة البريمي",type:"محافظة"},
+    en:{title:"Al Buraimi",subtitle:"A historic and commercial gateway in northwestern Oman",region:"Al Buraimi Governorate",type:"Governorate"},
+    image:"assets/oman/nizwa-fort.jpg",sourceUrl:"https://experienceoman.om/"
+  },
+  "north-al-sharqiyah": {
+    ar:{title:"شمال الشرقية",subtitle:"واحات وقرى جبلية ووجهات طبيعية",region:"محافظة شمال الشرقية",type:"محافظة"},
+    en:{title:"North Al Sharqiyah",subtitle:"Oases, mountain villages and natural destinations",region:"North Al Sharqiyah Governorate",type:"Governorate"},
+    image:"assets/oman/jabal-akhdar.jpg",sourceUrl:"https://experienceoman.om/"
+  },
+  "musandam": {
+    ar:{title:"مسندم",subtitle:"الخلجان والجبال والواجهة البحرية الفريدة",region:"محافظة مسندم",type:"محافظة"},
+    en:{title:"Musandam",subtitle:"Dramatic fjords, mountains and a distinctive coastline",region:"Musandam Governorate",type:"Governorate"},
+    image:"assets/oman/sur.jpg",sourceUrl:"https://experienceoman.om/"
+  },
+  "al-wusta": {
+    ar:{title:"الوسطى",subtitle:"مساحات واسعة وطبيعة ساحلية وصحراوية",region:"محافظة الوسطى",type:"محافظة"},
+    en:{title:"Al Wusta",subtitle:"Wide open spaces with coastal and desert landscapes",region:"Al Wusta Governorate",type:"Governorate"},
+    image:"assets/oman/salalah-beach.jpg",sourceUrl:"https://experienceoman.om/"
   }
 };
 
@@ -199,6 +234,18 @@ function render(){
         </div>
       </aside>
     </div>
+    <nav class="place-all-areas" aria-label="${l==="ar"?"جميع مناطق عُمان":"All Oman areas"}">
+      <div class="place-all-areas-head">
+        <h2>${l==="ar"?"جميع مناطق عُمان":"All Oman areas"}</h2>
+        <p>${l==="ar"?"انتقل مباشرة إلى أي محافظة أو منطقة أخرى.":"Jump directly to another governorate or area."}</p>
+      </div>
+      <div class="place-area-links">
+        ${Object.keys(places).map(k=>{
+          const pd=places[k][l];
+          return `<a class="${k===key?"active":""}" href="place.html?place=${encodeURIComponent(k)}"><b>${esc(pd.title)}</b><span>${esc(pd.region)}</span></a>`;
+        }).join("")}
+      </div>
+    </nav>
   </section>`;
   document.getElementById("footerText").textContent=l==="ar"
     ?"© BINGO Oman — معلومات الأماكن مبنية على مصادر رسمية موثوقة."
@@ -209,10 +256,8 @@ function refreshAfterLanguage(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
   render();
-  const old=window.BingoLang && window.BingoLang.toggle;
-  const btn=document.getElementById("langSwitch");
-  if(btn) btn.onclick=()=>{ if(window.BingoLang) window.BingoLang.toggle(); refreshAfterLanguage(); };
 });
+document.addEventListener("bingo-language-changed", render);
 </script>
 </body>
 </html>
