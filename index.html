@@ -1168,7 +1168,7 @@ document.addEventListener('DOMContentLoaded',loadHomeAds);
     }
     if(skip) skip.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();closeIntro();});
     document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Enter') closeIntro();});
-    setTimeout(closeIntro,4300);
+    setTimeout(closeIntro,30000);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',startBingoIntro); else startBingoIntro();
 })();
@@ -1229,7 +1229,7 @@ document.addEventListener('DOMContentLoaded',loadHomeAds);
       const close=()=>{ if(!intro) return; intro.classList.add('is-hidden'); setTimeout(()=>intro.remove(),700); };
       document.getElementById('skipIntro')?.addEventListener('click',close);
       document.getElementById('introExplore')?.addEventListener('click',close);
-      setTimeout(close,6500);
+
     })();
   </script>
 </body>
