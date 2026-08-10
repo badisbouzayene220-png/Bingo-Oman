@@ -687,3 +687,5 @@ html[dir="rtl"] .place-area-links a{text-align:right}
 .destination-button{margin-top:10px;width:max-content}
 .destination-large{grid-row:auto}
 @media(max-width:600px){.destination-card img{height:190px}}
+
+.travel-top-link{position:absolute;top:72px;right:24px;z-index:20;text-decoration:none;background:#fff;border:1px solid #e4e9f2;color:#092a82;padding:9px 13px;border-radius:999px;font-weight:800;font-size:12px;box-shadow:0 8px 20px #081a4512}.travel-top-link:hover{transform:translateY(-1px)}html[dir="rtl"] .travel-top-link{right:auto;left:24px}@media(max-width:700px){.travel-top-link{top:64px;right:12px}.travel-top-link{font-size:11px}html[dir="rtl"] .travel-top-link{right:auto;left:12px}}

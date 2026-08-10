@@ -21,6 +21,7 @@
       tenders: "Tenders",
       login: "Login",
       register: "Register",
+      travel: "Travel & Services",
 
       hero_eyebrow: "BUY • SELL • TRADE IN OMAN",
       hero_title_1: "Everything you need.",
@@ -119,6 +120,7 @@
       tenders: "المناقصات",
       login: "تسجيل الدخول",
       register: "إنشاء حساب",
+      travel: "السفر والخدمات",
 
       hero_eyebrow: "شراء • بيع • تداول في عُمان",
       hero_title_1: "كل ما تحتاجه.",
