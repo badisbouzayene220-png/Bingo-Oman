@@ -1,8 +1,14 @@
 (function(){
   let refreshing = false;
   async function getSession(){
-    try { const {data,error}=await sb.auth.getSession(); if(error) throw error; return data?.session || null; }
-    catch(e){ console.warn('BINGO auth session:',e); return null; }
+    try {
+      const {data,error}=await sb.auth.getSession();
+      if(error) throw error;
+      return data?.session || null;
+    } catch(e){
+      console.warn('BINGO auth session:',e);
+      return null;
+    }
   }
   async function getUser(){ const session=await getSession(); return session?.user || null; }
   function nameOf(user){ return user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'; }
@@ -118,7 +124,23 @@
   }
   window.BingoAuth={getSession,getUser,refresh};
   document.addEventListener('DOMContentLoaded',()=>{
+    // Initialize the header from the persisted Supabase session on every page.
+    // A short retry handles pages where Supabase restores the session just after DOM load.
     refresh();
-    sb.auth.onAuthStateChange((event)=>{ if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED') setTimeout(refresh,0); });
+    setTimeout(refresh,500);
+    setTimeout(refresh,1500);
+
+    sb.auth.onAuthStateChange((event)=>{
+      if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
+        setTimeout(refresh,0);
+        setTimeout(refresh,300);
+      }
+    });
+
+    // Re-check when the user returns to a tab or navigates back/forward.
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='visible') setTimeout(refresh,0);
+    });
+    window.addEventListener('pageshow',()=>setTimeout(refresh,0));
   });
 })();
