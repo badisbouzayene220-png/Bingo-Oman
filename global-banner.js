@@ -16,19 +16,15 @@
     const box=mount(); clearInterval(timer);
     if(!items.length){box.innerHTML='<div class="bingo-global-empty"></div>';return;}
     const a=items[index%items.length];
-    const mediaUrl=String(a.media_url||'').trim();
+    const resolvedMediaUrl=mediaUrl(a.media_url);
     const media=a.media_type==='video'
-      ? '<video class="bingo-global-media" src="'+esc(mediaUrl)+'" autoplay muted loop playsinline preload="auto"></video>'
-      : '<img class="bingo-global-media" src="'+esc(mediaUrl)+'" alt="'+esc(a.title||'Advertisement')+'" loading="eager" decoding="async">';
-    const cta=a.link_url?'<a class="bingo-global-cta" href="'+esc(a.link_url)+'" target="_blank" rel="noopener noreferrer">'+esc(a.button_text||'Shop Now')+' <span>→</span></a>':'';
-    const content='<div class="bingo-global-content"><div class="eyebrow">BINGO Oman</div><h2>'+esc(a.title||'Special Offer')+'</h2>'+(a.subtitle?'<p>'+esc(a.subtitle)+'</p>':'')+cta+'</div>';
-    box.innerHTML='<div class="bingo-global-slide active">'+media+'<div class="bingo-global-overlay"></div>'+content+'</div>'+(items.length>1
-      ? '<button class="bingo-global-arrow prev" type="button" aria-label="Previous banner">‹</button><button class="bingo-global-arrow next" type="button" aria-label="Next banner">›</button><div class="bingo-global-dots">'+items.map((_,i)=>'<button class="bingo-global-dot '+(i===index?'active':'')+'" type="button" aria-label="Banner '+(i+1)+'" data-banner-index="'+i+'"></button>').join('')+'</div><div class="bingo-global-progress"></div>' : '');
+      ? '<video class="bingo-global-media" src="'+esc(resolvedMediaUrl)+'" autoplay muted loop playsinline preload="auto"></video>'
+      : '<img class="bingo-global-media" src="'+esc(resolvedMediaUrl)+'" alt="" loading="eager">';
+    const inner='<div class="bingo-global-slide active">'+media+'</div>';
+    box.innerHTML=a.link_url
+      ? '<a class="bingo-global-click" href="'+esc(a.link_url)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
+      : inner;
     if(items.length>1 && !paused) timer=setInterval(()=>{index=(index+1)%items.length;render();},6000);
-    const mediaEl=box.querySelector('.bingo-global-media');
-    if(mediaEl){
-      mediaEl.addEventListener('error',()=>{mediaEl.classList.add('media-error'); const msg=document.createElement('div'); msg.className='bingo-global-media-error'; msg.textContent='Banner media could not be loaded'; box.querySelector('.bingo-global-slide')?.appendChild(msg);},{once:true});
-    }
     const video=box.querySelector('video'); if(video) video.play().catch(()=>{});
   }
   function go(i){if(!items.length)return;index=(i+items.length)%items.length;render();}
