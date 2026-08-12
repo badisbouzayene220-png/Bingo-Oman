@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  if(location.pathname.endsWith('/admin.html') || location.pathname.endsWith('/ar.html')) return;
+  if(location.pathname.endsWith('/admin.html')) return;
   let items=[], index=0, timer=null;
 
   function esc(s){return String(s??'').replace(/[&<>\'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
@@ -10,9 +10,9 @@
     if(!raw) return '';
     if(/^https?:\/\//i.test(raw) || /^data:/i.test(raw) || raw.startsWith('blob:')) return raw;
     try{
-      if(window.sb && sb.storage && sb.storage.from){
+      if(window.sb && window.sb.storage && window.sb.storage.from){
         const path=raw.replace(/^\/+/, '').replace(/^bingo-banners\//,'');
-        const {data}=sb.storage.from('bingo-banners').getPublicUrl(path);
+        const {data}=window.sb.storage.from('bingo-banners').getPublicUrl(path);
         if(data && data.publicUrl) return data.publicUrl;
       }
     }catch(e){console.warn('BINGO banner URL:',e);}
@@ -52,9 +52,9 @@
 
   async function load(){
     mount();
-    if(!window.sb || !sb.from) return;
+    if(!window.sb || !window.sb.from) return;
     try{
-      const {data,error}=await sb.from('site_banners')
+      const {data,error}=await window.sb.from('site_banners')
         .select('id,media_type,media_url,link_url,sort_order,created_at,starts_at,ends_at,status')
         .eq('status','published')
         .order('sort_order',{ascending:true})
