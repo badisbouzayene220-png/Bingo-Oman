@@ -1,8 +1,8 @@
-.bingo-global-banner-wrap{width:100%;background:#061a50;overflow:hidden;position:relative;z-index:5}
-.bingo-global-banner{position:relative;width:100%;height:clamp(170px,25vw,480px);min-height:170px;background:#061a50;touch-action:pan-y}
+.bingo-global-banner-wrap{width:100%;background:#eef2f7;overflow:hidden;position:relative;z-index:5}
+.bingo-global-banner{position:relative;width:100%;height:clamp(170px,25vw,480px);min-height:170px;background:#eef2f7;touch-action:pan-y}
 .bingo-global-slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .45s ease;display:flex;align-items:center;justify-content:center}
 .bingo-global-slide.active{opacity:1;visibility:visible}
-.bingo-global-media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#061a50}
+.bingo-global-media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#eef2f7}
 .bingo-global-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.68),rgba(0,0,0,.28) 52%,rgba(0,0,0,.03))}
 .bingo-global-content{position:relative;z-index:2;width:min(1180px,calc(100% - 80px));color:#fff;padding:28px 20px}
 .bingo-global-content .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.9;margin-bottom:7px}

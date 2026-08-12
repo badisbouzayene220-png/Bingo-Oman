@@ -255,8 +255,8 @@ async function uploadBannerFile(file){
  if(!file)return null;
  if(file.size>25*1024*1024)throw new Error('File is larger than 25 MB.');
  const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'');
- const path=`${crypto.randomUUID()}.${ext}`;
- const {error}=await sb.storage.from('bingo-banners').upload(path,file,{upsert:false,contentType:file.type||undefined});
+ const path=`banners/${crypto.randomUUID()}.${ext}`;
+ const {error}=await sb.storage.from('bingo-banners').upload(path,file,{upsert:false,cacheControl:'3600',contentType:file.type||((file.name||'').toLowerCase().endsWith('.jpg')?'image/jpeg':(file.name||'').toLowerCase().endsWith('.jpeg')?'image/jpeg':(file.name||'').toLowerCase().endsWith('.png')?'image/png':(file.name||'').toLowerCase().endsWith('.webp')?'image/webp':(file.name||'').toLowerCase().endsWith('.mp4')?'video/mp4':undefined)});
  if(error)throw error;
  const {data}=sb.storage.from('bingo-banners').getPublicUrl(path);
  return data.publicUrl;
