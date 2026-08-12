@@ -16,12 +16,7 @@
   let unreadTimer = null;
 
   function ensureActions(){
-    let actions=document.querySelector('.actions');
-    if(!actions){
-      const header=document.querySelector('header');
-      if(header){ actions=document.createElement('div'); actions.className='actions'; header.querySelector('.nav, .container')?.appendChild(actions); }
-    }
-    if(!actions) return null;
+    const actions=document.querySelector('.actions'); if(!actions) return null;
     let menu=actions.querySelector('.user-menu');
     if(!menu){
       actions.innerHTML='';
