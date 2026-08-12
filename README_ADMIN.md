@@ -20,3 +20,7 @@ where id = 'YOUR_AUTH_USER_ID';
 ```
 
 Do not make users admin from the public website.
+
+
+## Floating Company Ads
+In Admin Center → Company Ads, choose Placement: "Floating ad (character area)". Published ads appear in the floating BINGO widget where the character image used to appear. Ads can have an image/video URL, destination URL, schedule, and sort order.

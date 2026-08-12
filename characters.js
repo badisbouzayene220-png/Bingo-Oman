@@ -1,28 +1,66 @@
 (function(){
-  const C={
-    main:{name:'بينجو',role:'الشخصية الرئيسية',message:'مرحباً بك في BINGO عمان! كيف يمكنني مساعدتك اليوم؟',img:'assets/characters/main.png'},
-    women:{name:'بنجة',role:'التسوق والموضة',message:'اكتشفي الموضة، الجمال، المنزل والمنتجات النسائية بسهولة.',img:'assets/characters/women.png'},
-    trader:{name:'تاجر بنجو',role:'البيع والتجارة',message:'جاهز للبيع؟ أضف إعلانك ووصل إلى مشترين من كل عُمان.',img:'assets/characters/trader.png'},
-    services:{name:'خدمات بنجو',role:'الخدمات والحرف',message:'ابحث عن الخدمات، الوظائف والحرفيين الموثوقين.',img:'assets/characters/services.png'},
-    fun:{name:'لولو بنجو',role:'العروض والترفيه',message:'عروض، خصومات وتنبيهات مميزة بانتظارك!',img:'assets/characters/fun.png'}
-  };
-  const p=location.pathname.toLowerCase();
-  let current='main';
-  if(p.includes('add-listing')||p.includes('dashboard')) current='trader';
-  else if(p.includes('checkout')||p.includes('orders')) current='women';
-  else if(p.includes('messages')||p.includes('admin')||p.includes('opportunity')) current='services';
-  else if(p.includes('auctions')||p.includes('tenders')||p.includes('marketplace')||p.includes('product')||p.includes('listing')||p.includes('store')) current='trader';
-  const html=`<div class="bingo-character-system" id="bingoCharacterSystem"><div class="bingo-character-card"><div class="bingo-character-head"><div class="bingo-character-brand">BINGO <span>OMAN</span></div><button class="bingo-character-close" id="bingoCharacterClose">×</button></div><div class="bingo-character-stage"><img id="bingoCharacterImg" class="bingo-character-img" src="${C[current].img}" alt="${C[current].name}"></div><div class="bingo-character-info"><div id="bingoCharacterName" class="bingo-character-name">${C[current].name}</div><div id="bingoCharacterRole" class="bingo-character-role">${C[current].role}</div></div><div id="bingoCharacterMessage" class="bingo-character-message">${C[current].message}</div><div class="bingo-character-switcher"><button class="bingo-character-btn" data-character="main">الرئيسية</button><button class="bingo-character-btn" data-character="women">النساء</button><button class="bingo-character-btn" data-character="trader">التجارة</button><button class="bingo-character-btn" data-character="services">الخدمات</button><button class="bingo-character-btn" data-character="fun">العروض</button></div></div><button class="bingo-character-minimized" id="bingoCharacterOpen"><img src="${C.main.img}" alt="BINGO"></button></div>`;
+  'use strict';
+  let ads=[], index=0, timer=null, currentAd=null;
+  const esc=s=>String(s??'').replace(/[&<>\'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  function valid(a){
+    const now=Date.now();
+    const start=a.starts_at?new Date(a.starts_at).getTime():-Infinity;
+    const end=a.ends_at?new Date(a.ends_at).getTime():Infinity;
+    return a && a.image_url && start<=now && now<=end;
+  }
+  function mediaHtml(a){
+    const url=esc(a.image_url);
+    const low=String(a.image_url||'').toLowerCase();
+    const isVideo=/\.(mp4|webm|ogg)(\?|#|$)/i.test(low);
+    if(isVideo) return '<video class="bingo-character-ad-media" src="'+url+'" autoplay muted loop playsinline preload="metadata"></video>';
+    return '<img class="bingo-character-ad-media" src="'+url+'" alt="'+esc(a.title||'Company advertisement')+'" loading="eager" decoding="async">';
+  }
   function mount(){
     if(document.getElementById('bingoCharacterSystem')) return;
+    const html='<div class="bingo-character-system" id="bingoCharacterSystem"><div class="bingo-character-card"><div class="bingo-character-head"><div class="bingo-character-brand">BINGO <span>OMAN</span></div><button class="bingo-character-close" id="bingoCharacterClose">×</button></div><div id="bingoCompanyAdStage" class="bingo-character-stage bingo-company-ad-stage"></div><div class="bingo-character-info"><div id="bingoCompanyAdTitle" class="bingo-character-name">إعلانات الشركات</div><div class="bingo-character-role">إعلان ممول</div></div><div id="bingoCompanyAdMessage" class="bingo-character-message">إعلانات الشركات المميزة في BINGO Oman</div></div><button class="bingo-character-minimized" id="bingoCharacterOpen"><span id="bingoCompanyAdMini">AD</span></button></div>';
     document.body.insertAdjacentHTML('beforeend',html);
-    const root=document.getElementById('bingoCharacterSystem'),img=document.getElementById('bingoCharacterImg'),name=document.getElementById('bingoCharacterName'),role=document.getElementById('bingoCharacterRole'),msg=document.getElementById('bingoCharacterMessage');
-    function setCharacter(k){const c=C[k]; if(!c)return; current=k; img.classList.add('is-switching'); setTimeout(()=>{img.src=c.img;img.alt=c.name;name.textContent=c.name;role.textContent=c.role;msg.textContent=c.message;img.classList.remove('is-switching')},180);root.querySelectorAll('.bingo-character-btn').forEach(b=>b.classList.toggle('active',b.dataset.character===k));}
-    setCharacter(current);
-    root.querySelectorAll('.bingo-character-btn').forEach(b=>b.addEventListener('click',()=>setCharacter(b.dataset.character)));
+    const root=document.getElementById('bingoCharacterSystem');
     document.getElementById('bingoCharacterClose').onclick=()=>root.classList.add('minimized');
     document.getElementById('bingoCharacterOpen').onclick=()=>root.classList.remove('minimized');
-    document.querySelectorAll('a[href*="add-listing"],a[href*="register"]').forEach(a=>a.addEventListener('mouseenter',()=>setCharacter('trader')));
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+  function render(){
+    mount();
+    clearInterval(timer);
+    const stage=document.getElementById('bingoCompanyAdStage');
+    const title=document.getElementById('bingoCompanyAdTitle');
+    const msg=document.getElementById('bingoCompanyAdMessage');
+    const mini=document.getElementById('bingoCompanyAdMini');
+    if(!ads.length){
+      stage.innerHTML='<div class="bingo-company-ad-empty">لا توجد إعلانات حالياً</div>';
+      title.textContent='إعلانات الشركات';
+      msg.textContent='يمكنك التحكم بهذه الإعلانات من Admin → Company Ads';
+      mini.textContent='AD';
+      return;
+    }
+    const a=ads[index%ads.length]; currentAd=a;
+    const inner=mediaHtml(a);
+    stage.innerHTML=a.link_url
+      ? '<a class="bingo-company-ad-link" href="'+esc(a.link_url)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>'
+      : inner;
+    title.textContent=a.title||'إعلان شركة';
+    msg.textContent='إعلان شركة عبر BINGO Oman';
+    mini.innerHTML='<span>AD</span>';
+    const video=stage.querySelector('video'); if(video){video.muted=true;video.play().catch(()=>{});}
+    if(ads.length>1) timer=setInterval(()=>{index=(index+1)%ads.length;render();},6000);
+  }
+  async function load(){
+    mount();
+    if(!window.sb || !sb.from) return;
+    try{
+      const {data,error}=await sb.from('company_ads').select('id,title,image_url,link_url,sort_order,starts_at,ends_at,status,placement').eq('status','published').eq('placement','floating_character').order('sort_order',{ascending:true}).order('created_at',{ascending:false});
+      if(error) throw error;
+      ads=(data||[]).filter(valid);
+      render();
+    }catch(e){
+      console.warn('BINGO floating company ads:',e);
+      render();
+    }
+  }
+  function init(){mount();load();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
