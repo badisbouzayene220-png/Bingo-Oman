@@ -45,7 +45,7 @@
 <button data-tab="opportunities">🔨 Auctions & Tenders</button>
 <button data-tab="bids">💰 Bids & Offers</button>
 <button data-tab="users">👥 Users</button>
-<button data-tab="listings">📦 Marketplace</button><button data-tab="orders">🛒 Store Orders</button><button data-tab="products">Products</button><button class="tab-btn" data-tab="ads">📣 Company Ads</button>
+<button data-tab="listings">📦 Marketplace</button><button data-tab="orders">🛒 Store Orders</button><button data-tab="products">Products</button><button class="tab-btn" data-tab="ads">📣 Company Ads</button><button class="tab-btn" data-tab="banners">🖼️ Top Banners</button>
 </aside>
 
 <div class="admin-main">
@@ -77,6 +77,12 @@
 <section class="tab" id="tab-products" style="display:none">
 <div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Store products</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Manage products displayed on the public Store page.</p></div><button class="btn primary" id="newProduct">＋ New product</button></div>
 <div id="productTable"></div></div></section>
+<section class="tab" id="tab-banners" style="display:none">
+<div class="admin-card">
+ <div class="admin-toolbar"><div><h2 style="margin:0">Top advertisement banners</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Upload image or video banners shown at the very top of the Store page. Publish, pause, schedule and reorder them here.</p></div><button class="btn primary" id="newBanner">＋ New banner</button></div>
+ <div class="admin-tabs" style="margin-bottom:12px"><button class="active banner-filter" data-filter="all">All</button><button class="banner-filter" data-filter="draft">Draft</button><button class="banner-filter" data-filter="published">Published</button><button class="banner-filter" data-filter="paused">Paused</button></div>
+ <div id="bannerTable"></div>
+</div></section>
 <section class="tab" id="tab-ads" style="display:none">
 <div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Company advertisements</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Create sponsored banners and publish them on the marketplace.</p></div><button class="btn primary" id="newAd">＋ New company ad</button></div>
 <div class="admin-tabs" style="margin-bottom:12px"><button class="active ad-filter" data-filter="all">All</button><button class="ad-filter" data-filter="draft">Draft</button><button class="ad-filter" data-filter="published">Published</button><button class="ad-filter" data-filter="expired">Expired</button></div>
@@ -101,6 +107,22 @@
 </div><div id="oppMsg"></div><button class="btn primary" style="margin-top:15px">Save opportunity</button></form>
 </div></div>
 
+
+<div class="modal" id="bannerModal"><div class="modalbox"><div class="modalhead"><h2 id="bannerModalTitle">New top banner</h2><button class="close" onclick="closeModal('bannerModal')">×</button></div>
+<form id="bannerForm"><input type="hidden" id="bannerId">
+<div class="form-grid">
+<div><label>Banner headline</label><input id="bannerTitle" required placeholder="Summer promotion"></div>
+<div><label>Subtitle</label><input id="bannerSubtitle" placeholder="Shop our latest offers today"></div>
+<div><label>Button text</label><input id="bannerButton" value="Shop Now" placeholder="Shop Now"></div>
+<div><label>Status</label><select id="bannerStatus"><option value="draft">Draft</option><option value="published">Published</option><option value="paused">Paused</option></select></div>
+<div><label>Media type</label><select id="bannerType"><option value="image">Image</option><option value="video">Video</option></select></div>
+<div><label>Sort order</label><input id="bannerSort" type="number" value="0"></div>
+<div class="full"><label>Upload image / video</label><input id="bannerFile" type="file" accept="image/*,video/mp4,video/webm,video/ogg"><small style="display:block;color:#7b8798;margin-top:5px">Recommended: wide banner image 1920×600 or MP4/WebM video. Max 25 MB.</small></div>
+<div class="full"><label>Or media URL</label><input id="bannerUrl" placeholder="https://…"></div>
+<div class="full"><label>Destination URL (optional)</label><input id="bannerLink" placeholder="https://…"></div>
+<div><label>Start date (optional)</label><input id="bannerStart" type="datetime-local"></div><div><label>End date (optional)</label><input id="bannerEnd" type="datetime-local"></div>
+</div><div id="bannerPreview" style="margin-top:14px"></div><div id="bannerMsg"></div><button class="btn primary" style="margin-top:15px">Save banner</button>
+</form></div></div>
 
 <div class="modal" id="adModal"><div class="modalbox"><div class="modalhead"><h2 id="adModalTitle">New company advertisement</h2><button class="close" onclick="closeModal('adModal')">×</button></div>
 <form id="adForm"><input type="hidden" id="adId"><div class="form-grid">
@@ -145,7 +167,7 @@ async function init(){
  adminUser=user; $('adminApp').style.display='block';
  await refreshAll();
 }
-async function refreshAll(){await loadProducts();await Promise.all([loadOpps(),loadBids(),loadUsers(),loadStats(),loadListings(),loadAds(),loadOverview(),loadOrders()]);}
+async function refreshAll(){await loadProducts();await Promise.all([loadOpps(),loadBids(),loadUsers(),loadStats(),loadListings(),loadAds(),loadBanners(),loadOverview(),loadOrders()]);}
 
 async function loadStats(){
  const {data,error}=await sb.rpc('admin_dashboard_stats');
@@ -212,6 +234,53 @@ async function saveAd(e){
 async function setAd(id,status){const {error}=await sb.rpc('admin_set_company_ad_status',{p_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Advertisement status updated.');await loadAds()}}
 async function deleteAd(id){if(!confirm('Delete this company advertisement?'))return;const {error}=await sb.rpc('admin_delete_company_ad',{p_id:id});if(error)msg(error.message,'err');else{msg('Advertisement deleted.');await loadAds()}}
 
+
+
+let banners=[],bannerFilter='all';
+async function loadBanners(){
+ const {data,error}=await sb.rpc('admin_list_site_banners');
+ if(error){console.error(error);$('bannerTable').innerHTML='<div class="empty">Run setup_banner_ads.sql in Supabase first.</div>';return}
+ banners=data||[];renderBanners();
+}
+function renderBanners(){
+ const rows=banners.filter(x=>bannerFilter==='all'||x.status===bannerFilter);
+ $('bannerTable').innerHTML=rows.length?`<table class="admin-table"><thead><tr><th>Banner</th><th>Media</th><th>Status</th><th>Schedule</th><th>Order</th><th>Actions</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small>${esc(x.subtitle||'')}</small></td><td><span class="pill">${esc(x.media_type)}</span><br><small style="word-break:break-all">${esc(x.media_url)}</small></td><td>${statusPill(x.status)}</td><td>${x.starts_at?fmt(x.starts_at):'Now'} → ${x.ends_at?fmt(x.ends_at):'No end'}</td><td>${x.sort_order}</td><td class="actions-cell"><button class="mini-btn primary" onclick="editBanner('${x.id}')">Edit</button>${x.status==='published'?`<button class="mini-btn" onclick="setBanner('${x.id}','paused')">Pause</button>`:`<button class="mini-btn" onclick="setBanner('${x.id}','published')">Publish</button>`}<button class="mini-btn danger" onclick="deleteBanner('${x.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No top banners.</div>';
+}
+function fillBanner(x){
+ $('bannerId').value=x?.id||'';$('bannerTitle').value=x?.title||'';$('bannerSubtitle').value=x?.subtitle||'';$('bannerButton').value=x?.button_text||'Shop Now';$('bannerStatus').value=x?.status||'draft';$('bannerType').value=x?.media_type||'image';$('bannerSort').value=x?.sort_order??0;$('bannerUrl').value=x?.media_url||'';$('bannerLink').value=x?.link_url||'';$('bannerStart').value=localInput(x?.starts_at||'');$('bannerEnd').value=localInput(x?.ends_at||'');$('bannerFile').value='';$('bannerPreview').innerHTML=x?.media_url?`<div style="border-radius:12px;overflow:hidden;background:#eef2f7;max-height:240px"><${x.media_type==='video'?'video controls muted':'img'} src="${esc(x.media_url)}" style="width:100%;max-height:240px;object-fit:cover"></${x.media_type==='video'?'video':'img'}></div>`:'';
+}
+function newBanner(){fillBanner(null);$('bannerModalTitle').textContent='New top banner';openModal('bannerModal')}
+function editBanner(id){const x=banners.find(b=>b.id===id);if(x){fillBanner(x);$('bannerModalTitle').textContent='Edit top banner';openModal('bannerModal')}}
+async function uploadBannerFile(file){
+ if(!file)return null;
+ if(file.size>25*1024*1024)throw new Error('File is larger than 25 MB.');
+ const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const path=`${crypto.randomUUID()}.${ext}`;
+ const {error}=await sb.storage.from('bingo-banners').upload(path,file,{upsert:false,contentType:file.type||undefined});
+ if(error)throw error;
+ const {data}=sb.storage.from('bingo-banners').getPublicUrl(path);
+ return data.publicUrl;
+}
+async function saveBanner(e){
+ e.preventDefault();
+ const msgBox=$('bannerMsg');msgBox.innerHTML='<div class="notice">Saving banner…</div>';
+ try{
+  let url=$('bannerUrl').value.trim();
+  const file=$('bannerFile').files[0];
+  if(file){
+   const isImage=file.type.startsWith('image/'); const isVideo=['video/mp4','video/webm','video/ogg'].includes(file.type);
+   if(!isImage&&!isVideo)throw new Error('Please upload an image, MP4, WebM or OGG video.');
+   $('bannerType').value=isVideo?'video':'image';url=await uploadBannerFile(file)
+  }
+  const payload={id:$('bannerId').value||null,title:$('bannerTitle').value.trim(),subtitle:$('bannerSubtitle').value.trim()||null,button_text:$('bannerButton').value.trim()||'Shop Now',media_type:$('bannerType').value,media_url:url,link_url:$('bannerLink').value.trim()||null,status:$('bannerStatus').value,sort_order:Number($('bannerSort').value||0),starts_at:$('bannerStart').value?new Date($('bannerStart').value).toISOString():null,ends_at:$('bannerEnd').value?new Date($('bannerEnd').value).toISOString():null};
+  if(!payload.title||!payload.media_url)throw new Error('Title and image/video are required.');
+  const {error}=await sb.rpc('admin_upsert_site_banner',{p_banner:payload});if(error)throw error;
+  closeModal('bannerModal');msg('Top banner saved.');await loadBanners();
+ }catch(err){msgBox.innerHTML='<div class="notice err">'+esc(err.message||String(err))+'</div>'}
+}
+async function setBanner(id,status){const {error}=await sb.rpc('admin_upsert_site_banner',{p_banner:{...banners.find(x=>x.id===id),status}});if(error)msg(error.message,'err');else{msg('Banner status updated.');await loadBanners()}}
+async function deleteBanner(id){if(!confirm('Delete this top banner?'))return;const {error}=await sb.rpc('admin_delete_site_banner',{p_id:id});if(error)msg(error.message,'err');else{msg('Banner deleted.');await loadBanners()}}
+
 async function loadOrders(){const {data,error}=await sb.rpc('admin_list_store_orders');if(error){console.error(error);$('orderTable').innerHTML='<div class="empty">Run the latest setup_store.sql first.</div>';return}orders=data||[];renderOrders()}
 function renderOrders(){let d=orders.filter(o=>orderFilter==='all'||o.status===orderFilter);$('orderTable').innerHTML=d.length?`<table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Contact</th><th>Total</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody>${d.map(o=>`<tr><td><b>${esc(o.order_number)}</b></td><td>${esc(o.customer_name)}<br><small>${esc(o.address)}</small></td><td>${esc(o.phone)}<br><small>${esc(o.email||'')}</small></td><td>${money(o.total)}</td><td>${statusPill(o.status)}</td><td>${fmt(o.created_at)}</td><td><select onchange="updateOrderStatus('${o.id}',this.value)"><option value="pending" ${o.status==='pending'?'selected':''}>Pending</option><option value="confirmed" ${o.status==='confirmed'?'selected':''}>Confirmed</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="shipped" ${o.status==='shipped'?'selected':''}>Shipped</option><option value="delivered" ${o.status==='delivered'?'selected':''}>Delivered</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option></select></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No orders in this filter.</div>'}
 window.updateOrderStatus=async(id,status)=>{const {error}=await sb.rpc('admin_update_store_order_status',{p_order_id:id,p_status:status});if(error)msg(error.message,'err');else{msg('Order status updated.');await loadOrders()}};
@@ -253,7 +322,9 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.query
 document.querySelectorAll('.opp-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.opp-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');oppFilter=b.dataset.filter;renderOpps()});
 document.querySelectorAll('.bid-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.bid-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');bidFilter=b.dataset.filter;renderBids()});
 document.querySelectorAll('.list-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.list-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');listFilter=b.dataset.filter;loadListings()});
-$('oppSearch').oninput=renderOpps;document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
+$('oppSearch').oninput=renderOpps;
+$('newBanner').onclick=newBanner;$('bannerForm').onsubmit=saveBanner;
+document.querySelectorAll('.banner-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.banner-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');bannerFilter=b.dataset.filter;renderBanners()});document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
 document.addEventListener('DOMContentLoaded',init);
 document.querySelectorAll('.order-filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.order-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');orderFilter=b.dataset.filter;renderOrders()}));document.getElementById('newProduct')?.addEventListener('click',newProduct);document.getElementById('productForm')?.addEventListener('submit',saveProduct);</script>
 <script src="characters.js"></script>
