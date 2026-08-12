@@ -21,6 +21,3 @@ Open **Admin Center → Top Banners** to:
 - CTA opens the configured destination
 
 Run `setup_banner_ads.sql` once in Supabase SQL Editor before using the feature.
-
-## Banner display fix
-The banner uploader now preserves the uploaded MIME type, stores files under a dedicated storage folder, accepts storage paths as well as full public URLs, and filters scheduled banners correctly.
