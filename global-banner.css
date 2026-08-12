@@ -1,33 +1,7 @@
-/* BINGO Oman: full-width banner media only. No text, overlay, blue background or controls. */
-.bingo-global-banner-wrap{
-  display:block;width:100%;margin:0;padding:0;overflow:hidden;
-  position:relative;z-index:20;background:transparent;line-height:0;
-}
-.bingo-global-banner{
-  display:block;width:100%;margin:0;padding:0;overflow:hidden;
-  background:transparent;line-height:0;
-}
-.bingo-global-link{
-  display:block;width:100%;margin:0;padding:0;
-  background:transparent;line-height:0;text-decoration:none;
-}
-.bingo-global-media{
-  display:block;width:100%;height:auto;margin:0;padding:0;border:0;
-  background:transparent;line-height:0;
-}
-.bingo-global-banner img.bingo-global-media{
-  width:100%;height:auto;min-height:180px;max-height:560px;
-  object-fit:cover;object-position:center;
-}
-.bingo-global-banner video.bingo-global-media{
-  width:100%;height:auto;min-height:180px;max-height:560px;
-  aspect-ratio:16/5;object-fit:cover;object-position:center;
-}
-@media(max-width:700px){
-  .bingo-global-banner img.bingo-global-media{
-    min-height:150px;max-height:360px;aspect-ratio:16/7;object-fit:cover;
-  }
-  .bingo-global-banner video.bingo-global-media{
-    min-height:150px;max-height:360px;aspect-ratio:16/7;object-fit:cover;
-  }
-}
+.bingo-global-banner-wrap{display:block;width:100%;margin:0;padding:0;overflow:hidden;position:relative;z-index:20;background:transparent;line-height:0}
+.bingo-global-banner{width:100%;margin:0;padding:0;overflow:hidden;background:transparent}
+.bingo-global-slide,.bingo-global-link{display:block;width:100%;margin:0;padding:0;line-height:0;text-decoration:none}
+.bingo-global-media{display:block;width:100%;height:auto;margin:0;padding:0;border:0;background:transparent;object-fit:cover}
+.bingo-global-banner img.bingo-global-media{width:100%;height:auto;max-height:520px;object-fit:cover}
+.bingo-global-banner video.bingo-global-media{width:100%;height:auto;max-height:520px;object-fit:cover}
+@media(max-width:700px){.bingo-global-banner img.bingo-global-media,.bingo-global-banner video.bingo-global-media{max-height:none;aspect-ratio:16/7;object-fit:cover}}
