@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Oman | Messages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="logo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script><script src="global-banner.js" defer></script>
+<script src="auth.js"></script>
+<script src="language.js"></script>
+<style>
+.messages-page{padding:28px 0 50px}.messages-layout{display:grid;grid-template-columns:350px 1fr;gap:18px;min-height:650px}.messages-list,.chat-panel{background:#fff;border:1px solid #e7eaf0;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,.05)}
+.messages-list-head,.chat-head{padding:18px 20px;border-bottom:1px solid #edf0f4}.messages-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.messages-list-head h2,.chat-head h2{margin:0;font-size:20px}.unread-total,.unread-badge{display:inline-flex;align-items:center;justify-content:center;background:#ef4444;color:#fff;font-weight:800;border-radius:999px;min-width:22px;height:22px;padding:0 7px;font-size:11px}.conversation-items{max-height:590px;overflow:auto}.conversation-item{display:flex;align-items:center;gap:12px;width:100%;border:0;border-bottom:1px solid #f0f2f5;background:#fff;text-align:left;padding:14px 16px;cursor:pointer}.conversation-item:hover,.conversation-item.active{background:#f7f9fc}.conversation-avatar,.chat-avatar{width:46px;height:46px;border-radius:50%;flex:0 0 46px;object-fit:cover;background:#eef2f7;display:flex;align-items:center;justify-content:center;font-weight:800;color:#667085;overflow:hidden}.conversation-avatar img,.chat-avatar img{width:100%;height:100%;object-fit:cover}.conversation-main{min-width:0;flex:1}.conversation-top{display:flex;align-items:center;gap:8px}.conversation-top strong{color:#172033;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.conversation-time{font-size:10px;color:#98a2b3;white-space:nowrap}.conversation-main small{display:block;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conversation-main .preview{margin-top:5px;font-size:13px}.conversation-unread{margin-left:auto}.chat-panel{display:flex;flex-direction:column;min-width:0}.chat-head{display:flex;align-items:center;gap:12px}.chat-title{min-width:0}.chat-title h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chat-title p{margin:4px 0 0;color:#667085;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chat-messages{flex:1;padding:22px;overflow:auto;background:#f8fafc;min-height:455px;display:flex;flex-direction:column;gap:10px}.bubble{max-width:min(72%,620px);padding:10px 14px;border-radius:16px;line-height:1.45;white-space:pre-wrap;word-break:break-word}.bubble.mine{align-self:flex-end;background:#ff6b00;color:#fff;border-bottom-right-radius:5px}.bubble.theirs{align-self:flex-start;background:#fff;color:#172033;border:1px solid #e7eaf0;border-bottom-left-radius:5px}.bubble time{display:block;font-size:10px;opacity:.7;margin-top:4px}.chat-form{display:flex;gap:10px;padding:15px;border-top:1px solid #edf0f4;background:#fff}.chat-form textarea{flex:1;resize:none;min-height:46px;max-height:120px;border:1px solid #d8dde6;border-radius:12px;padding:12px;font:inherit}.chat-form button{align-self:stretch;min-width:90px}.empty-chat{margin:auto;text-align:center;color:#667085;padding:30px}.listing-link{color:#ff6b00;font-weight:700;text-decoration:none}.listing-link:hover{text-decoration:underline}
+@media(max-width:800px){.messages-layout{grid-template-columns:1fr}.messages-list{max-height:285px}.conversation-items{max-height:215px}.chat-panel{min-height:620px}.bubble{max-width:85%}.messages-page{padding-top:15px}}
+/* BINGO Emoji + Sticker Picker */
+.chat-form{position:relative}
+.chat-tools{display:flex;align-items:flex-end;gap:8px}
+.emoji-btn{width:46px;height:46px;border:1px solid #d8dde6;border-radius:12px;background:#fff;cursor:pointer;font-size:23px;display:grid;place-items:center}
+.emoji-btn:hover{background:#f7f9fc;border-color:#c8d1df}
+.emoji-picker{display:none;position:absolute;left:15px;bottom:78px;width:min(390px,calc(100% - 30px));background:#fff;border:1px solid #e1e6ee;border-radius:16px;box-shadow:0 18px 55px rgba(15,23,42,.18);padding:12px;z-index:20}
+.emoji-picker.open{display:block}
+.emoji-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.emoji-picker-head strong{font-size:13px;color:#172033}
+.emoji-picker-close{border:0;background:#f4f6f9;border-radius:8px;width:28px;height:28px;cursor:pointer}
+.emoji-tabs{display:flex;gap:6px;border-bottom:1px solid #edf0f4;padding-bottom:8px;margin-bottom:9px}
+.emoji-tab{border:0;background:#f7f9fc;color:#667085;border-radius:9px;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer}
+.emoji-tab.active{background:#eaf0ff;color:#092a82}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-height:180px;overflow:auto}
+.emoji-choice{border:0;background:#fff;border-radius:9px;padding:7px 2px;font-size:22px;cursor:pointer}
+.emoji-choice:hover{background:#f4f7fc}
+.sticker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;max-height:290px;overflow:auto}
+.sticker-choice{border:1px solid #e6eaf1;background:#f8fafc;border-radius:12px;padding:6px;cursor:pointer;text-align:center}
+.sticker-choice:hover{border-color:#ff7900;background:#fff7f0}
+.sticker-choice img{display:block;width:100%;height:135px;object-fit:contain;border-radius:9px}
+.sticker-choice span{display:block;font-size:10px;font-weight:800;color:#172033;padding:5px 2px 2px}
+.bingo-sticker-bubble{max-width:min(320px,78%);padding:7px;background:#fff!important;border:1px solid #e7eaf0!important;border-radius:16px!important}
+.bingo-sticker-bubble img{display:block;width:100%;max-height:300px;object-fit:contain;border-radius:12px}
+@media(max-width:600px){
+  .chat-form{gap:7px}
+  .chat-tools{gap:7px}
+  .emoji-btn{width:42px;height:42px}
+  .chat-form textarea{min-width:0}
+  .sticker-choice img{height:115px}
+}
+</style>
+<link rel="stylesheet" href="characters.css">
+<link rel="stylesheet" href="global-banner.css">
+</head>
+<body>
+<header class="header"><div class="container nav"><a class="logo" href="index.html"><img src="logo-en.png" alt="BINGO Oman"></a><button class="hamb" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button><nav class="navlinks" id="navlinks"><a href="index.html">Home</a><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></nav><div class="actions"><a class="login" href="login.html" data-login-nav>Login</a><a class="btn primary small" href="register.html">Register</a></div></div></header>
+<main class="messages-page"><div class="container"><div class="messages-layout">
+<section class="messages-list"><div class="messages-list-head"><h2>Messages</h2><span id="totalUnread" class="unread-total" style="display:none">0</span></div><div id="conversationList" class="conversation-items"><div class="empty-chat">Loading conversations…</div></div></section>
+<section class="chat-panel"><div id="chatHead" class="chat-head"><div class="chat-avatar">💬</div><div class="chat-title"><h2>Select a conversation</h2><p>Your messages will appear here.</p></div></div><div id="chatMessages" class="chat-messages"><div class="empty-chat">Choose a conversation from the left.</div></div><form id="chatForm" class="chat-form" style="display:none">
+<div id="emojiPicker" class="emoji-picker" aria-hidden="true">
+  <div class="emoji-picker-head"><strong>Emoji &amp; BINGO Stickers</strong><button type="button" class="emoji-picker-close" id="closeEmojiPicker">×</button></div>
+  <div class="emoji-tabs">
+    <button type="button" class="emoji-tab active" id="emojiTab">😊 Emoji</button>
+    <button type="button" class="emoji-tab" id="stickerTab">🎟️ BINGO</button>
+  </div>
+  <div id="emojiGrid" class="emoji-grid"></div>
+  <div id="stickerGrid" class="sticker-grid" style="display:none">
+    <button type="button" class="sticker-choice" data-sticker="bingo_no_deal">
+      <img src="assets/bingo_no_deal.png" alt="BINGO لم نتفق هذه المرة">
+      <span>لم نتفق هذه المرة</span>
+    </button>
+    <button type="button" class="sticker-choice" data-sticker="bingo_success">
+      <img src="assets/bingo_deal.png" alt="BINGO تم الاتفاق">
+      <span>تم الاتفاق 🤝</span>
+    </button>
+  </div>
+</div>
+<div class="chat-tools">
+  <button type="button" class="emoji-btn" id="emojiButton" aria-label="Emoji and BINGO stickers">😊</button>
+  <textarea id="messageInput" placeholder="Write a message…" rows="1" maxlength="4000"></textarea>
+  <button class="btn primary" type="submit">Send</button>
+</div>
+</form></section>
+</div></div></main>
+<script>
+const $=id=>document.getElementById(id);const esc=value=>String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const params=new URLSearchParams(location.search);let currentUser=null,currentConversation=null,globalChannel=null,conversationCache=[];
+function formatTime(value){if(!value)return'';return new Date(value).toLocaleString('en-OM',{dateStyle:'medium',timeStyle:'short'});}function shortTime(value){if(!value)return'';const d=new Date(value),now=new Date();const same=d.toDateString()===now.toDateString();return same?d.toLocaleTimeString('en-OM',{hour:'numeric',minute:'2-digit'}):d.toLocaleDateString('en-OM',{month:'short',day:'numeric'});}function initials(name){const parts=String(name||'User').trim().split(/\s+/).filter(Boolean);return esc((parts[0]?.[0]||'U')+(parts.length>1?(parts[parts.length-1]?.[0]||''):'')).toUpperCase();}
+function avatarHtml(profile,cls='conversation-avatar'){const name=profile?.full_name||profile?.username||'User';return profile?.avatar_url?`<div class="${cls}"><img src="${esc(profile.avatar_url)}" alt="${esc(name)}"></div>`:`<div class="${cls}">${initials(name)}</div>`;}
+async function loadConversations(){
+ const {data,error}=await sb.from('conversations').select('id,listing_id,auction_id,buyer_id,seller_id,created_at').or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`).order('created_at',{ascending:false});
+ if(error){$('conversationList').innerHTML='<div class="empty-chat">Could not load messages.<br><small>'+esc(error.message)+'</small></div>';return;}
+ conversationCache=data||[];if(!conversationCache.length){$('conversationList').innerHTML='<div class="empty-chat">No conversations yet.<br>Open an ad and click “Contact seller”.</div>';$('totalUnread').style.display='none';return;}
+ const otherIds=[...new Set(conversationCache.map(c=>c.buyer_id===currentUser.id?c.seller_id:c.buyer_id).filter(Boolean))];const listingIds=[...new Set(conversationCache.map(c=>c.listing_id).filter(Boolean))];const auctionIds=[...new Set(conversationCache.map(c=>c.auction_id).filter(Boolean))];const conversationIds=conversationCache.map(c=>c.id);
+ const [{data:profiles},{data:listings},{data:auctions},{data:messages}]=await Promise.all([
+   otherIds.length?sb.from('public_profiles').select('id,full_name,username,avatar_url').in('id',otherIds):Promise.resolve({data:[]} ),
+   listingIds.length?sb.from('listings').select('id,title').in('id',listingIds):Promise.resolve({data:[]} ),
+   auctionIds.length?sb.from('auctions').select('id,title').in('id',auctionIds):Promise.resolve({data:[]} ),
+   conversationIds.length?sb.from('messages').select('conversation_id,message,created_at,sender_id,is_read').in('conversation_id',conversationIds).order('created_at',{ascending:false}):Promise.resolve({data:[]} )
+ ]);
+ const profileMap=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));const listingMap=Object.fromEntries((listings||[]).map(x=>[x.id,x.title]));const auctionMap=Object.fromEntries((auctions||[]).map(x=>[x.id,x.title]));const lastMap={},unreadMap={};(messages||[]).forEach(m=>{if(!lastMap[m.conversation_id])lastMap[m.conversation_id]=m;if(m.sender_id!==currentUser.id&&!m.is_read)unreadMap[m.conversation_id]=(unreadMap[m.conversation_id]||0)+1;});
+ const totalUnread=Object.values(unreadMap).reduce((a,b)=>a+b,0);$('totalUnread').textContent=totalUnread;$('totalUnread').style.display=totalUnread?'inline-flex':'none';
+ $('conversationList').innerHTML=conversationCache.map(c=>{const otherId=c.buyer_id===currentUser.id?c.seller_id:c.buyer_id;const p=profileMap[otherId]||{};const last=lastMap[c.id];const name=p.full_name||p.username||'User';const context=c.listing_id?(listingMap[c.listing_id]||'Listing'):c.auction_id?(auctionMap[c.auction_id]||'Auction'):'Conversation';const count=unreadMap[c.id]||0;const active=currentConversation===c.id?' active':'';return `<button class="conversation-item${active}" data-id="${esc(c.id)}">${avatarHtml(p)}<div class="conversation-main"><div class="conversation-top"><strong>${esc(name)}</strong><span class="conversation-time">${shortTime(last?.created_at||c.created_at)}</span>${count?`<span class="unread-badge conversation-unread">${count>99?'99+':count}</span>`:''}</div><small>${esc(context)}</small><small class="preview">${esc(conversationPreview(last?.message||'No messages yet'))}</small></div></button>`;}).join('');
+ document.querySelectorAll('.conversation-item').forEach(btn=>btn.addEventListener('click',()=>openConversation(btn.dataset.id)));
+}
+async function openConversation(id){const conversation=conversationCache.find(c=>c.id===id);if(!conversation)return;currentConversation=id;history.replaceState(null,'','messages.html?conversation='+encodeURIComponent(id));const otherId=conversation.buyer_id===currentUser.id?conversation.seller_id:conversation.buyer_id;const [{data:profile},{data:listing},{data:auction}]=await Promise.all([sb.from('public_profiles').select('full_name,username,avatar_url').eq('id',otherId).maybeSingle(),conversation.listing_id?sb.from('listings').select('id,title').eq('id',conversation.listing_id).maybeSingle():Promise.resolve({data:null}),conversation.auction_id?sb.from('auctions').select('id,title').eq('id',conversation.auction_id).maybeSingle():Promise.resolve({data:null})]);const name=profile?.full_name||profile?.username||'User';const context=listing?.title||auction?.title||'';$('chatHead').innerHTML=`${avatarHtml(profile,'chat-avatar')}<div class="chat-title"><h2>${esc(name)}</h2><p>${context?`<a class="listing-link" href="${conversation.listing_id?'listing.html?id='+encodeURIComponent(conversation.listing_id):'auctions.html'}">${esc(context)}</a>`: 'Conversation'}</p></div>`;$('chatForm').style.display='flex';await loadMessages();await markMessagesRead();await loadConversations();subscribeToMessages();$('messageInput').focus();}
+const BINGO_STICKERS={
+  bingo_no_deal:{src:'assets/bingo_no_deal.png',alt:'BINGO — لم نتفق هذه المرة!'},
+  bingo_success:{src:'assets/bingo_deal.png',alt:'BINGO — تم الاتفاق!'}
+};
+function stickerToken(type){return `[[BINGO_STICKER:${type}]]`;}
+function getBingoStickerType(message){
+  const value=String(message??'').trim();
+  const prefix='[[BINGO_STICKER:';
+  const suffix=']]';
+  if(!value.startsWith(prefix) || !value.endsWith(suffix)) return null;
+  const type=value.slice(prefix.length,-suffix.length);
+  return Object.prototype.hasOwnProperty.call(BINGO_STICKERS,type) ? type : null;
+}
+function renderMessageContent(message){
+  const value=String(message??'');
+  const type=getBingoStickerType(value);
+  if(type){
+    const sticker=BINGO_STICKERS[type];
+    return `<div class="bingo-sticker-bubble"><img src="${sticker.src}" alt="${esc(sticker.alt)}"></div>`;
+  }
+  return esc(value);
+}
+function conversationPreview(message){
+  const value=String(message??'');
+  const type=getBingoStickerType(value);
+  if(type)return type==='bingo_success'?'🎟️ BINGO — تم الاتفاق!':'🎟️ BINGO — لم نتفق هذه المرة!';
+  return value;
+}
+async function loadMessages(){if(!currentConversation)return;const {data,error}=await sb.from('messages').select('id,sender_id,message,is_read,created_at').eq('conversation_id',currentConversation).order('created_at',{ascending:true});if(error){$('chatMessages').innerHTML='<div class="empty-chat">'+esc(error.message)+'</div>';return;}if(!data?.length){$('chatMessages').innerHTML='<div class="empty-chat">No messages yet. Say hello 👋</div>';return;}$('chatMessages').innerHTML=data.map(m=>{const mine=m.sender_id===currentUser.id;return `<div class="bubble ${mine?'mine':''} ${getBingoStickerType(m.message)?'bingo-sticker-wrapper':''} ${!mine?'theirs':''}">${renderMessageContent(m.message)}<time>${formatTime(m.created_at)}</time></div>`;}).join('');const box=$('chatMessages');box.scrollTop=box.scrollHeight;}
+async function markMessagesRead(){if(!currentConversation)return;await sb.from('messages').update({is_read:true}).eq('conversation_id',currentConversation).neq('sender_id',currentUser.id).eq('is_read',false);}
+async function sendMessage(text){if(!currentConversation||!text.trim())return;const {error}=await sb.from('messages').insert({conversation_id:currentConversation,sender_id:currentUser.id,message:text.trim()});if(error){alert('Could not send message: '+error.message);return;}$('messageInput').value='';closeEmojiPicker();await loadMessages();await loadConversations();}
+async function sendBingoSticker(type){if(!currentConversation)return;const token=stickerToken(type);const {error}=await sb.from('messages').insert({conversation_id:currentConversation,sender_id:currentUser.id,message:token});if(error){alert('Could not send BINGO sticker: '+error.message);return;}closeEmojiPicker();await loadMessages();await loadConversations();}
+function closeEmojiPicker(){$('emojiPicker').classList.remove('open');$('emojiPicker').setAttribute('aria-hidden','true');}
+function openEmojiPicker(){$('emojiPicker').classList.add('open');$('emojiPicker').setAttribute('aria-hidden','false');}
+const EMOJIS=['😀','😃','😄','😁','😆','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😎','🤩','🥳','😅','😋','😛','🤗','🤔','🤨','😐','😶','🙄','😏','😣','😥','😮','🤐','😯','😪','😫','🥱','😴','🤤','😌','🤝','👍','👎','👏','🙌','🙏','❤️','🧡','💙','💚','🔥','⭐','✨','🎉','🎊','💯','✅','❌','💰','🛒','📦','🏷️','🎟️','💬'];
+$('emojiGrid').innerHTML=EMOJIS.map(e=>`<button type="button" class="emoji-choice" data-emoji="${e}" aria-label="${e}">${e}</button>`).join('');
+$('emojiButton').addEventListener('click',()=>{$('emojiPicker').classList.contains('open')?closeEmojiPicker():openEmojiPicker();});
+$('closeEmojiPicker').addEventListener('click',closeEmojiPicker);
+$('emojiTab').addEventListener('click',()=>{$('emojiTab').classList.add('active');$('stickerTab').classList.remove('active');$('emojiGrid').style.display='grid';$('stickerGrid').style.display='none';});
+$('stickerTab').addEventListener('click',()=>{$('stickerTab').classList.add('active');$('emojiTab').classList.remove('active');$('emojiGrid').style.display='none';$('stickerGrid').style.display='grid';});
+document.querySelectorAll('.emoji-choice').forEach(btn=>btn.addEventListener('click',()=>{const input=$('messageInput');const start=input.selectionStart??input.value.length;const end=input.selectionEnd??input.value.length;input.value=input.value.slice(0,start)+btn.dataset.emoji+input.value.slice(end);input.focus();input.selectionStart=input.selectionEnd=start+btn.dataset.emoji.length;}));
+document.querySelectorAll('.sticker-choice').forEach(btn=>btn.addEventListener('click',()=>sendBingoSticker(btn.dataset.sticker)));
+document.addEventListener('click',e=>{if($('emojiPicker').classList.contains('open')&&!$('emojiPicker').contains(e.target)&&e.target!==$('emojiButton'))closeEmojiPicker();});
+function subscribeToMessages(){if(globalChannel)sb.removeChannel(globalChannel);globalChannel=sb.channel('user-messages-'+currentUser.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},async payload=>{if(payload.new?.conversation_id===currentConversation){await loadMessages();await markMessagesRead();}await loadConversations();}).subscribe();}
+$('chatForm').addEventListener('submit',async e=>{e.preventDefault();await sendMessage($('messageInput').value);});$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('chatForm').requestSubmit();}});
+(async()=>{currentUser=await BingoAuth.getUser();if(!currentUser){location.href='login.html?next='+encodeURIComponent(location.href);return;}await loadConversations();subscribeToMessages();const requested=params.get('conversation');if(requested&&conversationCache.some(c=>c.id===requested))await openConversation(requested);})();
+</script><script src="characters.js"></script>
+</body></html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Oman | Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="logo.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script><script src="global-banner.js" defer></script><script src="auth.js"></script><script src="language.js"></script>
+<style>
+.advanced{background:#fff;border:1px solid #e4e8ef;border-radius:18px;padding:18px;margin-bottom:22px;box-shadow:0 6px 20px #092a8208}
+.filters{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:9px}.filters input,.filters select{width:100%;box-sizing:border-box;padding:11px;border:1px solid #d9e0ea;border-radius:10px;background:#fff}.filter-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:11px}.near-btn{border:1px solid #d9e0ea;background:#fff;border-radius:10px;padding:10px 13px;font-weight:800;cursor:pointer}.near-btn.active{background:#092a82;color:#fff}.extra{display:none;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:10px}.extra.show{display:grid}.range{display:grid;grid-template-columns:1fr 1fr;gap:7px}.resultsbar{display:flex;justify-content:space-between;align-items:center;margin:12px 0}.distance{font-size:10px;color:#69778b}.ad-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}.ad-strip a{border-radius:15px;overflow:hidden;min-height:90px;background:#eef2f7;display:block}.ad-strip img{width:100%;height:100%;min-height:90px;object-fit:cover}@media(max-width:900px){.filters{grid-template-columns:1fr 1fr}.extra.show{grid-template-columns:1fr 1fr}.ad-strip{grid-template-columns:1fr}}@media(max-width:550px){.filters,.extra.show{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="characters.css">
+<link rel="stylesheet" href="global-banner.css">
+</head>
+<body>
+<div class="topbar"><div class="container"><span>🇴🇲 Oman’s marketplace</span><div><a href="tenders.html">Business & Tenders</a><b>•</b><a href="auctions.html">Live Auctions</a></div></div></div>
+<header class="header"><div class="container nav"><a class="logo" href="index.html"><img src="logo-en.png" alt="BINGO Oman"></a><button class="hamb" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button><nav class="navlinks" id="navlinks"><a href="index.html">Home</a><a class="active" href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></nav><div class="actions"><a class="btn primary small" href="add-listing.html">+ Sell</a></div></div></header>
+<section class="pagehead"><div class="container"><div class="kicker">BINGO MARKETPLACE</div><h1>Find your next deal.</h1><p>Search by category, specifications and location across Oman.</p></div></section>
+<section class="pagebody"><div class="container">
+<div id="ads" class="ad-strip"></div>
+<div class="advanced">
+<div class="filters">
+<input id="search" placeholder="Search listings, brands, models…">
+<select id="cat"><option value="">All categories</option></select>
+<select id="city"><option value="">All Oman</option><option>Muscat</option><option>Seeb</option><option>Salalah</option><option>Sohar</option><option>Nizwa</option><option>Sur</option><option>Ibri</option><option>Rustaq</option><option>Barka</option><option>Al Buraimi</option><option>Other</option></select>
+<select id="condition"><option value="">Any condition</option><option value="new">New</option><option value="used">Used</option><option value="excellent">Excellent</option><option value="good">Good</option></select>
+<select id="sort"><option value="newest">Newest</option><option value="price_low">Price: low to high</option><option value="price_high">Price: high to low</option><option value="near">Nearest</option></select>
+</div>
+<div id="extra" class="extra">
+<input id="brand" placeholder="Brand / Make">
+<input id="model" placeholder="Model">
+<input id="year" type="number" placeholder="Year">
+<div class="range"><input id="minPrice" type="number" placeholder="Min OMR"><input id="maxPrice" type="number" placeholder="Max OMR"></div>
+</div>
+<div class="filter-actions">
+<button class="near-btn" id="nearBtn">📍 Use my location</button>
+<span id="nearText" class="distance"></span>
+<button class="btn primary small" id="searchBtn">Search</button>
+<button class="btn outline small" id="clearBtn">Clear</button>
+</div>
+</div>
+<div class="resultsbar"><div class="market-status" id="status">Loading listings…</div><div class="distance" id="locationStatus"></div></div>
+<div class="grid" id="listings"></div>
+</div></section>
+<footer><div class="container footergrid"><div><img src="logo-en.png" alt="BINGO Oman"><p>Oman’s marketplace to buy, sell, bid and trade.</p></div><div><h4>Explore</h4><a href="marketplace.html">Marketplace</a><a href="store.html">Store</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></div><div><h4>Account</h4><a href="login.html">Login</a><a href="register.html">Create account</a><a href="dashboard.html">Dashboard</a></div><div><h4>BINGO Oman</h4><p class="orangeText">Buy • Sell • Trade</p><small>© 2026 BINGO Oman</small></div></div></footer>
+<script>
+const $ = id => document.getElementById(id);
+let categories=[], allListings=[], myLat=null,myLng=null;
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const km=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=(c-a)*p,y=(d-b)*p;return R*2*Math.atan2(Math.sqrt(Math.sin(x/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2),Math.sqrt(1-Math.sin(x/2)**2-Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2))};
+function attrs(x){return x.attributes||{}}
+async function loadAds(){
+  try{
+    const {data,error}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','marketplace_top').order('sort_order').limit(3);
+    if(error){console.warn('Company ads load error:',error);return}
+    $('ads').innerHTML=(data||[]).map(a=>`<a href="${esc(a.link_url||'#')}" target="_blank" rel="noopener"><img src="${esc(a.image_url)}" alt="${esc(a.title||'Advertisement')}"></a>`).join('');
+  }catch(err){console.warn('Company ads load error:',err)}
+}
+async function load(){
+  $('status').textContent='Loading listings…';
+  try{
+    const [{data:c,error:ce},{data:l,error:le}]=await Promise.all([
+      sb.from('categories').select('id,name_en,name_ar').eq('is_active',true).order('name_en'),
+      sb.from('listings').select('id,title,description,price,city,condition,created_at,category_id,latitude,longitude,attributes,listing_images(image_url,sort_order)').eq('status','published').order('created_at',{ascending:false})
+    ]);
+    if(ce) throw ce;
+    if(le) throw le;
+    categories=c||[];
+    const sel=$('cat');
+    sel.innerHTML='<option value="">All categories</option>'+categories.map(x=>`<option value="${x.id}">${esc(x.name_en)}</option>`).join('');
+    allListings=l||[];
+    await loadAds();
+    render();
+  }catch(err){
+    console.error('Marketplace load error:',err);
+    $('status').textContent='Could not load listings: '+(err?.message||err);
+    $('listings').innerHTML='<div class="empty-state"><h3>Could not load listings</h3><p>Open the browser console for the exact error.</p></div>';
+  }
+}
+
+function render(){const q=$('search').value.trim().toLowerCase(),cat=$('cat').value,city=$('city').value,cond=$('condition').value,brand=$('brand').value.trim().toLowerCase(),model=$('model').value.trim().toLowerCase(),year=Number($('year').value)||null,min=Number($('minPrice').value),max=Number($('maxPrice').value),sort=$('sort').value;
+let d=allListings.map(x=>{const a=attrs(x),text=Object.values(a).join(' ').toLowerCase();return {...x,_a:a,_text:text,_dist:(myLat!=null&&x.latitude!=null)?km(myLat,myLng,Number(x.latitude),Number(x.longitude)):Infinity}})
+.filter(x=>(!q||`${x.title} ${x.description||''} ${x._text}`.toLowerCase().includes(q))&&(!cat||x.category_id===cat)&&(!city||x.city===city)&&(!cond||x.condition===cond)&&(!brand||String(x._a.brand||x._a.make||'').toLowerCase().includes(brand))&&(!model||String(x._a.model||'').toLowerCase().includes(model))&&(!year||Number(x._a.year)===year)&&(!min||Number(x.price)>=min)&&(!max||Number(x.price)<=max));
+if(sort==='price_low')d.sort((a,b)=>a.price-b.price);else if(sort==='price_high')d.sort((a,b)=>b.price-a.price);else if(sort==='near')d.sort((a,b)=>a._dist-b._dist);
+$('status').textContent=`${d.length} listings`;if(myLat!=null)$('locationStatus').textContent='Showing results with location data where available';
+$('listings').innerHTML=d.map(x=>{const imgs=(x.listing_images||[]).sort((a,b)=>a.sort_order-b.sort_order),img=imgs[0]?.image_url,cat=categories.find(c=>c.id===x.category_id),distance=Number.isFinite(x._dist)?`${x._dist.toFixed(1)} km away`:'';return `<article class="card listing-card"><a class="thumb ${img?'has-image':''}" href="listing.html?id=${x.id}"><span class="tag">${esc(cat?.name_en||'Other')}</span>${img?`<img src="${esc(img)}" alt="">`:'<span class="empty-thumb">📦</span>'}</a><div class="cardbody"><h3>${esc(x.title)}</h3><div class="price">${Number(x.price||0).toLocaleString('en-OM',{minimumFractionDigits:3})} OMR</div><div class="meta"><span>📍 ${esc(x.city||'Oman')}</span><span>${esc(distance)}</span></div></div></article>`}).join('')||'<div class="empty-state"><h3>No listings found</h3><p>Try another filter or expand the location.</p></div>'}
+$('cat').onchange=()=>{const c=categories.find(x=>x.id===$('cat').value);$('extra').classList.toggle('show',!!c)};$('searchBtn').onclick=render;$('search').onkeydown=e=>{if(e.key==='Enter')render()};['city','condition','sort','brand','model','year','minPrice','maxPrice'].forEach(id=>$(id).addEventListener('change',render));$('clearBtn').onclick=()=>{['search','brand','model','year','minPrice','maxPrice'].forEach(id=>$(id).value='');['cat','city','condition'].forEach(id=>$(id).value='');$('sort').value='newest';render()};
+$('nearBtn').onclick=()=>{if(!navigator.geolocation){alert('Location is not supported by this browser.');return}navigator.geolocation.getCurrentPosition(p=>{myLat=p.coords.latitude;myLng=p.coords.longitude;$('nearBtn').classList.add('active');$('nearText').textContent='Location enabled';$('sort').value='near';render()},e=>alert('Please allow location access in your browser to find nearby listings.'));};
+load();
+</script>
+<script src="characters.js"></script>
+</body></html>

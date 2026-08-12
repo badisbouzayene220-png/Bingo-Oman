@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>BINGO Oman | Buy • Sell • Trade</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="logo.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script><script src="global-banner.js" defer></script>
+  <script src="auth.js"></script>
+
+  <!-- Language -->
+  <script src="language.js" defer></script>
+
+  <style id="bingo-intro-style">
+    /* =========================================================
+       BINGO OMAN — CINEMATIC INTRO / SPLASH
+       ========================================================= */
+    .bingo-intro{
+      position:fixed;inset:0;z-index:999999;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      background:#03163d;color:#fff;isolation:isolate;
+      opacity:1;visibility:visible;pointer-events:auto;
+      transition:opacity .72s cubic-bezier(.22,.8,.22,1),visibility .72s;
+    }
+    .bingo-intro.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+    .intro-bg{position:absolute;inset:0;background:
+      radial-gradient(circle at 50% 43%,rgba(24,78,157,.28),transparent 34%),
+      radial-gradient(circle at 50% 100%,rgba(255,105,0,.13),transparent 31%),
+      linear-gradient(145deg,#061b4a 0%,#031333 58%,#020e29 100%);z-index:0}
+    .intro-vignette{position:absolute;inset:-12%;z-index:1;background:radial-gradient(ellipse at center,transparent 38%,rgba(0,5,20,.48) 100%);pointer-events:none}
+    .intro-orbit{z-index:1;position:absolute;left:50%;bottom:7.5%;width:min(780px,78vw);height:min(180px,18vw);transform:translateX(-50%);border:1px solid rgba(255,136,25,.20);border-radius:50%;box-shadow:0 0 70px rgba(255,94,0,.08),inset 0 0 40px rgba(255,94,0,.06);opacity:0;animation:orbitIn 1.3s 1.05s ease-out forwards}
+    .intro-orbit:before,.intro-orbit:after{content:"";position:absolute;inset:18% 12%;border:1px solid rgba(255,151,43,.14);border-radius:50%}
+    .intro-orbit:after{inset:38% 27%;border-color:rgba(255,178,73,.24)}
+    .intro-beam{z-index:1;position:absolute;left:50%;bottom:9%;width:3px;height:46%;transform:translateX(-50%);background:linear-gradient(to top,rgba(255,126,0,.55),transparent);filter:blur(2px);opacity:0;animation:beamIn 1.1s 1s ease-out forwards}
+    .intro-beam::after{content:"";position:absolute;left:50%;bottom:0;width:240px;height:70px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,127,0,.52),transparent 70%);filter:blur(8px)}
+    .intro-particles{z-index:1;position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .intro-particles i{position:absolute;width:3px;height:3px;border-radius:50%;background:#ff8a18;box-shadow:0 0 10px #ff7800;opacity:0;animation:particleFloat var(--d) var(--delay) ease-in-out infinite}
+    .intro-particles i:nth-child(1){left:18%;bottom:24%;--d:4.8s;--delay:.4s}.intro-particles i:nth-child(2){left:27%;bottom:18%;--d:5.6s;--delay:1.2s}.intro-particles i:nth-child(3){left:76%;bottom:27%;--d:4.2s;--delay:.8s}.intro-particles i:nth-child(4){left:83%;bottom:17%;--d:5.2s;--delay:1.7s}.intro-particles i:nth-child(5){left:67%;bottom:36%;--d:4.5s;--delay:2s}.intro-particles i:nth-child(6){left:35%;bottom:31%;--d:5.1s;--delay:2.5s}.intro-particles i:nth-child(7){left:12%;bottom:40%;--d:6s;--delay:1.8s}.intro-particles i:nth-child(8){left:89%;bottom:42%;--d:4.7s;--delay:3s}
+
+    .intro-content{position:relative;z-index:2;width:min(620px,92vw);height:100%;min-height:620px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:52px 0 72px}
+    .intro-skip{position:absolute;z-index:20;top:28px;right:28px;display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.30);background:rgba(255,255,255,.07);color:#fff;border-radius:999px;padding:10px 15px;font:700 13px/1 "Inter","Noto Kufi Arabic",sans-serif;cursor:pointer;backdrop-filter:blur(14px);box-shadow:0 8px 28px rgba(0,0,0,.16);transition:.25s ease}
+    .intro-skip:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.48);transform:translateY(-1px)}
+    .intro-skip span{font-size:18px;line-height:1}
+
+    .intro-logo-wrap{position:relative;width:min(390px,67vw);aspect-ratio:1;display:grid;place-items:center;animation:logoEnter 1.25s cubic-bezier(.16,1,.3,1) .1s both}
+    .intro-logo-wrap::before{content:"";position:absolute;width:72%;height:72%;border-radius:50%;background:radial-gradient(circle,rgba(255,104,0,.22),transparent 68%);filter:blur(25px);animation:logoGlow 2.6s ease-in-out infinite}
+    .intro-logo-wrap::after{content:"";position:absolute;inset:4%;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 70%,rgba(255,144,38,.16) 80%,transparent 92%);filter:blur(1px);animation:spinGlow 7s linear infinite}
+    .intro-logo{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 28px 45px rgba(0,0,0,.45));animation:logoFloat 4.8s ease-in-out 1.3s infinite}
+    .intro-logo-shine{position:absolute;z-index:3;top:6%;left:-45%;width:32%;height:88%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.70),transparent);filter:blur(5px);opacity:0;animation:shineSweep 2.4s 1.35s ease-in-out 2}
+
+    .intro-copy{position:relative;margin-top:-10px;animation:copyEnter .8s cubic-bezier(.2,.8,.2,1) .75s both}
+    .intro-kicker{font:800 11px/1 "Inter",sans-serif;letter-spacing:.22em;color:#ff8a16;text-transform:uppercase;margin-bottom:12px;text-shadow:0 0 18px rgba(255,111,0,.22)}
+    .intro-title{margin:0;font-family:"Noto Kufi Arabic",Tahoma,Arial,sans-serif;font-size:clamp(23px,4.3vw,36px);font-weight:900;line-height:1.45;letter-spacing:-.035em;color:#fff;text-shadow:0 8px 30px rgba(0,0,0,.30)}
+    .intro-title .flash{display:inline-block;color:#ff8215;position:relative}
+    .intro-title .flash::after{content:"";position:absolute;inset:-5px -10px;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.72) 50%,transparent 70%);transform:translateX(-120%);animation:textFlash 2.8s 1.9s ease-in-out infinite;mix-blend-mode:screen}
+    .intro-subtitle{margin:8px 0 0;color:#dce6f7;font:600 clamp(14px,2.5vw,18px)/1.6 "Inter",sans-serif;letter-spacing:.01em}
+    .intro-subtitle b{color:#ff8a16}
+
+    .intro-actions{width:min(440px,82vw);display:grid;gap:12px;margin-top:28px;animation:actionsEnter .8s cubic-bezier(.2,.8,.2,1) 1.15s both}
+    .intro-btn{min-height:54px;border-radius:18px;padding:13px 22px;display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font:900 14px/1 "Noto Kufi Arabic","Inter",sans-serif;letter-spacing:.03em;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,background .22s ease;border:1px solid transparent}
+    .intro-btn:hover{transform:translateY(-3px)}
+    .intro-btn.primary{background:linear-gradient(135deg,#ff9d13,#ff4d08);color:#fff;box-shadow:0 14px 35px rgba(255,86,0,.30),0 0 0 1px rgba(255,182,72,.22) inset}
+    .intro-btn.primary:hover{box-shadow:0 18px 42px rgba(255,86,0,.40),0 0 0 1px rgba(255,205,128,.30) inset}
+    .intro-btn.secondary{background:rgba(3,22,61,.74);color:#fff;border-color:rgba(255,128,21,.68);box-shadow:0 12px 30px rgba(0,0,0,.20),0 0 22px rgba(255,95,0,.08) inset;backdrop-filter:blur(12px)}
+    .intro-btn.secondary:hover{background:rgba(8,37,82,.88)}
+    .intro-arrow{font-size:22px;line-height:1;direction:ltr}
+    .intro-note{margin-top:14px;color:#7f94b8;font:600 10px/1.5 "Inter",sans-serif;letter-spacing:.08em;text-transform:uppercase;animation:copyEnter .8s 1.45s both}
+
+    @keyframes logoEnter{0%{opacity:0;transform:translateY(42px) scale(.68) rotate(-4deg);filter:blur(12px)}55%{opacity:1;transform:translateY(-8px) scale(1.035) rotate(.6deg);filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+    @keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes logoGlow{0%,100%{opacity:.55;transform:scale(.88)}50%{opacity:1;transform:scale(1.08)}}
+    @keyframes spinGlow{to{transform:rotate(360deg)}}
+    @keyframes shineSweep{0%{left:-45%;opacity:0}12%{opacity:.85}45%,100%{left:115%;opacity:0}}
+    @keyframes textFlash{0%,35%{transform:translateX(-120%);opacity:0}48%{opacity:1}70%,100%{transform:translateX(120%);opacity:0}}
+    @keyframes copyEnter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes actionsEnter{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes orbitIn{from{opacity:0;transform:translateX(-50%) scale(.65)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+    @keyframes beamIn{from{opacity:0;height:0}to{opacity:.8;height:46%}}
+    @keyframes particleFloat{0%{opacity:0;transform:translateY(20px) scale(.5)}20%{opacity:.9}80%{opacity:.65}100%{opacity:0;transform:translateY(-120px) translateX(18px) scale(1.25)}}
+
+    @media(max-width:700px){
+      .intro-content{min-height:100%;padding:50px 0 55px}
+      .intro-skip{top:17px;right:15px;padding:9px 13px;font-size:12px}
+      .intro-logo-wrap{width:min(320px,69vw)}
+      .intro-copy{margin-top:-2px}
+      .intro-title{font-size:clamp(21px,6vw,29px)}
+      .intro-subtitle{font-size:13px}
+      .intro-actions{margin-top:23px;width:min(390px,86vw)}
+      .intro-btn{min-height:52px;border-radius:16px}
+      .intro-orbit{bottom:6%;width:95vw;height:18vw}
+      .intro-beam{bottom:8%;height:38%}
+    }
+    @media(prefers-reduced-motion:reduce){.intro-logo-wrap,.intro-logo,.intro-copy,.intro-actions,.intro-note,.intro-orbit,.intro-beam,.intro-particles i,.intro-title .flash::after{animation:none!important}.intro-logo-wrap{opacity:1}.intro-copy,.intro-actions,.intro-note{opacity:1;transform:none}}
+  </style>
+
+<link rel="stylesheet" href="characters.css">
+<link rel="stylesheet" href="global-banner.css">
+</head>
+
+<body>
+  <!-- =========================
+       BINGO INTRO
+       ========================= -->
+  <div id="bingoIntro" class="bingo-intro" aria-label="BINGO Oman introduction">
+    <div class="intro-bg"></div>
+    <div class="intro-vignette"></div>
+    <div class="intro-particles" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="intro-beam" aria-hidden="true"></div>
+    <div class="intro-orbit" aria-hidden="true"></div>
+
+    <button id="skipIntro" class="intro-skip" type="button" aria-label="Skip introduction">
+      <span data-intro-en="Skip" data-intro-ar="تخطي">تخطي</span><span>›</span>
+    </button>
+
+    <div class="intro-content">
+      <div class="intro-logo-wrap">
+        <img src="assets/bingo-oman-intro.png" alt="BINGO Oman" class="intro-logo">
+        <span class="intro-logo-shine" aria-hidden="true"></span>
+      </div>
+
+      <div class="intro-copy">
+        <div class="intro-kicker">OMAN'S MARKETPLACE</div>
+        <h1 class="intro-title" data-intro-title>
+          كل ما تحتاجه في <span class="flash">عُمان</span>، في مكان واحد
+        </h1>
+        <p class="intro-subtitle" data-intro-subtitle>
+          Everything you need in <b>Oman</b> — all in one place.
+        </p>
+      </div>
+
+      <div class="intro-actions">
+        <a class="intro-btn primary" href="travel.html">
+          <span data-intro-discover>اكتشف عُمان</span><span class="intro-arrow">‹</span>
+        </a>
+        <button id="introExplore" class="intro-btn secondary" type="button">
+          <span>BINGO OMAN</span><span class="intro-arrow">›</span>
+        </button>
+      </div>
+      <div class="intro-note">BUY • SELL • TRADE • DISCOVER</div>
+    </div>
+  </div>
+
+
+  <!-- =========================
+       TOP BAR
+  ========================== -->
+
+  <div class="topbar">
+    <div class="container topbar-inner">
+
+      <span data-i18n="oman_marketplace">
+        🇴🇲 Oman's marketplace
+      </span>
+
+      <div class="top-links">
+        <a href="tenders.html" data-i18n="business_tenders">
+          Business & Tenders
+        </a>
+
+        <b>•</b>
+
+        <a href="auctions.html" data-i18n="live_auctions">
+          Live Auctions
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
+  <header class="header">
+
+    <div class="container nav">
+
+      <!-- LOGO -->
+      <a class="main-logo" href="index.html" aria-label="BINGO Oman">
+
+        <img
+          id="headerLogo"
+          class="logo-image"
+          src="logo-en.png"
+          alt="BINGO Oman"
+        >
+
+      </a>
+
+
+      <!-- MOBILE MENU -->
+      <button
+        class="hamb"
+        id="hambButton"
+        type="button"
+        aria-label="Menu"
+      >
+        ☰
+      </button>
+
+
+      <!-- NAVIGATION -->
+      <nav class="navlinks" id="navlinks">
+
+        <a
+          class="active"
+          href="index.html"
+          data-i18n="home"
+        >
+          Home
+        </a>
+
+        <a
+          href="marketplace.html"
+          data-i18n="marketplace"
+        >
+          Marketplace
+        </a>
+
+        <a href="store.html">Store</a>
+
+        <a
+          href="auctions.html"
+          data-i18n="auctions"
+        >
+          Auctions
+        </a>
+
+        <a
+          href="tenders.html"
+          data-i18n="tenders"
+        >
+          Tenders
+        </a>
+
+      </nav>
+
+
+      <!-- ACTIONS -->
+      <div class="actions">
+
+        <!-- LANGUAGE BUTTON -->
+        <button
+          id="langSwitch"
+          class="lang-switch"
+          type="button"
+        >
+          العربية
+        </button>
+
+
+        <a
+          class="login"
+          href="login.html"
+          data-i18n="login"
+        >
+          Login
+        </a>
+
+
+        <a
+          class="btn primary small"
+          href="register.html"
+          data-i18n="register"
+        >
+          Register
+        </a>
+
+      </div>
+
+    </div>
+
+  <a class="travel-top-link" href="travel.html">✈️ <span data-i18n="travel">السفر والخدمات</span></a></header>
+
+
+  <!-- =========================
+       HERO
+  ========================== -->
+
+  <section class="hero">
+
+    <div class="container hero-grid">
+
+      <div class="hero-content">
+
+        <div class="eyebrow">
+          <i></i>
+
+          <span data-i18n="hero_eyebrow">
+            BUY • SELL • TRADE IN OMAN
+          </span>
+
+        </div>
+
+
+        <h1>
+
+          <span data-i18n="hero_title_1">
+            Everything you need.
+          </span>
+
+          <br>
+
+          <span data-i18n="hero_title_2">
+            One place.
+          </span>
+
+        </h1>
+
+
+        <p
+          class="lead"
+          data-i18n="hero_description"
+        >
+          Discover products, services, auctions and tenders across Oman.
+          Find great deals or put your own listing in front of buyers.
+        </p>
+
+
+        <!-- SEARCH -->
+
+        <form
+          class="searchbar"
+          id="searchForm"
+        >
+
+          <span class="searchicon">
+            ⌕
+          </span>
+
+
+          <input
+            id="q"
+            type="search"
+            data-i18n-placeholder="search_placeholder"
+            placeholder="What are you looking for?"
+          >
+
+
+          <select id="location">
+
+            <option
+              value="all"
+              data-i18n="all_oman"
+            >
+              All Oman
+            </option>
+
+            <option
+              value="muscat"
+              data-i18n="muscat"
+            >
+              Muscat
+            </option>
+
+            <option
+              value="seeb"
+              data-i18n="seeb"
+            >
+              Seeb
+            </option>
+
+            <option
+              value="salalah"
+              data-i18n="salalah"
+            >
+              Salalah
+            </option>
+
+            <option
+              value="sohar"
+              data-i18n="sohar"
+            >
+              Sohar
+            </option>
+
+            <option
+              value="nizwa"
+              data-i18n="nizwa"
+            >
+              Nizwa
+            </option>
+
+            <option
+              value="sur"
+              data-i18n="sur"
+            >
+              Sur
+            </option>
+
+          </select>
+
+
+          <button
+            class="btn primary"
+            type="submit"
+            data-i18n="search"
+          >
+            Search
+          </button>
+
+        </form>
+
+
+        <!-- POPULAR -->
+
+        <div class="popular">
+
+          <span data-i18n="popular">
+            Popular:
+          </span>
+
+          <a
+            href="marketplace.html?category=cars"
+            data-i18n="cars"
+          >
+            Cars
+          </a>
+
+          <a
+            href="marketplace.html?category=phones"
+            data-i18n="phones"
+          >
+            Phones
+          </a>
+
+          <a
+            href="marketplace.html?category=property"
+            data-i18n="properties"
+          >
+            Properties
+          </a>
+
+          <a
+            href="marketplace.html?category=furniture"
+            data-i18n="furniture"
+          >
+            Furniture
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <!-- HERO PHOTO -->
+      <div class="hero-art oman-hero-photo">
+        <a class="hero-photo-main place-photo-link" href="place.html?place=muscat" aria-label="تعرف على مسقط">
+          <img src="assets/oman/muscat-grand-mosque.jpg" alt="Sultan Qaboos Grand Mosque in Muscat" fetchpriority="high">
+          <div class="hero-photo-overlay"></div>
+          <div class="hero-photo-copy">
+            <span class="photo-location">🇴🇲 MUSCAT, OMAN</span>
+            <strong>عُمان تبدأ من هنا</strong>
+            <small>Real places. Local people. Better deals.</small>
+          </div>
+        </a>
+        <a class="hero-photo-mini mini-nizwa place-photo-link" href="place.html?place=nizwa">
+          <img src="assets/oman/nizwa-fort.jpg" alt="Nizwa Fort">
+          <span><b>Nizwa</b><small>Heritage & Souq</small></span>
+        </a>
+        <a class="hero-photo-mini mini-salalah place-photo-link" href="place.html?place=salalah">
+          <img src="assets/oman/salalah-beach.jpg" alt="Salalah beach">
+          <span><b>Salalah</b><small>Beach & Khareef</small></span>
+        </a>
+        <div class="hero-stat"><b>11+</b><span>محافظة ومدينة</span></div>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       EXPLORE
+  ========================== -->
+
+  <section class="section">
+
+    <div class="container">
+
+      <div class="sectiontitle">
+
+        <div>
+
+          <div
+            class="kicker"
+            data-i18n="explore_bingo"
+          >
+            EXPLORE BINGO
+          </div>
+
+          <h2 data-i18n="what_are_you_looking_for">
+            What are you looking for?
+          </h2>
+
+        </div>
+
+
+        <a
+          href="marketplace.html"
+          data-i18n="view_marketplace"
+        >
+          View marketplace →
+        </a>
+
+      </div>
+
+
+      <div class="grid">
+
+        <!-- CARS -->
+
+        <a
+          class="card"
+          href="marketplace.html?category=cars"
+        >
+
+          <div class="thumb category-photo">
+            <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=85" alt="Cars and vehicles" loading="lazy">
+          </div>
+
+          <div class="cardbody">
+
+            <h3 data-i18n="cars_vehicles">
+              Cars & Vehicles
+            </h3>
+
+            <p
+              class="meta"
+              data-i18n="find_next_ride"
+            >
+              Find your next ride
+            </p>
+
+          </div>
+
+        </a>
+
+
+        <!-- ELECTRONICS -->
+
+        <a
+          class="card"
+          href="marketplace.html?category=electronics"
+        >
+
+          <div class="thumb category-photo">
+            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=85" alt="Electronics" loading="lazy">
+          </div>
+
+          <div class="cardbody">
+
+            <h3 data-i18n="electronics">
+              Electronics
+            </h3>
+
+            <p
+              class="meta"
+              data-i18n="phones_laptops"
+            >
+              Phones, laptops & more
+            </p>
+
+          </div>
+
+        </a>
+
+
+        <!-- PROPERTY -->
+
+        <a
+          class="card"
+          href="marketplace.html?category=property"
+        >
+
+          <div class="thumb category-photo">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85" alt="Property" loading="lazy">
+          </div>
+
+          <div class="cardbody">
+
+            <h3 data-i18n="property">
+              Property
+            </h3>
+
+            <p
+              class="meta"
+              data-i18n="homes_land_offices"
+            >
+              Homes, land & offices
+            </p>
+
+          </div>
+
+        </a>
+
+
+        <!-- FURNITURE -->
+
+        <a
+          class="card"
+          href="marketplace.html?category=furniture"
+        >
+
+          <div class="thumb category-photo">
+            <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85" alt="Home and furniture" loading="lazy">
+          </div>
+
+          <div class="cardbody">
+
+            <h3 data-i18n="home_furniture">
+              Home & Furniture
+            </h3>
+
+            <p
+              class="meta"
+              data-i18n="make_space_better"
+            >
+              Make your space better
+            </p>
+
+          </div>
+
+        </a>
+
+
+        <!-- JOBS -->
+
+        <a
+          class="card"
+          href="marketplace.html?category=jobs"
+        >
+
+          <div class="thumb category-photo">
+            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85" alt="Jobs and services" loading="lazy">
+          </div>
+
+          <div class="cardbody">
+
+            <h3 data-i18n="jobs_services">
+              Jobs & Services
+            </h3>
+
+            <p
+              class="meta"
+              data-i18n="work_opportunities"
+            >
+              Work and opportunities
+            </p>
+
+          </div>
+
+        </a>
+
+
+        <!-- MORE -->
+
+        <a
+          class="card"
+          href="marketplace.html"
+        >
+
+          <div class="thumb category-photo">
+            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=85" alt="Everything else" loading="lazy">
+          </div>
+
+          <div class="cardbody">
+
+            <h3 data-i18n="everything_else">
+              Everything Else
+            </h3>
+
+            <p
+              class="meta"
+              data-i18n="discover_more"
+            >
+              Discover more
+            </p>
+
+          </div>
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       OMAN DESTINATIONS
+  ========================== -->
+  <section class="oman-destinations">
+    <div class="container">
+      <div class="destinations-head">
+        <div>
+          <div class="kicker" data-i18n="discover_oman_kicker">DISCOVER OMAN</div>
+          <h2 data-i18n="discover_oman_title">أماكن حقيقية. صور حقيقية. عُمان كما هي.</h2>
+          <p data-i18n="discover_oman_desc">استكشف المدن والمحافظات والمعالم التي تجعل كل إعلان في BINGO أقرب إلى مجتمعك.</p>
+        </div>
+        <a href="marketplace.html" class="destinations-link" data-i18n="explore_local">استكشف السوق المحلي ←</a>
+      </div>
+
+      <div class="destination-grid">
+        <article class="destination-card destination-large">
+          <img src="assets/oman/muscat-grand-mosque.jpg" alt="Sultan Qaboos Grand Mosque in Muscat" loading="lazy">
+          <div class="destination-shade"></div>
+          <div class="destination-content"><span data-i18n="dest_muscat_meta">Muscat • Capital</span><h3 data-i18n="dest_muscat_title">جامع السلطان قابوس الأكبر</h3><small data-i18n="dest_muscat_desc">العاصمة • الأعمال • التسوق • الخدمات</small><a class="destination-button" href="place.html?place=muscat" data-i18n="view_place">عرض المكان</a></div>
+        </article>
+        <article class="destination-card">
+          <img src="assets/oman/nizwa-fort.jpg" alt="Nizwa Fort" loading="lazy">
+          <div class="destination-shade"></div>
+          <div class="destination-content"><span data-i18n="dest_nizwa_meta">Al Dakhiliyah • Nizwa</span><h3 data-i18n="dest_nizwa_title">قلعة نزوى</h3><small data-i18n="dest_nizwa_desc">تراث • سوق • عقارات • فرص</small><a class="destination-button" href="place.html?place=nizwa" data-i18n="view_place">عرض المكان</a></div>
+        </article>
+        <article class="destination-card">
+          <img src="assets/oman/mutrah-souq.jpg" alt="Muttrah Souq in Muscat" loading="lazy">
+          <div class="destination-shade"></div>
+          <div class="destination-content"><span data-i18n="dest_muttrah_meta">Muscat • Muttrah</span><h3 data-i18n="dest_muttrah_title">سوق مطرح</h3><small data-i18n="dest_muttrah_desc">تجارة • هدايا • منتجات محلية</small><a class="destination-button" href="place.html?place=muscat" data-i18n="view_place">عرض المكان</a></div>
+        </article>
+        <article class="destination-card">
+          <img src="assets/oman/salalah-beach.jpg" alt="Salalah Beach" loading="lazy">
+          <div class="destination-shade"></div>
+          <div class="destination-content"><span data-i18n="dest_salalah_meta">Dhofar • Salalah</span><h3 data-i18n="dest_salalah_title">صلالة</h3><small data-i18n="dest_salalah_desc">البحر • الخريف • السياحة</small><a class="destination-button" href="place.html?place=salalah" data-i18n="view_place">عرض المكان</a></div>
+        </article>
+        <article class="destination-card">
+          <img src="assets/oman/sur.jpg" alt="Sur coastal city" loading="lazy">
+          <div class="destination-shade"></div>
+          <div class="destination-content"><span data-i18n="dest_sur_meta">South Al Sharqiyah • Sur</span><h3 data-i18n="dest_sur_title">صور</h3><small data-i18n="dest_sur_desc">البحر • القوارب • التجارة</small><a class="destination-button" href="place.html?place=sur" data-i18n="view_place">عرض المكان</a></div>
+        </article>
+        <article class="destination-card">
+          <img src="assets/oman/jabal-akhdar.jpg" alt="Jabal Akhdar in Oman" loading="lazy">
+          <div class="destination-shade"></div>
+          <div class="destination-content"><span data-i18n="dest_jabal_meta">Al Dakhiliyah • Jabal Akhdar</span><h3 data-i18n="dest_jabal_title">الجبل الأخضر</h3><small data-i18n="dest_jabal_desc">جبال • مزارع • تجارب محلية</small><a class="destination-button" href="place.html?place=jabal-akhdar" data-i18n="view_place">عرض المكان</a></div>
+        </article>
+      </div>
+
+      <div class="oman-strip" aria-label="All Oman areas">
+        <a href="place.html?place=muscat"><b>مسقط</b><span>Muscat</span></a>
+        <a href="place.html?place=al-batinah-north"><b>شمال الباطنة</b><span>Al Batinah North</span></a>
+        <a href="place.html?place=al-batinah-south"><b>جنوب الباطنة</b><span>Al Batinah South</span></a>
+        <a href="place.html?place=al-dakhiliyah"><b>الداخلية</b><span>Al Dakhiliyah</span></a>
+        <a href="place.html?place=al-dhahirah"><b>الظاهرة</b><span>Al Dhahirah</span></a>
+        <a href="place.html?place=al-buraimi"><b>البريمي</b><span>Al Buraimi</span></a>
+        <a href="place.html?place=dhofar"><b>ظفار</b><span>Dhofar</span></a>
+        <a href="place.html?place=north-al-sharqiyah"><b>شمال الشرقية</b><span>North Al Sharqiyah</span></a>
+        <a href="place.html?place=south-al-sharqiyah"><b>جنوب الشرقية</b><span>South Al Sharqiyah</span></a>
+        <a href="place.html?place=musandam"><b>مسندم</b><span>Musandam</span></a>
+        <a href="place.html?place=al-wusta"><b>الوسطى</b><span>Al Wusta</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================
+       FEATURES
+  ========================== -->
+
+  <section
+    class="section"
+    style="padding-top:0"
+  >
+
+    <div class="container featuregrid">
+
+
+      <!-- MARKETPLACE -->
+
+      <a
+        class="feature f1"
+        href="marketplace.html"
+      >
+
+        <div>
+
+          <div
+            class="kicker"
+            data-i18n="marketplace_kicker"
+          >
+            MARKETPLACE
+          </div>
+
+          <h2 data-i18n="buy_sell_easy">
+            Buy & sell with ease.
+          </h2>
+
+          <p data-i18n="browse_local_listings">
+            Browse local listings and connect with buyers and sellers.
+          </p>
+
+        </div>
+
+        <span>
+          🛍️
+        </span>
+
+      </a>
+
+
+      <!-- AUCTIONS -->
+
+      <a
+        class="feature f2"
+        href="auctions.html"
+      >
+
+        <div>
+
+          <div
+            class="kicker"
+            data-i18n="live_now"
+          >
+            LIVE NOW
+          </div>
+
+          <h2 data-i18n="bid_win_repeat">
+            Bid. Win. Repeat.
+          </h2>
+
+          <p data-i18n="discover_auctions">
+            Discover exciting auctions and place your next winning bid.
+          </p>
+
+        </div>
+
+        <span>
+          🔨
+        </span>
+
+      </a>
+
+
+      <!-- TENDERS -->
+
+      <a
+        class="feature f3"
+        href="tenders.html"
+      >
+
+        <div>
+
+          <div
+            class="kicker"
+            data-i18n="business"
+          >
+            BUSINESS
+          </div>
+
+          <h2 data-i18n="opportunities_await">
+            Opportunities await.
+          </h2>
+
+          <p data-i18n="find_tenders">
+            Find tenders and business opportunities across Oman.
+          </p>
+
+        </div>
+
+        <span>
+          📋
+        </span>
+
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       CTA
+  ========================== -->
+
+  <!-- BINGO INTERACTIVE CATEGORIES -->
+<!-- BINGO INTERACTIVE CATEGORIES -->
+<section class="interactive-categories" id="categories">
+  <div class="container">
+    <div class="sectiontitle interactive-title">
+      <div>
+        <span class="kicker" data-i18n="exploreLabel">EXPLORE BINGO</span>
+        <h2 data-i18n="categoriesTitle">استكشف أقسام BINGO</h2>
+        <p data-i18n="categoriesLead">اضغط على أي قسم للانتقال مباشرة إلى الصفحة الخاصة به.</p>
+      </div>
+      <a class="categories-all" href="marketplace.html" data-i18n="viewAll">عرض الكل →</a>
+    </div>
+
+    <div class="interactive-category-grid">
+      <a class="interactive-category-card" href="marketplace.html?category=vehicles" data-category="vehicles">
+        <span class="category-icon">🚗</span>
+        <div><h3 data-i18n="catVehicles">السيارات والمركبات</h3><p data-i18n="catVehiclesDesc">سيارات، دراجات ومركبات للبيع</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="marketplace.html?category=property" data-category="property">
+        <span class="category-icon">🏠</span>
+        <div><h3 data-i18n="catProperty">العقارات</h3><p data-i18n="catPropertyDesc">منازل، شقق، أراضٍ ومكاتب</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="marketplace.html?category=electronics" data-category="electronics">
+        <span class="category-icon">📱</span>
+        <div><h3 data-i18n="catElectronics">الإلكترونيات</h3><p data-i18n="catElectronicsDesc">هواتف، أجهزة وتقنيات</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="marketplace.html?category=fashion" data-category="fashion">
+        <span class="category-icon">👗</span>
+        <div><h3 data-i18n="catFashion">الأزياء</h3><p data-i18n="catFashionDesc">ملابس، عطور وإكسسوارات</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="marketplace.html?category=services" data-category="services">
+        <span class="category-icon">🛠️</span>
+        <div><h3 data-i18n="catServices">الخدمات</h3><p data-i18n="catServicesDesc">خدمات يقدمها أصحاب الأعمال في عُمان</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="auctions.html" data-category="auctions">
+        <span class="category-icon">🔨</span>
+        <div><h3 data-i18n="catAuctions">المزادات</h3><p data-i18n="catAuctionsDesc">اكتشف المزادات وشارك بالمزايدة</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="tenders.html" data-category="tenders">
+        <span class="category-icon">📋</span>
+        <div><h3 data-i18n="catTenders">المناقصات</h3><p data-i18n="catTendersDesc">فرص ومناقصات الأعمال في عُمان</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+
+      <a class="interactive-category-card" href="store.html" data-category="store">
+        <span class="category-icon">🛍️</span>
+        <div><h3 data-i18n="catStore">متجر BINGO</h3><p data-i18n="catStoreDesc">منتجات وخدمات مختارة من المتجر</p></div>
+        <span class="category-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+<section class="cta">
+
+    <div class="container cta-inner">
+
+      <div>
+
+        <div
+          class="kicker"
+          data-i18n="got_something"
+        >
+          GOT SOMETHING TO SELL?
+        </div>
+
+        <h2 data-i18n="unused_items">
+          Turn unused items into opportunities.
+        </h2>
+
+        <p data-i18n="create_listing">
+          Create a listing and reach buyers across Oman.
+        </p>
+
+      </div>
+
+
+      <a
+        class="btn white"
+        href="register.html"
+        data-i18n="start_selling"
+      >
+        Start selling →
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer>
+
+    <div class="container footergrid">
+
+
+      <!-- FOOTER BRAND -->
+
+      <div class="footer-brand">
+
+        <a
+          href="index.html"
+          class="footer-logo"
+        >
+
+          <img
+            id="footerLogo"
+            class="logo-image"
+            src="logo-en.png"
+            alt="BINGO Oman"
+          >
+
+        </a>
+
+
+        <p data-i18n="footer_description">
+          Oman's marketplace to buy, sell, bid and trade.
+        </p>
+
+      </div>
+
+
+      <!-- EXPLORE -->
+
+      <div>
+
+        <h4 data-i18n="explore">
+          Explore
+        </h4>
+
+        <a
+          href="marketplace.html"
+          data-i18n="marketplace"
+        >
+          Marketplace
+        </a>
+
+        <a href="store.html">Store</a>
+
+        <a
+          href="auctions.html"
+          data-i18n="auctions"
+        >
+          Auctions
+        </a>
+
+        <a
+          href="tenders.html"
+          data-i18n="tenders"
+        >
+          Tenders
+        </a>
+
+      </div>
+
+
+      <!-- ACCOUNT -->
+
+      <div>
+
+        <h4 data-i18n="account">
+          Account
+        </h4>
+
+        <a
+          href="login.html"
+          data-i18n="login"
+        >
+          Login
+        </a>
+
+        <a
+          href="register.html"
+          data-i18n="create_account"
+        >
+          Create account
+        </a>
+
+        <a
+          href="dashboard.html"
+          data-i18n="dashboard"
+        >
+          Dashboard
+        </a>
+
+      </div>
+
+
+      <!-- BINGO -->
+
+      <div>
+
+        <h4>
+          BINGO Oman
+        </h4>
+
+        <p class="orangeText">
+          <span data-i18n="buy_sell_trade">
+            Buy • Sell • Trade
+          </span>
+        </p>
+
+        <small>
+          © 2026 BINGO Oman
+        </small>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- =========================
+       HOME JS
+  ========================== -->
+
+  <script>
+
+    /* Mobile menu */
+
+    const hamburger = document.getElementById("hambButton");
+    const navlinks = document.getElementById("navlinks");
+
+    if (hamburger && navlinks) {
+
+      hamburger.addEventListener("click", function () {
+
+        navlinks.classList.toggle("open");
+
+      });
+
+    }
+
+
+    /* Search */
+
+    const searchForm = document.getElementById("searchForm");
+
+    if (searchForm) {
+
+      searchForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const input = document.getElementById("q");
+        const location = document.getElementById("location");
+
+        const query = input ? input.value.trim() : "";
+        const city = location ? location.value : "all";
+
+        let url = "marketplace.html";
+
+        const params = new URLSearchParams();
+
+        if (query) {
+          params.set("q", query);
+        }
+
+        if (city && city !== "all") {
+          params.set("city", city);
+        }
+
+        if (params.toString()) {
+          url += "?" + params.toString();
+        }
+
+        window.location.href = url;
+
+      });
+
+    }
+
+
+    /* 3D hover */
+
+    const scene = document.querySelector(".scene3d");
+
+    if (scene) {
+
+      scene.addEventListener("pointermove", function (event) {
+
+        const rect = scene.getBoundingClientRect();
+
+        const x =
+          (event.clientX - rect.left) /
+          rect.width -
+          0.5;
+
+        const y =
+          (event.clientY - rect.top) /
+          rect.height -
+          0.5;
+
+        scene.style.transform =
+          `rotateX(${(-y * 4).toFixed(2)}deg)
+           rotateY(${(x * 5).toFixed(2)}deg)`;
+
+      });
+
+
+      scene.addEventListener("pointerleave", function () {
+
+        scene.style.transform = "";
+
+      });
+
+    }
+
+  </script>
+
+<script>
+async function loadHomeAds(){
+  const box=document.getElementById('homeAds'); if(!box||!window.sb)return;
+  try{
+    const {data,error}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','home_top').order('sort_order').limit(3);
+    if(error) throw error;
+    box.innerHTML=(data||[]).map(a=>`<a class="home-ad" href="${String(a.link_url||'#').replace(/"/g,'&quot;')}" target="_blank" rel="noopener"><img src="${String(a.image_url||'').replace(/"/g,'&quot;')}" alt="${String(a.title||'Offer').replace(/"/g,'&quot;')}" loading="lazy"><span>${String(a.title||'Featured offer')}</span></a>`).join('');
+    if(!data?.length) box.closest('.home-offers').style.display='none';
+  }catch(e){console.warn('Home ads:',e)}
+}
+document.addEventListener('DOMContentLoaded',loadHomeAds);
+</script>
+<script>
+(function(){
+  function startBingoIntro(){
+    var intro=document.getElementById('bingoIntro');
+    var skip=document.getElementById('skipIntro');
+    if(!intro) return;
+    var seen=false;
+    try{ seen=sessionStorage.getItem('bingoOmanIntroSeen')==='1'; }catch(e){}
+    if(seen){ intro.remove(); return; }
+    document.documentElement.classList.add('bingo-intro-lock');
+    document.body.classList.add('bingo-intro-lock');
+    var closed=false;
+    function closeIntro(){
+      if(closed) return; closed=true;
+      intro.classList.add('is-hidden');
+      document.documentElement.classList.remove('bingo-intro-lock');
+      document.body.classList.remove('bingo-intro-lock');
+      try{sessionStorage.setItem('bingoOmanIntroSeen','1');}catch(e){}
+      setTimeout(function(){if(intro.parentNode) intro.parentNode.removeChild(intro);},750);
+    }
+    if(skip) skip.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();closeIntro();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Enter') closeIntro();});
+    setTimeout(closeIntro,30000);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',startBingoIntro); else startBingoIntro();
+})();
+</script>
+<script src="characters.js"></script>
+
+<script>
+/* BINGO INTERACTIVE CATEGORY SYSTEM */
+(function(){
+  const lang = (document.documentElement.lang || localStorage.getItem('bingoLanguage') || 'ar').toLowerCase();
+  const labels = {
+    ar:{
+      exploreLabel:"استكشف BINGO",
+      categoriesTitle:"استكشف أقسام BINGO",
+      categoriesLead:"اضغط على أي قسم للانتقال مباشرة إلى الصفحة الخاصة به.",
+      viewAll:"عرض الكل →",
+      catVehicles:"السيارات والمركبات",catVehiclesDesc:"سيارات، دراجات ومركبات للبيع",
+      catProperty:"العقارات",catPropertyDesc:"منازل، شقق، أراضٍ ومكاتب",
+      catElectronics:"الإلكترونيات",catElectronicsDesc:"هواتف، أجهزة وتقنيات",
+      catFashion:"الأزياء",catFashionDesc:"ملابس، عطور وإكسسوارات",
+      catServices:"الخدمات",catServicesDesc:"خدمات يقدمها أصحاب الأعمال في عُمان",
+      catAuctions:"المزادات",catAuctionsDesc:"اكتشف المزادات وشارك بالمزايدة",
+      catTenders:"المناقصات",catTendersDesc:"فرص ومناقصات الأعمال في عُمان",
+      catStore:"متجر BINGO",catStoreDesc:"منتجات وخدمات مختارة من المتجر"
+    },
+    en:{
+      exploreLabel:"EXPLORE BINGO",
+      categoriesTitle:"Explore BINGO Categories",
+      categoriesLead:"Tap any section to go directly to its dedicated page.",
+      viewAll:"View all →",
+      catVehicles:"Vehicles",catVehiclesDesc:"Cars, bikes and vehicles for sale",
+      catProperty:"Property",catPropertyDesc:"Homes, apartments, land and offices",
+      catElectronics:"Electronics",catElectronicsDesc:"Phones, devices and technology",
+      catFashion:"Fashion",catFashionDesc:"Clothing, perfumes and accessories",
+      catServices:"Services",catServicesDesc:"Services from businesses across Oman",
+      catAuctions:"Auctions",catAuctionsDesc:"Discover auctions and place bids",
+      catTenders:"Tenders",catTendersDesc:"Business opportunities and tenders in Oman",
+      catStore:"BINGO Store",catStoreDesc:"Selected products and services from the store"
+    }
+  };
+  const dict = labels[lang] || labels.ar;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key=el.getAttribute("data-i18n");
+    if(dict[key]) el.textContent=dict[key];
+  });
+  document.querySelectorAll(".interactive-category-card").forEach(card=>{
+    card.addEventListener("click", function(){
+      this.classList.add("category-opening");
+      setTimeout(()=>this.classList.remove("category-opening"),220);
+    });
+  });
+})();
+</script>
+
+  <script>
+    (function(){
+      const intro=document.getElementById('bingoIntro');
+      const close=()=>{ if(!intro) return; intro.classList.add('is-hidden'); setTimeout(()=>intro.remove(),700); };
+      document.getElementById('skipIntro')?.addEventListener('click',close);
+      document.getElementById('introExplore')?.addEventListener('click',close);
+
+    })();
+  </script>
+</body>
+</html>

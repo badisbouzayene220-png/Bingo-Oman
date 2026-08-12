@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BINGO Oman | Opportunity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="logo.css">
+<style>
+.bidbox{max-width:620px;margin:24px auto;padding:28px;border-radius:18px;background:#fff;box-shadow:0 10px 35px rgba(0,0,0,.08)}
+.bidbox input{width:100%;padding:13px;border:1px solid #d7dce5;border-radius:10px;font-size:16px;box-sizing:border-box}
+.bidbox label{display:block;font-weight:700;margin:16px 0 8px}.bidbox .msg{margin-top:14px}.bidbox .success{color:#137333}.bidbox .error{color:#b3261e}
+.detail-card{max-width:900px;margin:0 auto}.detail-card img{max-width:100%;max-height:420px;border-radius:16px;object-fit:cover}.detail-meta{display:flex;gap:18px;flex-wrap:wrap;margin:14px 0;color:#596273}.closed{padding:14px;background:#fff4e5;border-radius:10px;margin-top:18px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase-client.js"></script><script src="global-banner.js" defer></script><script src="auth.js"></script><script src="language.js"></script>
+<link rel="stylesheet" href="characters.css">
+<link rel="stylesheet" href="global-banner.css">
+</head>
+<body>
+<header class="header"><div class="container nav"><a class="logo" href="index.html"><img src="logo-en.png" alt="BINGO Oman"></a>
+<nav class="navlinks"><a href="marketplace.html">Marketplace</a><a href="auctions.html">Auctions</a><a href="tenders.html">Tenders</a></nav><div class="actions"><a class="login" href="login.html" data-login-nav>Login</a><a class="btn primary small" href="register.html">Register</a></div></div></header>
+<main class="pagebody"><div class="container" id="app"><div class="empty-state"><h3>Loading…</h3></div></div></main>
+
+<script>
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const money=v=>Number(v||0).toLocaleString('en-OM',{minimumFractionDigits:3,maximumFractionDigits:3})+' OMR';
+const params=new URLSearchParams(location.search), type=params.get('type'), id=params.get('id');
+const next=encodeURIComponent(location.pathname+location.search);
+
+function render(d){
+  const auction=type==='auction';
+  const closed=d.status!=='open' || new Date(d.closes_at)<=new Date();
+  document.title='BINGO Oman | '+d.title;
+  document.getElementById('app').innerHTML=`<div class="detail-card">
+    ${d.image_url?`<img src="${esc(d.image_url)}" alt="${esc(d.title)}">`:''}
+    <span class="tag">${esc(auction?(d.status==='open'?'LIVE':'CLOSED'):(d.status==='open'?'OPEN':'CLOSED'))}</span>
+    <h1>${esc(d.title)}</h1>
+    <div class="detail-meta"><span>📍 ${esc(d.city||'Oman')}</span>${d.reference?`<span>Ref: ${esc(d.reference)}</span>`:''}<span>Closing: ${new Date(d.closes_at).toLocaleString()}</span></div>
+    <p>${esc(d.description||'No additional description provided.')}</p>
+    ${auction?`<div class="price big">Current bid: ${money(d.current_amount)}</div><p>${Number(d.bid_count||0)} bids</p>`:''}
+    ${closed?`<div class="closed">This opportunity is closed and no new offers can be submitted.</div>`:`<div class="bidbox">
+      <h2>${auction?'Place your bid':'Submit your tender offer'}</h2>
+      <p>${auction?'Your bid must be higher than the current bid.':'Enter the amount you are offering for this tender.'}</p>
+      <label for="amount">Amount (OMR)</label>
+      <input id="amount" type="number" min="0.001" step="0.001" placeholder="0.000">
+      <button id="bidBtn" class="btn primary" style="width:100%;margin-top:18px">${auction?'Place bid':'Submit offer'}</button>
+      <p id="msg" class="msg"></p>
+    </div>`}
+  </div>`;
+  const btn=document.getElementById('bidBtn');
+  if(btn) btn.onclick=()=>submitBid(auction);
+}
+async function submitBid(auction){
+  const user=await BingoAuth.getUser();
+  if(!user){ location.href='login.html?next='+next; return; }
+  const amount=Number(document.getElementById('amount').value);
+  const msg=document.getElementById('msg'), btn=document.getElementById('bidBtn');
+  if(!Number.isFinite(amount)||amount<=0){msg.className='msg error';msg.textContent='Please enter a valid amount.';return}
+  btn.disabled=true; msg.textContent='Submitting…';
+  const fn=auction?'place_auction_bid':'submit_tender_offer';
+  const {data,error}=await sb.rpc(fn,{p_opportunity_id:id,p_amount:amount});
+  if(error){msg.className='msg error';msg.textContent=error.message;btn.disabled=false;return}
+  msg.className='msg success';msg.textContent=auction?'Bid placed successfully.':'Offer submitted successfully.';
+  setTimeout(()=>location.reload(),900);
+}
+(async()=>{
+  if(!type||!id||!['auction','tender'].includes(type)){location.href='tenders.html';return}
+  const {data,error}=await sb.from('opportunities').select('*').eq('id',id).eq('kind',type).maybeSingle();
+  if(error||!data){document.getElementById('app').innerHTML='<div class="empty-state"><h3>Opportunity not found</h3><p>'+esc(error?.message||'This opportunity does not exist.')+'</p></div>';return}
+  render(data);
+})();
+</script>
+<script src="characters.js"></script>
+</body></html>
