@@ -229,7 +229,15 @@ function exportUsersExcel(){
 
 async function loadUsers(){
  const {data,error}=await sb.rpc('admin_list_users');
- if(error){msg(error.message,'err');return} users=data||[];renderUsers();
+ if(error){
+   console.error('admin_list_users:',error);
+   users=[];
+   $('userTable').innerHTML=`<div class="empty"><b>Users could not be loaded.</b><br><small>${esc(error.message||'Unknown error')}</small><br><br><small>Run <b>setup_admin_users.sql</b> in Supabase SQL Editor, then click Refresh.</small></div>`;
+   msg('Users RPC is not configured in Supabase. Run setup_admin_users.sql.','err');
+   return;
+ }
+ users=Array.isArray(data)?data:[];
+ renderUsers();
 }
 function renderUsers(){
  const q=$('userSearch').value.toLowerCase();
