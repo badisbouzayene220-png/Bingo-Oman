@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="logo.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script><script src="supabase-client.js"></script><script src="auth.js"></script><script src="language.js"></script>
 <style>
 .admin-wrap{background:#f6f8fc;min-height:calc(100vh - 114px);padding:34px 0 70px}
@@ -67,7 +67,7 @@
 </section>
 
 <section class="tab" id="tab-users" style="display:none">
-<div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Users</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Manage account roles and active status.</p></div></div><div class="search-row"><input id="userSearch" placeholder="Search name, username or email…"></div><div id="userTable"></div></div>
+<div class="admin-card"><div class="admin-toolbar"><div><h2 style="margin:0">Users</h2><p style="margin:5px 0;color:#7b8798;font-size:11px">Manage account roles and active status. Export the complete user list to Excel.</p></div><button class="btn primary" id="exportUsers">⬇ Export Excel</button></div><div class="search-row"><input id="userSearch" placeholder="Search name, username or email…"></div><div id="userTable"></div></div>
 </section>
 
 <section class="tab" id="tab-listings" style="display:none">
@@ -198,6 +198,35 @@ function renderBids(){
  if(!a.length){$('bidTable').innerHTML='<div class="empty">No bids or offers found.</div>';return}
  $('bidTable').innerHTML=`<table class="admin-table"><thead><tr><th>Opportunity</th><th>Bidder</th><th>Type</th><th>Amount</th><th>Date</th><th>Winner</th><th>Action</th></tr></thead><tbody>${a.map(x=>`<tr><td><b>${esc(x.opportunity_title)}</b></td><td>${esc(x.bidder_name||'User')}<br><small>${esc(x.bidder_email||'')}</small></td><td>${esc(x.bid_type)}</td><td><b>${money(x.amount)}</b></td><td>${fmt(x.created_at)}</td><td>${x.is_winner?'<span class="winner">✓ Winner</span>':'—'}</td><td><button class="mini-btn" onclick="showBid('${x.id}')">Details</button></td></tr>`).join('')}</tbody></table>`;
 }
+function exportUsersExcel(){
+ if(!users.length){msg('No users available to export.','err');return}
+ if(typeof XLSX==='undefined'){msg('Excel export library could not be loaded. Please check your internet connection and try again.','err');return}
+
+ // Export the full user dataset returned by the secure admin RPC,
+ // not only the rows currently visible after search.
+ const rows=users.map((x,i)=>({
+   '#':i+1,
+   'User ID':x.id||'',
+   'Full Name':x.full_name||'',
+   'Username':x.username||'',
+   'Email':x.email||'',
+   'Role':x.role||'user',
+   'Status':x.is_active!==false?'Active':'Inactive',
+   'Joined':x.created_at?new Date(x.created_at).toLocaleString():'',
+ }));
+ const ws=XLSX.utils.json_to_sheet(rows);
+ ws['!cols']=[
+   {wch:6},{wch:38},{wch:28},{wch:22},{wch:34},
+   {wch:14},{wch:14},{wch:24}
+ ];
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,'Users');
+ const now=new Date();
+ const stamp=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+ XLSX.writeFile(wb,`BINGO-Oman-Users-${stamp}.xlsx`);
+ msg(`Excel file created with ${users.length} users.`);
+}
+
 async function loadUsers(){
  const {data,error}=await sb.rpc('admin_list_users');
  if(error){msg(error.message,'err');return} users=data||[];renderUsers();
@@ -322,7 +351,7 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.query
 document.querySelectorAll('.opp-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.opp-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');oppFilter=b.dataset.filter;renderOpps()});
 document.querySelectorAll('.bid-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.bid-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');bidFilter=b.dataset.filter;renderBids()});
 document.querySelectorAll('.list-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.list-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');listFilter=b.dataset.filter;loadListings()});
-$('oppSearch').oninput=renderOpps;
+$('oppSearch').oninput=renderOpps;$('exportUsers')?.addEventListener('click',exportUsersExcel);
 $('newBanner').onclick=newBanner;$('bannerForm').onsubmit=saveBanner;
 document.querySelectorAll('.banner-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.banner-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');bannerFilter=b.dataset.filter;renderBanners()});document.querySelectorAll('.ad-filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ad-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');adFilter=b.dataset.filter;renderAds()});$('newAd').onclick=newAd;$('adForm').onsubmit=saveAd;$('bidSearch').oninput=renderBids;$('userSearch').oninput=renderUsers;$('refreshAll').onclick=refreshAll;$('newOpp').onclick=newOpp;$('oppForm').onsubmit=saveOpp;
 document.addEventListener('DOMContentLoaded',init);
