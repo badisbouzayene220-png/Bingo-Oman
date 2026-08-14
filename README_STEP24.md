@@ -14,3 +14,7 @@ Updated the ERP financial reporting UI to use the existing accounting RPC functi
 - Financial reports default to yesterday → today.
 
 No database functions are duplicated or changed by this frontend update.
+
+## Step 24 V3 — Clean Financial Data
+
+See `README_STEP24_V3_CLEAN_FINANCIAL_DATA.md` and run `setup_step24_v3_clean_financial_data.sql` once to clear existing financial transactions while preserving ERP master data.
