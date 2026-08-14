@@ -14,12 +14,19 @@ This module adds a company-management layer to BINGO Oman without replacing the 
 - Excel exports for customers, invoices and expenses.
 - Printable tax invoice.
 - Audit log for ERP changes.
+- Suppliers / الموردون with balances, VAT data and payment terms.
+- Purchases / المشتريات with purchase invoices, VAT, supplier balances and stock receiving.
+- Supplier payments with cash/bank posting to Accounts Payable.
+- Inventory receiving from approved purchases and stock movement history.
+- Expanded finance overview: sales, collections, purchases, supplier payments, expenses, receivables, payables and VAT.
 - Admin-only RLS and SECURITY DEFINER RPCs.
 
 ## Setup
 1. Open Supabase SQL Editor.
 2. Run `setup_erp.sql` once after the existing BINGO database setup.
-3. Open `admin.html` and click `🧾 ERP / Finance`.
+3. Run `setup_step9_products_inventory.sql` if Products & Inventory is not already installed.
+4. Run `setup_finance_expansion.sql` to activate Suppliers, Purchases and Supplier Payments.
+5. Open `admin.html` and click `🧾 ERP / Finance`.
 
 The ERP uses the existing `public.is_admin()` helper and therefore only BINGO administrators can access it.
 
