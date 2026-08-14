@@ -41,8 +41,27 @@ function productOptions(selected=''){return '<option value="">بند مخصص / 
 function selectInvoiceProduct(i,value){invoiceItems[i].product_id=value;const p=products.find(x=>x.id===value);if(p){invoiceItems[i].description=p.name;invoiceItems[i].unit_price=Number(p.sale_price||0)}renderItems()}
 function removeItem(i){invoiceItems.splice(i,1);if(!invoiceItems.length)addItem();renderItems()}
 function normalizeDecimalInput(value){return String(value??'').replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-1632)).replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-1776)).replace(/٫/g,'.').replace(/,/g,'.').replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1')}
+function normalizeDecimalInput(value){return String(value??'').replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-1632)).replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-1776)).replace(/٫/g,'.').replace(/,/g,'.').replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1')}
 function updateItemQuantity(i,value){const v=normalizeDecimalInput(value);invoiceItems[i].quantity=v===''?0:Number(v);calcInvoice()}
-function renderItems(){$('invoiceItems').innerHTML=invoiceItems.map((x,i)=>`<div class="item-row"><select onchange="selectInvoiceProduct(${i},this.value)">${productOptions(x.product_id)}</select><input value="${esc(x.description)}" placeholder="الوصف" oninput="invoiceItems[${i}].description=this.value"><input class="invoice-qty" type="text" inputmode="decimal" autocomplete="off" dir="ltr" aria-label="الكمية" value="${esc(x.quantity)}" onfocus="this.select()" oninput="updateItemQuantity(${i},this.value)" onblur="this.value=invoiceItems[${i}].quantity||0"><input type="number" min="0" step="0.001" value="${x.unit_price}" oninput="invoiceItems[${i}].unit_price=Number(this.value);calcInvoice()"><input type="number" min="0" step="0.001" value="${x.discount}" oninput="invoiceItems[${i}].discount=Number(this.value);calcInvoice()"><button type="button" class="remove-item" onclick="removeItem(${i})">×</button></div>`).join('');calcInvoice()}
+function bindInvoiceItemInputs(){
+  document.querySelectorAll('#invoiceItems .invoice-qty').forEach(input=>{
+    const i=Number(input.dataset.index);
+    input.addEventListener('focus',()=>{input.select()});
+    input.addEventListener('click',e=>{e.stopPropagation();input.focus()});
+    input.addEventListener('keydown',e=>{
+      if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();return;}
+      e.stopPropagation();
+    });
+    input.addEventListener('input',()=>updateItemQuantity(i,input.value));
+    input.addEventListener('change',()=>updateItemQuantity(i,input.value));
+    input.addEventListener('blur',()=>{input.value=invoiceItems[i].quantity===0?'0':String(invoiceItems[i].quantity)});
+  });
+}
+function renderItems(){
+  $('invoiceItems').innerHTML=invoiceItems.map((x,i)=>`<div class="item-row"><select onchange="selectInvoiceProduct(${i},this.value)">${productOptions(x.product_id)}</select><input value="${esc(x.description)}" placeholder="الوصف" oninput="invoiceItems[${i}].description=this.value"><input class="invoice-qty" type="text" inputmode="decimal" autocomplete="off" dir="ltr" tabindex="0" data-index="${i}" aria-label="الكمية" value="${esc(x.quantity)}"><input type="number" min="0" step="0.001" value="${x.unit_price}" oninput="invoiceItems[${i}].unit_price=Number(this.value);calcInvoice()"><input type="number" min="0" step="0.001" value="${x.discount}" oninput="invoiceItems[${i}].discount=Number(this.value);calcInvoice()"><button type="button" class="remove-item" onclick="removeItem(${i})">×</button></div>`).join('');
+  bindInvoiceItemInputs();
+  calcInvoice();
+}
 function calcInvoice(){let sub=0,disc=0;invoiceItems.forEach(x=>{sub+=Number(x.quantity||0)*Number(x.unit_price||0);disc+=Number(x.discount||0)});let taxable=Math.max(sub-disc,0),vat=taxable*Number($('iVat')?.value||0)/100,total=taxable+vat;$('sumSub').textContent=money(sub);$('sumDisc').textContent=money(disc);$('sumTaxable').textContent=money(taxable);$('sumVat').textContent=money(vat);$('sumTotal').textContent=money(total)}
 $('iVat').oninput=calcInvoice;
 function updateInvoiceAction(){const b=$('invoiceSubmit');if(!b)return;const issued=$('iStatus').value==='issued';b.textContent=issued?'إصدار الفاتورة':'حفظ المسودة';b.classList.toggle('primary',issued);b.classList.toggle('green',!issued)}
