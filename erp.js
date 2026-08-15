@@ -6,7 +6,7 @@ function msg(t,type='ok'){ $('msg').innerHTML=t?`<div class="notice ${type}">${e
 function openModal(id){$(id).classList.add('open')} function closeModal(id){$(id).classList.remove('open')}
 function badge(s){return `<span class="badge b-${esc(s)}">${esc(s)}</span>`}
 async function adminCheck(){const u=await BingoAuth.getUser();if(!u)return false;const {data}=await sb.from('profiles').select('id,role,is_active').eq('id',u.id).maybeSingle();return data?.role==='admin'&&data?.is_active!==false}
-async function init(){if(!await adminCheck()){$('denied').style.display='block';return}$('app').style.display='block';$('from').value=monthAgo();$('to').value=today();$('vatFrom').value=monthAgo();$('vatTo').value=today();await loadSettings();await loadBingoUsers();await loadCustomers();await loadProducts();await loadInvoices();await loadExpenses();await loadDashboard();await loadPayments();await loadVat();await loadFinancialAccounts();await loadReports()}
+async function init(){if(!await adminCheck()){$('denied').style.display='block';return}$('app').style.display='block';$('from').value=monthAgo();$('to').value=today();$('vatFrom').value=monthAgo();$('vatTo').value=today();await loadSettings();await loadBingoUsers();await loadCustomers();await loadSuppliers();await loadProducts();await loadPurchases();await loadInvoices();await loadExpenses();await loadDashboard();await loadPayments();await loadVat();await loadFinancialAccounts();await loadReports()}
 async function rpc(name,args={}){const {data,error}=await sb.rpc(name,args);if(error)throw error;return data}
 async function loadDashboard(){try{let d=await rpc('erp_dashboard',{p_from:$('from').value,p_to:$('to').value});$('sales').textContent=money(d.sales);$('paid').textContent=money(d.paid);$('expenses').textContent=money(d.expenses);$('receivable').textContent=money(d.receivable);$('vatSales').textContent=money(d.vat_sales);$('vatExpenses').textContent=money(d.vat_expenses);$('customersCount').textContent=d.customers||0}catch(e){msg(e.message,'err')}}
 async function loadSettings(){try{settings=await rpc('erp_company_settings_read').catch(()=>null);if(!settings){const {data}=await sb.from('erp_company_settings').select('*').eq('id','default').maybeSingle();settings=data||{}};$('sCompany').value=settings.company_name||'';$('sLegal').value=settings.legal_name||'';$('sTax').value=settings.tax_number||'';$('sCR').value=settings.commercial_registration||'';$('sPhone').value=settings.phone||'';$('sEmail').value=settings.email||'';$('sCurrency').value=settings.currency||'OMR';$('sVat').value=settings.vat_rate??5;$('sPrefix').value=settings.invoice_prefix||'INV-'}catch(e){console.warn(e.message)}}
@@ -30,6 +30,165 @@ $('productForm').onsubmit=async e=>{e.preventDefault();try{await rpc('erp_upsert
 function adjustStock(id){const p=products.find(x=>x.id===id);if(!p)return;$('stProductId').value=p.id;$('stProductName').value=`${p.name} — ${p.sku||'بدون SKU'} | المخزون الحالي: ${p.stock_qty||0}`;$('stType').value='in';$('stQty').value='';$('stReference').value='';$('stDate').value=today();$('stNotes').value='';openModal('stockModal')}
 $('stockForm').onsubmit=async e=>{e.preventDefault();try{await rpc('erp_adjust_stock',{p_product_id:$('stProductId').value,p_movement_type:$('stType').value,p_quantity:Number($('stQty').value),p_reference:$('stReference').value,p_movement_date:$('stDate').value||today(),p_notes:$('stNotes').value});closeModal('stockModal');msg('تم تسجيل حركة المخزون.');await loadProducts()}catch(e){msg(e.message,'err')}};
 function exportProducts(){if(!products.length)return msg('لا توجد منتجات للتصدير.','err');const ws=XLSX.utils.json_to_sheet(products.map(p=>({'SKU':p.sku||'','Name':p.name,'Category':p.category||'','Unit':p.unit||'','Cost Price':Number(p.cost_price||0),'Sale Price':Number(p.sale_price||0),'VAT %':Number(p.vat_rate||0),'Stock':Number(p.stock_qty||0),'Min Stock':Number(p.min_stock||0),'Status':Number(p.stock_qty||0)<=0?'Out of stock':Number(p.stock_qty||0)<=Number(p.min_stock||0)?'Low':'Available'})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Products');XLSX.writeFile(wb,'BINGO-Oman-Products-Inventory.xlsx')}
+
+
+// ============================================================
+// PURCHASES — V18 UI repair
+// Uses the protected ERP RPCs. No direct destructive table writes.
+// ============================================================
+let suppliers=[];
+let purchaseItems=[];
+let purchases=[];
+
+async function loadSuppliers(){
+  try{
+    const q=$('supplierSearch')?.value?.trim()||'';
+    // Prefer an admin RPC if the project has one; otherwise read the
+    // supplier table through the authenticated admin session.
+    let data=null,error=null;
+    if(sb.rpc){
+      ({data,error}=await sb.rpc('erp_list_suppliers',{p_search:q||null}));
+    }
+    if(error || !Array.isArray(data)){
+      const r=await sb.from('erp_suppliers').select('*').order('name',{ascending:true}).limit(500);
+      if(r.error) throw r.error;
+      data=r.data||[];
+      if(q) data=data.filter(x=>`${x.name||''} ${x.company_name||''} ${x.contact_person||''}`.toLowerCase().includes(q.toLowerCase()));
+    }
+    suppliers=data||[];
+    renderSuppliers();
+    fillPurchaseSupplierSelect();
+  }catch(e){
+    if($('supplierTable')) $('supplierTable').innerHTML='<div class="notice err">'+esc(e.message)+'</div>';
+  }
+}
+
+function renderSuppliers(){
+  if(!$('supplierTable')) return;
+  if(!suppliers.length){$('supplierTable').innerHTML='<div style="padding:30px;text-align:center;color:#718096">لا يوجد موردون.</div>';return;}
+  $('supplierTable').innerHTML=`<table class="table"><thead><tr><th>المورد</th><th>جهة الاتصال</th><th>الهاتف</th><th>VAT</th><th>إجراء</th></tr></thead><tbody>${suppliers.map(s=>`<tr><td><b>${esc(s.name||'—')}</b><br><small>${esc(s.company_name||'')}</small></td><td>${esc(s.contact_person||'—')}</td><td>${esc(s.phone||'—')}</td><td>${esc(s.tax_number||'—')}</td><td><button class="btnx" onclick="editSupplier('${s.id}')">تعديل</button></td></tr>`).join('')}</tbody></table>`;
+}
+
+function fillPurchaseSupplierSelect(selected=''){
+  const el=$('puSupplier'); if(!el)return;
+  el.innerHTML='<option value="">اختر المورد</option>'+suppliers.map(s=>`<option value="${s.id}" ${s.id===selected?'selected':''}>${esc(s.name||s.company_name||'مورد')}${s.company_name&&s.company_name!==s.name?' — '+esc(s.company_name):''}</option>`).join('');
+}
+
+function openSupplierModal(id=''){
+  const s=id?suppliers.find(x=>x.id===id):null;
+  $('suId').value=s?.id||'';$('suName').value=s?.name||'';$('suContact').value=s?.contact_person||'';$('suCompany').value=s?.company_name||'';$('suPhone').value=s?.phone||'';$('suEmail').value=s?.email||'';$('suTax').value=s?.tax_number||'';$('suCR').value=s?.commercial_registration||'';$('suCity').value=s?.city||'';$('suTerms').value=s?.payment_terms_days??30;$('suAddress').value=s?.address||'';$('suNotes').value=s?.notes||'';openModal('supplierModal');
+}
+function editSupplier(id){openSupplierModal(id)}
+
+$('supplierForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  try{
+    const payload={id:$('suId').value||null,name:$('suName').value.trim(),contact_person:$('suContact').value.trim(),company_name:$('suCompany').value.trim(),phone:$('suPhone').value.trim(),email:$('suEmail').value.trim(),tax_number:$('suTax').value.trim(),commercial_registration:$('suCR').value.trim(),city:$('suCity').value.trim(),payment_terms_days:Number($('suTerms').value||30),address:$('suAddress').value.trim(),notes:$('suNotes').value.trim()};
+    let {error}=await sb.rpc('erp_upsert_supplier',{p_supplier:payload});
+    if(error) throw error;
+    closeModal('supplierModal');msg('تم حفظ المورد.');await loadSuppliers();
+  }catch(e){msg(e.message,'err')}
+});
+
+function addPurchaseLine(x={}){
+  purchaseItems.push({product_id:x.product_id||'',description:x.description||'',quantity:Number(x.quantity||1),unit_cost:Number(x.unit_cost||0),discount:Number(x.discount||0)});
+  renderPurchaseItems();
+}
+function removePurchaseLine(i){purchaseItems.splice(i,1);if(!purchaseItems.length)addPurchaseLine();else renderPurchaseItems();}
+function selectPurchaseProduct(i,value){purchaseItems[i].product_id=value;const p=products.find(x=>x.id===value);if(p){purchaseItems[i].description=p.name;purchaseItems[i].unit_cost=Number(p.cost_price||0)}renderPurchaseItems();}
+function purchaseProductOptions(selected=''){return '<option value="">اختر المنتج</option>'+products.filter(p=>p.is_active!==false).map(p=>`<option value="${p.id}" ${p.id===selected?'selected':''}>${esc(p.name)}${p.sku?' — '+esc(p.sku):''} | مخزون: ${Number(p.stock_qty||0)}</option>`).join('')}
+function renderPurchaseItems(){
+  if(!$('purchaseItems'))return;
+  $('purchaseItems').innerHTML=purchaseItems.map((x,i)=>`<div class="item-row"><select onchange="selectPurchaseProduct(${i},this.value)">${purchaseProductOptions(x.product_id)}</select><input value="${esc(x.description)}" placeholder="الوصف" oninput="purchaseItems[${i}].description=this.value"><input type="number" min="0.001" step="0.001" value="${x.quantity}" oninput="purchaseItems[${i}].quantity=Number(this.value);calcPurchase()"><input type="number" min="0" step="0.001" value="${x.unit_cost}" oninput="purchaseItems[${i}].unit_cost=Number(this.value);calcPurchase()"><input type="number" min="0" step="0.001" value="${x.discount}" oninput="purchaseItems[${i}].discount=Number(this.value);calcPurchase()"><button type="button" class="remove-item" onclick="removePurchaseLine(${i})">×</button></div>`).join('');
+  calcPurchase();
+}
+function calcPurchase(){
+  let sub=0,disc=0;purchaseItems.forEach(x=>{sub+=Number(x.quantity||0)*Number(x.unit_cost||0);disc+=Number(x.discount||0)});const taxable=Math.max(sub-disc,0),vat=taxable*Number($('puVat')?.value||0)/100,total=taxable+vat;if($('puTotal'))$('puTotal').textContent=money(total);
+}
+function openPurchaseModal(id=''){
+  const p=id?purchases.find(x=>x.id===id):null;
+  $('puId').value=p?.id||'';$('puDate').value=p?.purchase_date||today();$('puDue').value=p?.due_date||'';$('puVat').value=p?.vat_rate??(settings.vat_rate??5);$('puNotes').value=p?.notes||'';$('puReceived').checked=p?.status==='received';
+  fillPurchaseSupplierSelect(p?.supplier_id||'');purchaseItems=[];
+  if(p){rpc('erp_get_purchase_items',{p_purchase_id:p.id}).then(items=>{purchaseItems=items||[];renderPurchaseItems()}).catch(e=>msg(e.message,'err'))}else addPurchaseLine();
+  openModal('purchaseModal');
+}
+$('puVat')?.addEventListener('input',calcPurchase);
+
+async function loadPurchases(){
+  try{
+    purchases=await rpc('erp_list_purchases',{p_search:$('purchaseSearch')?.value||null,p_status:$('purchaseStatus')?.value||null})||[];
+    renderPurchases();
+  }catch(e){if($('purchaseTable'))$('purchaseTable').innerHTML='<div class="notice err">'+esc(e.message)+'</div>';}
+}
+function renderPurchases(){
+  if(!$('purchaseTable'))return;
+  if(!purchases.length){$('purchaseTable').innerHTML='<div style="padding:30px;text-align:center;color:#718096">لا توجد مشتريات.</div>';return;}
+  $('purchaseTable').innerHTML=`<table class="table"><thead><tr><th>رقم الشراء</th><th>المورد</th><th>التاريخ</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${purchases.map(p=>{
+    const total=Number(p.total||0),paid=Number(p.calculated_paid??p.paid_amount??0),bal=Math.max(total-paid,0),status=p.status||'draft';
+    const canEdit=status==='draft';
+    const canPay=['received','partially_paid'].includes(status)&&bal>0;
+    const canCancel=status!=='cancelled';
+    return `<tr><td><b>${esc(p.purchase_number)}</b></td><td>${esc(p.supplier_name||p.supplier_company||'—')}</td><td>${esc(p.purchase_date||'')}</td><td>${money(total)}</td><td>${money(paid)}</td><td>${money(bal)}</td><td>${badge(status)}</td><td class="actions-cell"><button class="btnx" onclick="viewPurchase('${p.id}')">عرض</button>${canEdit?`<button class="btnx" onclick="openPurchaseModal('${p.id}')">تعديل</button>`:''}${canPay?`<button class="btnx green" onclick="supplierPayment('${p.id}')">دفعة</button>`:''}${canCancel?`<button type="button" class="btnx danger purchase-cancel-btn" data-purchase-cancel="${p.id}" onclick="cancelPurchase('${p.id}')" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:5px;color:#a52020!important;border:2px solid #d33!important;background:#fff1f1!important;font-weight:900!important;cursor:pointer!important;min-width:86px">🗑 إلغاء</button>`:''}</td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+async function viewPurchase(id){
+  const p=purchases.find(x=>x.id===id);if(!p)return;
+  try{const items=await rpc('erp_get_purchase_items',{p_purchase_id:id});const text=(items||[]).map(x=>`${x.product_name||x.description||'Item'} × ${x.quantity} @ ${money(x.unit_cost)}`).join('\n');alert(`شراء: ${p.purchase_number}\nالحالة: ${p.status}\nالإجمالي: ${money(p.total)}\nالمدفوع: ${money(p.calculated_paid??p.paid_amount)}\nالمتبقي: ${money(Math.max(Number(p.total)-Number((p.calculated_paid??p.paid_amount)??0),0))}\n\n${text}`)}catch(e){msg(e.message,'err')}
+}
+async function cancelPurchase(id){
+  const p=purchases.find(x=>x.id===id);
+  if(!p)return;
+  const paid=Number(p.calculated_paid??p.paid_amount??0);
+  const reason=prompt(`إلغاء الشراء ${p.purchase_number}\nاكتب سبب الإلغاء:`,'Cancelled by admin');
+  if(reason===null)return;
+  if(!confirm(`تأكيد إلغاء ${p.purchase_number}؟\nسيتم تنفيذ عكس المخزون والقيد المحاسبي بواسطة النظام.`))return;
+
+  const btn=document.querySelector(`[data-purchase-cancel="${id}"]`);
+  const original=btn?btn.innerHTML:'🗑 إلغاء';
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ جاري الإلغاء...';btn.style.pointerEvents='none';}
+  msg('⏳ جاري الإلغاء...','ok');
+
+  try{
+    // Do not allow the UI to hang forever if the RPC/auth request never returns.
+    const rpcPromise=rpc('erp_cancel_purchase',{p_purchase_id:id,p_reason:reason.trim()||'Cancelled by admin'});
+    const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('انتهت مهلة طلب الإلغاء. تحقق من جلسة تسجيل الدخول وصلاحية admin ثم أعد المحاولة.')),20000));
+    const result=await Promise.race([rpcPromise,timeout]);
+
+    msg(result?.supplier_refund_required||paid>0
+      ?'تم إلغاء الشراء. توجد دفعة مورد سابقة وتتطلب معالجة رد المورد.'
+      :'تم إلغاء الشراء وعكس المخزون والقيد المحاسبي.');
+
+    await loadPurchases();
+    await loadProducts();
+    await loadDashboard();
+    await loadVat();
+    await loadFinancialAccounts();
+    await loadReports();
+  }catch(e){
+    console.error('erp_cancel_purchase failed:',e);
+    msg(`❌ فشل إلغاء الشراء: ${e?.message||e}`,'err');
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML=original;btn.style.pointerEvents='auto';}
+  }
+}
+async function supplierPayment(purchaseId){
+  const p=purchases.find(x=>x.id===purchaseId);if(!p)return;
+  const paid=Number(p.calculated_paid??p.paid_amount??0),bal=Math.max(Number(p.total||0)-paid,0);if(bal<=0)return msg('لا يوجد رصيد مستحق.','err');
+  const amount=Number(prompt(`دفعة للمورد — المتبقي ${bal.toFixed(3)} OMR`,bal.toFixed(3))||0);if(!(amount>0))return;if(amount>bal+0.000001)return msg('مبلغ الدفعة أكبر من المتبقي.','err');
+  const method=prompt('طريقة الدفع: cash / bank / card','bank')||'bank';
+  try{await rpc('erp_record_supplier_payment',{p_payment:{purchase_id:purchaseId,amount,method,payment_date:today(),notes:'Supplier payment from ERP'}});msg('تم تسجيل دفعة المورد.');await loadPurchases();await loadDashboard();await loadFinancialReports()}catch(e){msg(e.message,'err')}
+}
+$('purchaseForm')?.addEventListener('submit',async e=>{
+  e.preventDefault();
+  try{
+    if(!$('puSupplier').value)throw new Error('اختر المورد.');
+    if(!purchaseItems.length)throw new Error('أضف منتجاً واحداً على الأقل.');
+    const received=$('puReceived').checked;
+    if(received){for(const x of purchaseItems){if(!x.product_id)throw new Error('كل بند مستلم يجب أن يكون مرتبطاً بمنتج.');if(Number(x.quantity)<=0)throw new Error('الكمية يجب أن تكون أكبر من صفر.');}}
+    const result=await rpc('erp_create_purchase',{p_purchase:{id:$('puId').value||null,supplier_id:$('puSupplier').value,purchase_date:$('puDate').value,due_date:$('puDue').value,status:received?'received':'draft',vat_rate:Number($('puVat').value||0),notes:$('puNotes').value},p_items:purchaseItems.map(x=>({product_id:x.product_id,description:x.description,quantity:Number(x.quantity||0),unit_cost:Number(x.unit_cost||0),discount:Number(x.discount||0)}))});
+    closeModal('purchaseModal');msg(received?`تم استلام الشراء ${result?.purchase_number||''} وتحديث المخزون والمحاسبة.`:'تم حفظ الشراء كمسودة.');await loadPurchases();await loadProducts();await loadDashboard();await loadVat();await loadFinancialAccounts();await loadReports();
+  }catch(e){msg(e.message||'حدث خطأ أثناء حفظ الشراء','err')}
+});
 
 async function loadInvoices(){try{invoices=await rpc('erp_list_invoices',{p_search:$('invoiceSearch')?.value||null,p_status:$('invoiceStatus')?.value||null})||[];renderInvoices();fillCustomerSelects()}catch(e){$('invoiceTable').innerHTML='<div class="notice err">'+esc(e.message)+'</div>'}}
 function renderInvoices(){if(!invoices.length){$('invoiceTable').innerHTML='<div style="padding:30px;text-align:center;color:#718096">لا توجد فواتير.</div>';return}$('invoiceTable').innerHTML=`<table class="table"><thead><tr><th>رقم</th><th>العميل</th><th>التاريخ</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${invoices.map(i=>`<tr><td><b>${esc(i.invoice_number)}</b></td><td>${esc(i.customer_name||'—')}</td><td>${esc(i.issue_date||'')}</td><td>${money(i.total)}</td><td>${money(i.paid_amount)}</td><td>${money(Math.max(Number(i.total)-Number(i.paid_amount),0))}</td><td>${badge(i.status)}</td><td class="actions-cell"><button class="btnx" onclick="printInvoice('${i.id}')">🖨</button>${Number(i.total)>Number(i.paid_amount)&&i.status!=='cancelled'?`<button class="btnx green" onclick="newPayment('${i.id}')">دفعة</button>`:''}${i.status==='issued'&&Number(i.paid_amount||0)===0?`<button class="btnx danger" onclick="cancelInvoice('${i.id}')">إلغاء</button>`:''}</td></tr>`).join('')}</tbody></table>`}
@@ -106,6 +265,6 @@ async function loadReports(){return loadFinancialReports()}
 
 async function printInvoice(id){try{const i=invoices.find(x=>x.id===id);if(!i)return;const items=await rpc('erp_get_invoice_items',{p_invoice_id:id});const w=window.open('','_blank');w.document.write(`<html dir="rtl"><head><title>${esc(i.invoice_number)}</title><style>body{font-family:Arial;padding:40px;color:#111}h1{color:#092a82}.head{display:flex;justify-content:space-between}.box{border:1px solid #ddd;padding:15px;margin:15px 0;border-radius:8px}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ddd;padding:10px;text-align:right}.total{font-size:20px;font-weight:bold;text-align:left;margin-top:20px}</style></head><body><div class="head"><div><h1>${esc(settings.company_name||'BINGO Oman')}</h1><div>${esc(settings.tax_number||'')}</div><div>${esc(settings.phone||'')}</div></div><div><h2>فاتورة ضريبية</h2><b>${esc(i.invoice_number)}</b><div>${esc(i.issue_date)}</div></div></div><div class="box"><b>العميل:</b> ${esc(i.customer_name||'—')} ${i.customer_company?'<br>'+esc(i.customer_company):''}</div><table><thead><tr><th>الوصف</th><th>الكمية</th><th>سعر الوحدة</th><th>الخصم</th><th>الإجمالي</th></tr></thead><tbody>${(items||[]).map(x=>`<tr><td>${esc(x.description)}</td><td>${x.quantity}</td><td>${Number(x.unit_price).toFixed(3)}</td><td>${Number(x.discount).toFixed(3)}</td><td>${Number(x.line_total).toFixed(3)}</td></tr>`).join('')}</tbody></table><div class="total">Subtotal: ${Number(i.subtotal).toFixed(3)} OMR<br>VAT ${Number(i.vat_rate).toFixed(2)}%: ${Number(i.vat_amount).toFixed(3)} OMR<br>Grand Total: ${Number(i.total).toFixed(3)} OMR</div></body></html>`);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(_e){}},500)}catch(e){msg(e.message,'err')}}
 document.querySelectorAll('.report-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.report-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeFinancialReport=b.dataset.report;loadFinancialReports()});
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.style.display='none');$('tab-'+b.dataset.tab).style.display='block';if(b.dataset.tab==='reports'){loadFinancialReports()}});
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.style.display='none');$('tab-'+b.dataset.tab).style.display='block';if(b.dataset.tab==='reports'){loadFinancialReports()}if(b.dataset.tab==='purchases'){loadSuppliers();loadPurchases()}if(b.dataset.tab==='suppliers'){loadSuppliers()}});
 (function initFinancialDates(){const now=new Date();const t=localDateISO(now);const y=new Date(now);y.setDate(y.getDate()-1);const yesterday=localDateISO(y);$('finTo')&&($('finTo').value=t);$('finFrom')&&($('finFrom').value=yesterday);$('from')&&($('from').value=t);$('to')&&($('to').value=t);$('vatFrom')&&($('vatFrom').value=t);$('vatTo')&&($('vatTo').value=t)})();
 init();

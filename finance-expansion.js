@@ -112,10 +112,71 @@
     try{
       const d=await fx('erp_list_purchases',{p_search:$('purchaseSearch')?.value||null,p_status:$('purchaseStatus')?.value||null});
       const ps=rows(d);window.purchases=ps;
-      $('purchaseTable').innerHTML=!ps.length?'<div class="notice">لا توجد مشتريات.</div>':`<div class="fin-table-wrap"><table class="fin-table"><thead><tr><th>رقم الشراء</th><th>المورد</th><th>التاريخ</th><th>الحالة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>إجراء</th></tr></thead><tbody>${ps.map(p=>`<tr><td><b>${E(p.purchase_number)}</b></td><td>${E(p.supplier_name||'—')}</td><td>${E(p.purchase_date||'—')}</td><td>${status(p.status)}</td><td>${M(p.total)}</td><td>${M(p.calculated_paid ?? p.paid_amount)}</td><td><b>${M(p.balance)}</b></td><td style="white-space:nowrap"><button class="btnx" onclick="viewPurchase('${p.id}')">تفاصيل</button> ${p.status==='draft'?`<button class="btnx" onclick="editPurchase('${p.id}')">تعديل</button>`:''} ${Number(p.balance)>0&&p.status!=='draft'&&p.status!=='cancelled'?`<button class="btnx primary" onclick="paySupplier('${p.id}')">دفع للمورد</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+      $('purchaseTable').innerHTML=!ps.length?'<div class="notice">لا توجد مشتريات.</div>':`<div class="fin-table-wrap"><table class="fin-table"><thead><tr><th>رقم الشراء</th><th>المورد</th><th>التاريخ</th><th>الحالة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>إجراء</th></tr></thead><tbody>${ps.map(p=>`<tr><td><b>${E(p.purchase_number)}</b></td><td>${E(p.supplier_name||'—')}</td><td>${E(p.purchase_date||'—')}</td><td>${status(p.status)}</td><td>${M(p.total)}</td><td>${M(p.calculated_paid ?? p.paid_amount)}</td><td><b>${M(p.balance)}</b></td><td style="white-space:nowrap"><button class="btnx" onclick="viewPurchase('${p.id}')">تفاصيل</button> ${p.status==='draft'?`<button class="btnx" onclick="editPurchase('${p.id}')">تعديل</button>`:''} ${Number(p.balance)>0&&p.status!=='draft'&&p.status!=='cancelled'?`<button class="btnx primary" onclick="paySupplier('${p.id}')">دفع للمورد</button>`:''}${p.status==='cancelled'&&Number(p.calculated_paid??p.paid_amount??0)>0?`<button type="button" class="btnx supplier-refund-btn" data-supplier-refund="${p.id}" onclick="refundSupplier('${p.id}')" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:5px;color:#166534!important;border:2px solid #16a34a!important;background:#f0fdf4!important;font-weight:900!important;cursor:pointer!important;min-width:120px">💰 استرداد المورد</button>`:''}${p.status!=='cancelled'?`<button type="button" class="btnx danger purchase-cancel-btn" data-purchase-cancel="${p.id}" onclick="cancelPurchase('${p.id}')" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:5px;color:#a52020!important;border:2px solid #d33!important;background:#fff1f1!important;font-weight:900!important;cursor:pointer!important;min-width:86px">🗑 إلغاء</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
     }catch(e){msg(e.message,'err')}
   };
   window.editPurchase=async function(id){const p=(window.purchases||[]).find(x=>x.id===id);if(p)openPurchaseModal(p)};
+  window.cancelPurchase=async function(id){
+    const p=(window.purchases||[]).find(x=>x.id===id);
+    if(!p)return;
+    if(p.status==='cancelled'){msg('هذا الشراء ملغى بالفعل.','err');return;}
+    const btn=document.querySelector(`[data-purchase-cancel=\"${CSS.escape(String(id))}\"]`);
+    if(btn){btn.disabled=true;btn.dataset.cancelBusy='1';btn.textContent='⏳ جاري الإلغاء...';}
+    const reason=prompt(`إلغاء الشراء ${p.purchase_number}\nاكتب سبب الإلغاء:`,'Cancelled by admin');
+    if(reason===null){if(btn){btn.disabled=false;btn.dataset.cancelBusy='';btn.textContent='🗑 إلغاء';}return;}
+    if(!confirm(`تأكيد إلغاء ${p.purchase_number}؟\nسيتم عكس المخزون والقيد المحاسبي.\nإذا كانت هناك دفعة للمورد فسيتم تسجيل الحاجة إلى رد المورد.`)){
+      if(btn){btn.disabled=false;btn.dataset.cancelBusy='';btn.textContent='🗑 إلغاء';}
+      return;
+    }
+    try{
+      const result=await fx('erp_cancel_purchase',{p_purchase_id:id,p_reason:reason.trim()||'Cancelled by admin'});
+      if(!result || result.success===false)throw new Error(result?.message||'لم يتم إلغاء الشراء.');
+      msg(result?.supplier_refund_required?'تم إلغاء الشراء. توجد دفعة مورد سابقة وتتطلب معالجة رد المورد.':'تم إلغاء الشراء وعكس المخزون والقيد المحاسبي.');
+      await loadPurchases();
+      if(window.loadProducts)await window.loadProducts();
+      if(window.loadDashboard)await window.loadDashboard();
+      if(window.loadFinancialReports)await window.loadFinancialReports();
+    }catch(e){
+      const detail=e?.message||e?.details||e?.hint||e?.error_description||'تعذر إلغاء الشراء.';
+      console.error('erp_cancel_purchase failed',e);
+      msg(String(detail),'err');
+    }finally{
+      const fresh=document.querySelector(`[data-purchase-cancel=\"${CSS.escape(String(id))}\"]`);
+      if(fresh){fresh.disabled=false;fresh.dataset.cancelBusy='';}
+    }
+  };
+
+  window.refundSupplier=async function(id){
+    const p=(window.purchases||[]).find(x=>x.id===id);if(!p)return;
+    const refundStatus=await fx('erp_get_supplier_refund_status',{p_purchase_id:id});
+    const max=Number(refundStatus?.refund_balance||0);
+    if(max<=0){msg('لا يوجد مبلغ مستحق للاسترداد من المورد.','err');return}
+    const amount=prompt(`مبلغ استرداد المورد (المتاح ${M(max)}):`,max.toFixed(3));
+    if(amount===null)return;
+    const n=Number(amount);
+    if(!n||n<=0||n>max){msg('مبلغ الاسترداد غير صحيح.','err');return}
+    const method=(prompt('طريقة استلام الاسترداد: cash أو bank','cash')||'cash').trim().toLowerCase();
+    if(!['cash','bank'].includes(method)){msg('طريقة الاسترداد يجب أن تكون cash أو bank.','err');return}
+    const reference=prompt('مرجع الاسترداد (اختياري):','')||'';
+    const btn=document.querySelector(`[onclick="refundSupplier('${CSS.escape(String(id))}')"]`);
+    if(btn){btn.disabled=true;btn.dataset.refundBusy='1';btn.textContent='⏳ جاري الاسترداد...';}
+    try{
+      const result=await fx('erp_record_supplier_refund',{p_refund:{purchase_id:id,amount:n,method,refund_date:today(),reference,notes:'Supplier refund from ERP'}});
+      if(!result||result.success===false)throw new Error(result?.message||'لم يتم تسجيل استرداد المورد.');
+      msg(`تم تسجيل استرداد المورد ${M(n)} بنجاح.`);
+      await loadPurchases();
+      if(window.loadSuppliers)await window.loadSuppliers();
+      if(window.loadDashboard)await window.loadDashboard();
+      if(window.loadFinancialReports)await window.loadFinancialReports();
+    }catch(e){
+      const detail=e?.message||e?.details||e?.hint||e?.error_description||'تعذر تسجيل استرداد المورد.';
+      console.error('erp_record_supplier_refund failed',e);msg(String(detail),'err');
+    }finally{
+      const fresh=document.querySelector(`[onclick="refundSupplier('${CSS.escape(String(id))}')"]`);
+      if(fresh){fresh.disabled=false;fresh.dataset.refundBusy='';}
+    }
+  };
+
   window.paySupplier=async function(id){
     const p=(window.purchases||[]).find(x=>x.id===id);if(!p)return;
     const max=Number(p.balance||0);const amount=prompt(`المبلغ المراد دفعه للمورد (المتبقي ${M(max)}):`,max.toFixed(3));if(amount===null)return;
