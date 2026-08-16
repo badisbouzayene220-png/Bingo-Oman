@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   let ads=[], index=0, timer=null, currentAd=null;
-  const esc=s=>String(s??'').replace(/[&<>\'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>\'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));
   function valid(a){
     const now=Date.now();
     const start=a.starts_at?new Date(a.starts_at).getTime():-Infinity;
@@ -63,4 +63,22 @@
   }
   function init(){mount();load();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+
+/* Admin-only HR navigation: keep ERP untouched and expose HR as its own page. */
+(function(){
+  function addHrLink(){
+    if(!/\/admin(?:\.html)?$/i.test(window.location.pathname)) return;
+    const side=document.querySelector('.admin-side');
+    if(!side || side.querySelector('[data-bingo-hr-link]')) return;
+    const link=document.createElement('a');
+    link.href='hr.html';
+    link.setAttribute('data-bingo-hr-link','1');
+    link.textContent='👥 HR / الموارد البشرية';
+    link.style.cssText='display:block;text-align:left;text-decoration:none;padding:12px;border-radius:10px;font-weight:800;color:#667085';
+    link.addEventListener('mouseenter',()=>{link.style.background='#eef3ff';link.style.color='#092a82';});
+    link.addEventListener('mouseleave',()=>{link.style.background='';link.style.color='#667085';});
+    side.appendChild(link);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',addHrLink); else addHrLink();
 })();
