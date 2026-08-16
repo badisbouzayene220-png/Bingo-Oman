@@ -178,17 +178,11 @@ async function supplierPayment(purchaseId){
   const method=prompt('طريقة الدفع: cash / bank / card','bank')||'bank';
   try{await rpc('erp_record_supplier_payment',{p_payment:{purchase_id:purchaseId,amount,method,payment_date:today(),notes:'Supplier payment from ERP'}});msg('تم تسجيل دفعة المورد.');await loadPurchases();await loadDashboard();await loadFinancialReports()}catch(e){msg(e.message,'err')}
 }
-$('purchaseForm')?.addEventListener('submit',async e=>{
-  e.preventDefault();
-  try{
-    if(!$('puSupplier').value)throw new Error('اختر المورد.');
-    if(!purchaseItems.length)throw new Error('أضف منتجاً واحداً على الأقل.');
-    const received=$('puReceived').checked;
-    if(received){for(const x of purchaseItems){if(!x.product_id)throw new Error('كل بند مستلم يجب أن يكون مرتبطاً بمنتج.');if(Number(x.quantity)<=0)throw new Error('الكمية يجب أن تكون أكبر من صفر.');}}
-    const result=await rpc('erp_create_purchase',{p_purchase:{id:$('puId').value||null,supplier_id:$('puSupplier').value,purchase_date:$('puDate').value,due_date:$('puDue').value,status:received?'received':'draft',vat_rate:Number($('puVat').value||0),notes:$('puNotes').value},p_items:purchaseItems.map(x=>({product_id:x.product_id,description:x.description,quantity:Number(x.quantity||0),unit_cost:Number(x.unit_cost||0),discount:Number(x.discount||0)}))});
-    closeModal('purchaseModal');msg(received?`تم استلام الشراء ${result?.purchase_number||''} وتحديث المخزون والمحاسبة.`:'تم حفظ الشراء كمسودة.');await loadPurchases();await loadProducts();await loadDashboard();await loadVat();await loadFinancialAccounts();await loadReports();
-  }catch(e){msg(e.message||'حدث خطأ أثناء حفظ الشراء','err')}
-});
+// Purchase saving is handled exclusively by finance-expansion.js.
+// The legacy submit handler was removed because it registered a second
+// erp_create_purchase RPC call using the old purchaseItems array.
+// That duplicate call could overwrite the correct DOM quantity (e.g. 10)
+// with a stale value (e.g. 2).
 
 async function loadInvoices(){try{invoices=await rpc('erp_list_invoices',{p_search:$('invoiceSearch')?.value||null,p_status:$('invoiceStatus')?.value||null})||[];renderInvoices();fillCustomerSelects()}catch(e){$('invoiceTable').innerHTML='<div class="notice err">'+esc(e.message)+'</div>'}}
 function renderInvoices(){if(!invoices.length){$('invoiceTable').innerHTML='<div style="padding:30px;text-align:center;color:#718096">لا توجد فواتير.</div>';return}$('invoiceTable').innerHTML=`<table class="table"><thead><tr><th>رقم</th><th>العميل</th><th>التاريخ</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${invoices.map(i=>`<tr><td><b>${esc(i.invoice_number)}</b></td><td>${esc(i.customer_name||'—')}</td><td>${esc(i.issue_date||'')}</td><td>${money(i.total)}</td><td>${money(i.paid_amount)}</td><td>${money(Math.max(Number(i.total)-Number(i.paid_amount),0))}</td><td>${badge(i.status)}</td><td class="actions-cell"><button class="btnx" onclick="printInvoice('${i.id}')">🖨</button>${Number(i.total)>Number(i.paid_amount)&&i.status!=='cancelled'?`<button class="btnx green" onclick="newPayment('${i.id}')">دفعة</button>`:''}${i.status==='issued'&&Number(i.paid_amount||0)===0?`<button class="btnx danger" onclick="cancelInvoice('${i.id}')">إلغاء</button>`:''}</td></tr>`).join('')}</tbody></table>`}

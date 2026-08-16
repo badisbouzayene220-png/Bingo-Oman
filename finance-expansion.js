@@ -57,39 +57,165 @@
   function supplierOptions(selected=''){return `<option value="">بدون مورد</option>`+suppliers.map(s=>`<option value="${s.id}" ${s.id===selected?'selected':''}>${E(s.name)}${s.company_name?' — '+E(s.company_name):''}</option>`).join('')}
   function productOptions(selected=''){return `<option value="">اختر المنتج</option>`+(window.products||products||[]).map(p=>`<option value="${p.id}" data-cost="${p.cost_price||0}" ${p.id===selected?'selected':''}>${E(p.sku||'')} — ${E(p.name)}</option>`).join('')}
 
+  function normalizePurchaseNumber(value, fallback=0){
+    let v=String(value??'').trim();
+    v=v.replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-1632));
+    v=v.replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-1776));
+    v=v.replace(/٫/g,'.').replace(/,/g,'.').replace(/[^0-9.\-]/g,'');
+    const first=v.indexOf('.');
+    if(first>=0)v=v.slice(0,first+1)+v.slice(first+1).replace(/\./g,'');
+    const n=Number(v);
+    return Number.isFinite(n)?n:fallback;
+  }
+
   window.openPurchaseModal=async function(p){
     if(!suppliers.length)await loadSuppliers();
     $('puId').value=p?.id||'';$('puSupplier').innerHTML=supplierOptions(p?.supplier_id||'');
     $('puDate').value=p?.purchase_date||today();$('puDue').value=p?.due_date||'';$('puVat').value=p?.vat_rate??(settings.vat_rate??5);$('puNotes').value=p?.notes||'';$('puReceived').checked=p?.status==='received';
     purchaseLines=[]; window.purchaseLines=purchaseLines;
-    if(p?.id){const items=rows(await fx('erp_get_purchase_items',{p_purchase_id:p.id}));purchaseLines=items.map(x=>({product_id:x.product_id||'',description:x.description||'',quantity:Number(x.quantity||1),unit_cost:Number(x.unit_cost||0),discount:Number(x.discount||0)}));}
+    if(p?.id){
+      const items=rows(await fx('erp_get_purchase_items',{p_purchase_id:p.id}));
+      purchaseLines=items.map(x=>({
+        product_id:x.product_id||'',
+        description:x.description||'',
+        quantity:normalizePurchaseNumber(x.quantity,1),
+        unit_cost:normalizePurchaseNumber(x.unit_cost,0),
+        discount:normalizePurchaseNumber(x.discount,0)
+      }));
+      window.purchaseLines=purchaseLines;
+    }
     if(!purchaseLines.length)addPurchaseLine();else renderPurchaseLines();
     openModal('purchaseModal');
   };
-  window.addPurchaseLine=function(){purchaseLines.push({product_id:'',description:'',quantity:1,unit_cost:0,discount:0});renderPurchaseLines()};
-  window.removePurchaseLine=function(i){purchaseLines.splice(i,1);renderPurchaseLines()};
-  window.syncPurchaseLine=function(i,field,val){
-    purchaseLines[i][field]=field==='product_id'||field==='description'?val:Number(val||0);
-    if(field==='product_id'){const p=(window.products||products||[]).find(x=>x.id===val);if(p){purchaseLines[i].description=p.name;purchaseLines[i].unit_cost=Number(p.cost_price||0)}}
+
+  window.addPurchaseLine=function(){
+    purchaseLines.push({product_id:'',description:'',quantity:1,unit_cost:0,discount:0});
+    window.purchaseLines=purchaseLines;
     renderPurchaseLines();
   };
+
+  window.removePurchaseLine=function(i){
+    purchaseLines.splice(i,1);
+    if(!purchaseLines.length)purchaseLines.push({product_id:'',description:'',quantity:1,unit_cost:0,discount:0});
+    window.purchaseLines=purchaseLines;
+    renderPurchaseLines();
+  };
+
+  window.syncPurchaseLine=function(i,field,val){
+    if(!purchaseLines[i])return;
+    purchaseLines[i][field]=field==='product_id'||field==='description'
+      ? String(val??'')
+      : normalizePurchaseNumber(val,0);
+    if(field==='product_id'){
+      const p=(window.products||products||[]).find(x=>x.id===val);
+      if(p){
+        purchaseLines[i].description=p.name;
+        purchaseLines[i].unit_cost=normalizePurchaseNumber(p.cost_price,0);
+      }
+    }
+    window.purchaseLines=purchaseLines;
+    renderPurchaseLines();
+  };
+
+  function syncPurchaseLinesFromDOM(){
+    const box=$('purchaseItems');
+    if(!box)return;
+    box.querySelectorAll('[data-purchase-line]').forEach(row=>{
+      const i=Number(row.dataset.purchaseLine);
+      if(!Number.isInteger(i)||!purchaseLines[i])return;
+      const qty=row.querySelector('.purchase-line-qty');
+      const cost=row.querySelector('.purchase-line-cost');
+      const disc=row.querySelector('.purchase-line-discount');
+      const desc=row.querySelector('.purchase-line-description');
+      const product=row.querySelector('.purchase-line-product');
+      if(product)purchaseLines[i].product_id=product.value||'';
+      if(desc)purchaseLines[i].description=desc.value||'';
+      if(qty)purchaseLines[i].quantity=normalizePurchaseNumber(qty.value,0);
+      if(cost)purchaseLines[i].unit_cost=normalizePurchaseNumber(cost.value,0);
+      if(disc)purchaseLines[i].discount=normalizePurchaseNumber(disc.value,0);
+    });
+    window.purchaseLines=purchaseLines;
+  }
+
   function renderPurchaseLines(){
     const box=$('purchaseItems');if(!box)return;
-    box.innerHTML=purchaseLines.map((x,i)=>`<div class="invoice-line" style="display:grid;grid-template-columns:2fr 2fr .8fr 1fr 1fr auto;gap:7px;align-items:end;margin-bottom:8px"><label>المنتج<select onchange="syncPurchaseLine(${i},'product_id',this.value)">${productOptions(x.product_id)}</select></label><label>الوصف<input value="${E(x.description)}" onchange="syncPurchaseLine(${i},'description',this.value)"></label><label>الكمية<input type="number" min=".001" step=".001" value="${x.quantity}" onchange="syncPurchaseLine(${i},'quantity',this.value)"></label><label>تكلفة الوحدة<input type="number" min="0" step=".001" value="${x.unit_cost}" onchange="syncPurchaseLine(${i},'unit_cost',this.value)"></label><label>الخصم<input type="number" min="0" step=".001" value="${x.discount}" onchange="syncPurchaseLine(${i},'discount',this.value)"></label><button type="button" class="btnx" onclick="removePurchaseLine(${i})">×</button></div>`).join('');
-    const sub=purchaseLines.reduce((a,x)=>a+Number(x.quantity||0)*Number(x.unit_cost||0),0),disc=purchaseLines.reduce((a,x)=>a+Number(x.discount||0),0),tax=Math.max(sub-disc,0)*Number($('puVat')?.value||0)/100;
-    $('puTotal').textContent=M(Math.max(sub-disc,0)+tax);
+    box.innerHTML=purchaseLines.map((x,i)=>`<div class="invoice-line" data-purchase-line="${i}" style="display:grid;grid-template-columns:2fr 2fr .8fr 1fr 1fr auto;gap:7px;align-items:end;margin-bottom:8px"><label>المنتج<select class="purchase-line-product" onchange="syncPurchaseLine(${i},'product_id',this.value)">${productOptions(x.product_id)}</select></label><label>الوصف<input class="purchase-line-description" value="${E(x.description)}" onchange="syncPurchaseLine(${i},'description',this.value)"></label><label>الكمية<input class="purchase-line-qty" type="number" min=".001" step=".001" inputmode="decimal" value="${normalizePurchaseNumber(x.quantity,1)}" oninput="purchaseLines[${i}].quantity=normalizePurchaseNumber(this.value,0);window.purchaseLines=purchaseLines;calcPurchaseLinesTotal()" onchange="syncPurchaseLine(${i},'quantity',this.value)"></label><label>تكلفة الوحدة<input class="purchase-line-cost" type="number" min="0" step=".001" inputmode="decimal" value="${normalizePurchaseNumber(x.unit_cost,0)}" oninput="purchaseLines[${i}].unit_cost=normalizePurchaseNumber(this.value,0);window.purchaseLines=purchaseLines;calcPurchaseLinesTotal()" onchange="syncPurchaseLine(${i},'unit_cost',this.value)"></label><label>الخصم<input class="purchase-line-discount" type="number" min="0" step=".001" inputmode="decimal" value="${normalizePurchaseNumber(x.discount,0)}" oninput="purchaseLines[${i}].discount=normalizePurchaseNumber(this.value,0);window.purchaseLines=purchaseLines;calcPurchaseLinesTotal()" onchange="syncPurchaseLine(${i},'discount',this.value)"></label><button type="button" class="btnx" onclick="removePurchaseLine(${i})">×</button></div>`).join('');
+    calcPurchaseLinesTotal();
   }
-  document.addEventListener('input',e=>{if(e.target.id==='puVat')renderPurchaseLines()});
+
+  function calcPurchaseLinesTotal(){
+    const sub=purchaseLines.reduce((a,x)=>a+normalizePurchaseNumber(x.quantity,0)*normalizePurchaseNumber(x.unit_cost,0),0);
+    const disc=purchaseLines.reduce((a,x)=>a+normalizePurchaseNumber(x.discount,0),0);
+    const tax=Math.max(sub-disc,0)*normalizePurchaseNumber($('puVat')?.value,0)/100;
+    if($('puTotal'))$('puTotal').textContent=M(Math.max(sub-disc,0)+tax);
+  }
+
+  function renderPurchaseLinesTotalOnly(){
+    syncPurchaseLinesFromDOM();
+    calcPurchaseLinesTotal();
+  }
+
+  document.addEventListener('input',e=>{
+    if(e.target.id==='puVat')calcPurchaseLinesTotal();
+  });
+
+  let purchaseSaving=false;
   document.addEventListener('submit',async function(ev){
     if(ev.target.id!=='purchaseForm')return;
     ev.preventDefault();
+    if(purchaseSaving)return;
+    purchaseSaving=true;
+    const submitBtn=ev.target.querySelector('button[type="submit"]');
+    const oldText=submitBtn?.textContent;
+    if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='جاري الحفظ...';}
     try{
+      // Always read the visible inputs immediately before the RPC.
+      // This prevents a stale in-memory value from replacing a quantity such as 10 with 1/2.
+      syncPurchaseLinesFromDOM();
       if(!purchaseLines.length)throw new Error('أضف منتجاً واحداً على الأقل.');
-      const payload={id:$('puId').value||null,supplier_id:$('puSupplier').value||null,purchase_date:$('puDate').value,due_date:$('puDue').value||null,vat_rate:Number($('puVat').value||0),status:$('puReceived').checked?'received':'draft',notes:$('puNotes').value};
-      const items=purchaseLines.map(x=>({product_id:x.product_id||null,description:x.description,quantity:Number(x.quantity),unit_cost:Number(x.unit_cost),discount:Number(x.discount||0)}));
+      for(const x of purchaseLines){
+        x.quantity=normalizePurchaseNumber(x.quantity,0);
+        x.unit_cost=normalizePurchaseNumber(x.unit_cost,0);
+        x.discount=normalizePurchaseNumber(x.discount,0);
+        if(x.quantity<=0)throw new Error('الكمية يجب أن تكون أكبر من صفر.');
+        if($('puReceived').checked&&!x.product_id)throw new Error('كل بند مستلم يجب أن يكون مرتبطاً بمنتج.');
+      }
+      window.purchaseLines=purchaseLines;
+
+      const payload={
+        id:$('puId').value||null,
+        supplier_id:$('puSupplier').value||null,
+        purchase_date:$('puDate').value,
+        due_date:$('puDue').value||null,
+        vat_rate:normalizePurchaseNumber($('puVat').value,0),
+        status:$('puReceived').checked?'received':'draft',
+        notes:$('puNotes').value
+      };
+      const items=purchaseLines.map(x=>({
+        product_id:x.product_id||null,
+        description:x.description||'',
+        quantity:normalizePurchaseNumber(x.quantity,0),
+        unit_cost:normalizePurchaseNumber(x.unit_cost,0),
+        discount:normalizePurchaseNumber(x.discount,0)
+      }));
+
+      // Single authoritative purchase RPC call.
       await fx('erp_create_purchase',{p_purchase:payload,p_items:items});
-      closeModal('purchaseModal');msg(payload.status==='received'?'تم حفظ الشراء وإضافة الكميات للمخزون.':'تم حفظ فاتورة الشراء كمسودة.');loadPurchases();if(window.loadProducts)loadProducts();if(window.loadDashboard)loadDashboard();
-    }catch(e){msg(e.message,'err')}
+
+      closeModal('purchaseModal');
+      msg(payload.status==='received'?'تم حفظ الشراء وإضافة الكميات للمخزون.':'تم حفظ فاتورة الشراء كمسودة.');
+      await Promise.all([
+        loadPurchases(),
+        window.loadProducts?window.loadProducts():Promise.resolve(),
+        window.loadDashboard?window.loadDashboard():Promise.resolve()
+      ]);
+    }catch(e){
+      console.error('erp_create_purchase failed:',e);
+      msg(e.message||'حدث خطأ أثناء حفظ الشراء','err');
+    }finally{
+      purchaseSaving=false;
+      if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=oldText||'حفظ';}
+    }
   });
 
   function ensurePurchaseDetailsModal(){
@@ -112,7 +238,7 @@
     try{
       const d=await fx('erp_list_purchases',{p_search:$('purchaseSearch')?.value||null,p_status:$('purchaseStatus')?.value||null});
       const ps=rows(d);window.purchases=ps;
-      $('purchaseTable').innerHTML=!ps.length?'<div class="notice">لا توجد مشتريات.</div>':`<div class="fin-table-wrap"><table class="fin-table"><thead><tr><th>رقم الشراء</th><th>المورد</th><th>التاريخ</th><th>الحالة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>إجراء</th></tr></thead><tbody>${ps.map(p=>`<tr><td><b>${E(p.purchase_number)}</b></td><td>${E(p.supplier_name||'—')}</td><td>${E(p.purchase_date||'—')}</td><td>${status(p.status)}</td><td>${M(p.total)}</td><td>${M(p.calculated_paid ?? p.paid_amount)}</td><td><b>${M(p.balance)}</b></td><td style="white-space:nowrap"><button class="btnx" onclick="viewPurchase('${p.id}')">تفاصيل</button> ${p.status==='draft'?`<button class="btnx" onclick="editPurchase('${p.id}')">تعديل</button>`:''} ${Number(p.balance)>0&&p.status!=='draft'&&p.status!=='cancelled'?`<button class="btnx primary" onclick="paySupplier('${p.id}')">دفع للمورد</button>`:''}${p.status==='cancelled'&&Number(p.calculated_paid??p.paid_amount??0)>0?`<button type="button" class="btnx supplier-refund-btn" data-supplier-refund="${p.id}" onclick="refundSupplier('${p.id}')" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:5px;color:#166534!important;border:2px solid #16a34a!important;background:#f0fdf4!important;font-weight:900!important;cursor:pointer!important;min-width:120px">💰 استرداد المورد</button>`:''}${p.status!=='cancelled'?`<button type="button" class="btnx danger purchase-cancel-btn" data-purchase-cancel="${p.id}" onclick="cancelPurchase('${p.id}')" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:5px;color:#a52020!important;border:2px solid #d33!important;background:#fff1f1!important;font-weight:900!important;cursor:pointer!important;min-width:86px">🗑 إلغاء</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+      $('purchaseTable').innerHTML=!ps.length?'<div class="notice">لا توجد مشتريات.</div>':`<div class="fin-table-wrap"><table class="fin-table"><thead><tr><th>رقم الشراء</th><th>المورد</th><th>التاريخ</th><th>الحالة</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>إجراء</th></tr></thead><tbody>${ps.map(p=>`<tr><td><b>${E(p.purchase_number)}</b></td><td>${E(p.supplier_name||'—')}</td><td>${E(p.purchase_date||'—')}</td><td>${status(p.status)}</td><td>${M(p.total)}</td><td>${M(p.calculated_paid ?? p.paid_amount)}</td><td><b>${M(p.balance)}</b></td><td style="white-space:nowrap"><button class="btnx" onclick="viewPurchase('${p.id}')">تفاصيل</button> ${p.status==='draft'?`<button class="btnx" onclick="editPurchase('${p.id}')">تعديل</button>`:''} ${Number(p.balance)>0&&p.status!=='draft'&&p.status!=='cancelled'?`<button class="btnx primary" onclick="paySupplier('${p.id}')">دفع للمورد</button>`:''}${p.status!=='cancelled'?`<button type="button" class="btnx danger purchase-cancel-btn" data-purchase-cancel="${p.id}" onclick="cancelPurchase('${p.id}')" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;gap:5px;color:#a52020!important;border:2px solid #d33!important;background:#fff1f1!important;font-weight:900!important;cursor:pointer!important;min-width:86px">🗑 إلغاء</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
     }catch(e){msg(e.message,'err')}
   };
   window.editPurchase=async function(id){const p=(window.purchases||[]).find(x=>x.id===id);if(p)openPurchaseModal(p)};
@@ -143,37 +269,6 @@
     }finally{
       const fresh=document.querySelector(`[data-purchase-cancel=\"${CSS.escape(String(id))}\"]`);
       if(fresh){fresh.disabled=false;fresh.dataset.cancelBusy='';}
-    }
-  };
-
-  window.refundSupplier=async function(id){
-    const p=(window.purchases||[]).find(x=>x.id===id);if(!p)return;
-    const refundStatus=await fx('erp_get_supplier_refund_status',{p_purchase_id:id});
-    const max=Number(refundStatus?.refund_balance||0);
-    if(max<=0){msg('لا يوجد مبلغ مستحق للاسترداد من المورد.','err');return}
-    const amount=prompt(`مبلغ استرداد المورد (المتاح ${M(max)}):`,max.toFixed(3));
-    if(amount===null)return;
-    const n=Number(amount);
-    if(!n||n<=0||n>max){msg('مبلغ الاسترداد غير صحيح.','err');return}
-    const method=(prompt('طريقة استلام الاسترداد: cash أو bank','cash')||'cash').trim().toLowerCase();
-    if(!['cash','bank'].includes(method)){msg('طريقة الاسترداد يجب أن تكون cash أو bank.','err');return}
-    const reference=prompt('مرجع الاسترداد (اختياري):','')||'';
-    const btn=document.querySelector(`[onclick="refundSupplier('${CSS.escape(String(id))}')"]`);
-    if(btn){btn.disabled=true;btn.dataset.refundBusy='1';btn.textContent='⏳ جاري الاسترداد...';}
-    try{
-      const result=await fx('erp_record_supplier_refund',{p_refund:{purchase_id:id,amount:n,method,refund_date:today(),reference,notes:'Supplier refund from ERP'}});
-      if(!result||result.success===false)throw new Error(result?.message||'لم يتم تسجيل استرداد المورد.');
-      msg(`تم تسجيل استرداد المورد ${M(n)} بنجاح.`);
-      await loadPurchases();
-      if(window.loadSuppliers)await window.loadSuppliers();
-      if(window.loadDashboard)await window.loadDashboard();
-      if(window.loadFinancialReports)await window.loadFinancialReports();
-    }catch(e){
-      const detail=e?.message||e?.details||e?.hint||e?.error_description||'تعذر تسجيل استرداد المورد.';
-      console.error('erp_record_supplier_refund failed',e);msg(String(detail),'err');
-    }finally{
-      const fresh=document.querySelector(`[onclick="refundSupplier('${CSS.escape(String(id))}')"]`);
-      if(fresh){fresh.disabled=false;fresh.dataset.refundBusy='';}
     }
   };
 
