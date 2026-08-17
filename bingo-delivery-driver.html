@@ -1,36 +1,204 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bingo Driver</title><link rel="stylesheet" href="bingo-delivery.css"></head>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bingo Driver</title>
+<link rel="stylesheet" href="bingo-delivery.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase-client.js"></script>
+<style>
+.driver-login{max-width:440px;margin:40px auto}.driver-login form{display:grid;gap:12px}.driver-login input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #ddd;border-radius:10px}.driver-login label{display:grid;gap:6px;font-weight:600}.driver-hidden{display:none!important}.driver-userbar{display:flex;align-items:center;gap:8px}.driver-error{padding:12px;border-radius:10px;background:#fff1f1;color:#a00}.driver-success{padding:12px;border-radius:10px;background:#effaf1;color:#176b2c}
+</style>
+</head>
 <body>
-<header class="bd-topbar"><div class="bd-brand">BINGO Driver<small data-bd-i18n="driver">المندوب</small></div><nav class="bd-nav"><a href="bingo-delivery-customer.html" data-bd-i18n="customer">العميل</a><a href="bingo-delivery-seller.html" data-bd-i18n="seller">البائع</a><a href="bingo-delivery-admin.html" data-bd-i18n="admin">إدارة التوصيل</a><a href="javascript:BingoDelivery.setLang(BingoDelivery.getLang()==='ar'?'en':'ar')" data-bd-language>EN</a></nav></header>
+<header class="bd-topbar">
+  <div class="bd-brand">BINGO Driver<small data-bd-i18n="driver">المندوب</small></div>
+  <nav class="bd-nav">
+    <a href="bingo-delivery-customer.html" data-bd-i18n="customer">العميل</a>
+    <a href="bingo-delivery-seller.html" data-bd-i18n="seller">البائع</a>
+    <a href="bingo-delivery-admin.html" data-bd-i18n="admin">إدارة التوصيل</a>
+    <a href="#" data-bd-language>EN</a>
+    <span id="driver-user" class="driver-userbar"></span>
+  </nav>
+</header>
+
 <main class="bd-main">
-<section class="bd-card"><div class="bd-actions"><button id="driver-online" class="bd-btn primary">ONLINE</button><span id="driver-online-badge" class="bd-badge success">متصل</span></div><p id="driver-message" role="status"></p></section>
-<section class="bd-card" style="margin-top:18px"><h2 data-bd-i18n="newOrder">طلب جديد</h2><div id="driver-orders"><p>جاري تحميل الطلبات...</p></div></section>
-<section class="bd-card" style="margin-top:18px"><h2 data-bd-i18n="activeDeliveries">التوصيلات النشطة</h2><div id="active-deliveries"><p>لا توجد توصيلات نشطة</p></div></section>
-<div class="bd-grid cards" style="margin-top:18px"><section class="bd-card"><div class="bd-muted" data-bd-i18n="today">اليوم</div><div id="driver-today" class="bd-stat">0.000 OMR</div></section><section class="bd-card"><div class="bd-muted" data-bd-i18n="thisWeek">هذا الأسبوع</div><div id="driver-week" class="bd-stat">0.000 OMR</div></section></div>
+<section id="driver-login" class="bd-card driver-login driver-hidden">
+  <h2>دخول المندوب</h2>
+  <p class="bd-muted">سجّل الدخول بحساب المندوب للوصول إلى التوصيلات.</p>
+  <form id="driver-login-form">
+    <label>البريد الإلكتروني
+      <input id="driver-email" type="email" autocomplete="username" required placeholder="delivery.driver@test.com">
+    </label>
+    <label>كلمة المرور
+      <input id="driver-password" type="password" autocomplete="current-password" required>
+    </label>
+    <button class="bd-btn orange" type="submit">تسجيل الدخول</button>
+    <div id="driver-login-message" role="alert"></div>
+  </form>
+</section>
+
+<section id="driver-app" class="driver-hidden">
+  <section class="bd-card">
+    <div class="bd-actions">
+      <button id="driver-online" class="bd-btn primary" type="button">ONLINE</button>
+      <span id="driver-online-badge" class="bd-badge success">متصل</span>
+    </div>
+    <p id="driver-message" role="status"></p>
+  </section>
+
+  <section class="bd-card" style="margin-top:18px">
+    <h2 data-bd-i18n="newOrder">طلب جديد</h2>
+    <div id="driver-orders"><p>جاري تحميل الطلبات...</p></div>
+  </section>
+
+  <section class="bd-card" style="margin-top:18px">
+    <h2 data-bd-i18n="activeDeliveries">التوصيلات النشطة</h2>
+    <div id="active-deliveries"><p>لا توجد توصيلات نشطة</p></div>
+  </section>
+
+  <div class="bd-grid cards" style="margin-top:18px">
+    <section class="bd-card"><div class="bd-muted" data-bd-i18n="today">اليوم</div><div id="driver-today" class="bd-stat">0.000 OMR</div></section>
+    <section class="bd-card"><div class="bd-muted" data-bd-i18n="thisWeek">هذا الأسبوع</div><div id="driver-week" class="bd-stat">0.000 OMR</div></section>
+  </div>
+</section>
 </main>
+
 <script src="bingo-delivery.js"></script>
 <script>
 (function(){
- const wait=()=>{if(!window.BingoDelivery||!window.supabaseClient)return setTimeout(wait,100);init()};
- async function init(){
-  const sb=window.supabaseClient; await BingoDelivery.renderAuth();
-  const msg=document.getElementById('driver-message'), onlineBtn=document.getElementById('driver-online'), badge=document.getElementById('driver-online-badge');
-  const esc=v=>String(v??'').replace(/[&<>\'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  async function load(){
-   const {data:sessionData}=await sb.auth.getSession(); if(!sessionData?.session){document.getElementById('driver-orders').innerHTML='<p>يرجى تسجيل الدخول</p>';return}
-   const {data,error}=await sb.from('delivery_assignments').select('id,status,order_id,driver_id,offered_at,delivery_orders(id,order_number,status,total,delivery_fee,delivery_address,distance_km)').in('status',['offered','accepted','picked_up','on_delivery']).order('offered_at',{ascending:false});
-   if(error){document.getElementById('driver-orders').innerHTML='<p>'+esc(error.message)+'</p>';return}
-   const rows=data||[], offered=rows.filter(a=>a.status==='offered'), active=rows.filter(a=>['accepted','picked_up','on_delivery'].includes(a.status));
-   document.getElementById('driver-orders').innerHTML=offered.length?offered.map(a=>{const o=a.delivery_orders||{};return `<article class="delivery-order-card"><strong>${esc(o.order_number||a.order_id)}</strong><span>${Number(o.distance_km||0).toFixed(2)} km</span><span>${Number(o.delivery_fee||0).toFixed(3)} OMR</span><small>${esc(o.delivery_address||'')}</small><div class="bd-actions"><button class="bd-btn primary" data-action="accept" data-id="${a.id}">قبول</button><button class="bd-btn ghost" data-action="reject" data-id="${a.id}">رفض</button></div></article>`}).join(''):'<p>لا توجد طلبات جديدة</p>';
-   document.getElementById('active-deliveries').innerHTML=active.length?active.map(a=>{const o=a.delivery_orders||{};let b='';if(a.status==='accepted')b=`<button class="bd-btn orange" data-action="pickup" data-id="${a.id}">استلام</button>`;else if(a.status==='picked_up'||a.status==='on_delivery')b=`<button class="bd-btn primary" data-action="delivered" data-id="${a.id}">تم التسليم</button>`;return `<article class="delivery-order-card"><strong>${esc(o.order_number||a.order_id)}</strong><span>${esc(a.status)}</span><span>${Number(o.delivery_fee||0).toFixed(3)} OMR</span><small>${esc(o.delivery_address||'')}</small><div class="bd-actions">${b}</div></article>`}).join(''):'<p>لا توجد توصيلات نشطة</p>';
-   const {data:driver}=await sb.from('delivery_drivers').select('is_online,is_available').eq('user_id',sessionData.session.user.id).maybeSingle();const on=!!driver?.is_online;onlineBtn.textContent=on?'OFFLINE':'ONLINE';badge.textContent=on?'متصل':'غير متصل';
+  'use strict';
+  const sb=window.supabaseClient||window.sb||window.supabase;
+  const loginEl=document.getElementById('driver-login');
+  const appEl=document.getElementById('driver-app');
+  const userEl=document.getElementById('driver-user');
+  const msg=document.getElementById('driver-message');
+  const loginMsg=document.getElementById('driver-login-message');
+  const onlineBtn=document.getElementById('driver-online');
+  const badge=document.getElementById('driver-online-badge');
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
+
+  function showLogin(){loginEl.classList.remove('driver-hidden');appEl.classList.add('driver-hidden');userEl.textContent='';}
+  function showApp(email){loginEl.classList.add('driver-hidden');appEl.classList.remove('driver-hidden');userEl.innerHTML=esc(email||'');}
+
+  async function ensureDriver(user, online=true){
+    const {data,error}=await sb.rpc('delivery_set_driver_status',{p_online:online});
+    if(error) throw error;
+    return data;
   }
-  onlineBtn.onclick=async()=>{try{const {data:s}=await sb.auth.getSession();if(!s?.session)throw new Error('يرجى تسجيل الدخول أولاً');await BingoDelivery.setDriverStatus(onlineBtn.textContent==='ONLINE');await load()}catch(e){msg.textContent=e.message||'فشل تحديث الحالة'}};
-  document.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;try{if(b.dataset.action==='accept')await BingoDelivery.decideAssignment(b.dataset.id,true);else if(b.dataset.action==='reject')await BingoDelivery.decideAssignment(b.dataset.id,false);else if(b.dataset.action==='pickup')await BingoDelivery.setAssignmentStatus(b.dataset.id,'picked_up');else if(b.dataset.action==='delivered')await BingoDelivery.setAssignmentStatus(b.dataset.id,'delivered');msg.textContent='تم تحديث الطلب بنجاح';await load()}catch(err){msg.textContent=err.message||'تعذر تحديث الطلب'}});
-  await load();setInterval(load,15000);
- }
- wait();
+
+  async function load(){
+    const {data:{user},error:ue}=await sb.auth.getUser();
+    if(ue) throw ue;
+    if(!user){showLogin();return;}
+    showApp(user.email);
+
+    const {data:driver,error:de}=await sb.from('delivery_drivers')
+      .select('id,is_online,is_available')
+      .eq('id',user.id)
+      .maybeSingle();
+    if(de) throw de;
+
+    if(!driver){
+      try{ await ensureDriver(user,true); }
+      catch(e){ msg.textContent='تعذر إنشاء ملف المندوب: '+(e.message||e); }
+    }
+
+    const {data:driver2,error:de2}=await sb.from('delivery_drivers')
+      .select('id,is_online,is_available')
+      .eq('id',user.id)
+      .maybeSingle();
+    if(de2) throw de2;
+    const on=!!driver2?.is_online;
+    onlineBtn.textContent=on?'OFFLINE':'ONLINE';
+    badge.textContent=on?'متصل':'غير متصل';
+    badge.className='bd-badge '+(on?'success':'warning');
+
+    const {data,error}=await sb.from('delivery_assignments')
+      .select('id,status,order_id,driver_id,offered_at,delivery_orders(id,order_number,status,total,delivery_fee,delivery_address,distance_km)')
+      .eq('driver_id',user.id)
+      .in('status',['offered','accepted','picked_up','on_delivery'])
+      .order('offered_at',{ascending:false});
+    if(error) throw error;
+
+    const rows=data||[];
+    const offered=rows.filter(a=>a.status==='offered');
+    const active=rows.filter(a=>['accepted','picked_up','on_delivery'].includes(a.status));
+
+    document.getElementById('driver-orders').innerHTML=offered.length?offered.map(a=>{
+      const o=a.delivery_orders||{};
+      return `<article class="delivery-order-card"><strong>${esc(o.order_number||a.order_id)}</strong><span>${Number(o.distance_km||0).toFixed(2)} km</span><span>${Number(o.delivery_fee||0).toFixed(3)} OMR</span><small>${esc(o.delivery_address||'')}</small><div class="bd-actions"><button class="bd-btn primary" data-action="accept" data-id="${a.id}">قبول</button><button class="bd-btn ghost" data-action="reject" data-id="${a.id}">رفض</button></div></article>`;
+    }).join(''):'<p>لا توجد طلبات جديدة</p>';
+
+    document.getElementById('active-deliveries').innerHTML=active.length?active.map(a=>{
+      const o=a.delivery_orders||{};let b='';
+      if(a.status==='accepted') b=`<button class="bd-btn orange" data-action="pickup" data-id="${a.id}">استلام</button>`;
+      else if(a.status==='picked_up'||a.status==='on_delivery') b=`<button class="bd-btn primary" data-action="delivered" data-id="${a.id}">تم التسليم</button>`;
+      return `<article class="delivery-order-card"><strong>${esc(o.order_number||a.order_id)}</strong><span>${esc(a.status)}</span><span>${Number(o.delivery_fee||0).toFixed(3)} OMR</span><small>${esc(o.delivery_address||'')}</small><div class="bd-actions">${b}</div></article>`;
+    }).join(''):'<p>لا توجد توصيلات نشطة</p>';
+
+    await loadEarnings(user.id);
+  }
+
+  async function loadEarnings(driverId){
+    const now=new Date();
+    const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+    const day=now.getDay();
+    const diff=(day+6)%7;
+    const startWeek=new Date(now.getFullYear(),now.getMonth(),now.getDate()-diff).toISOString();
+    const {data}=await sb.from('delivery_earnings').select('amount,created_at').eq('driver_id',driverId).gte('created_at',startWeek);
+    const rows=data||[];
+    const today=rows.filter(r=>r.created_at>=startToday).reduce((s,r)=>s+Number(r.amount||0),0);
+    const week=rows.reduce((s,r)=>s+Number(r.amount||0),0);
+    document.getElementById('driver-today').textContent=today.toFixed(3)+' OMR';
+    document.getElementById('driver-week').textContent=week.toFixed(3)+' OMR';
+  }
+
+  async function login(e){
+    e.preventDefault();
+    loginMsg.textContent='جاري تسجيل الدخول...';
+    const email=document.getElementById('driver-email').value.trim();
+    const password=document.getElementById('driver-password').value;
+    const {error}=await sb.auth.signInWithPassword({email,password});
+    if(error){loginMsg.innerHTML='<span class="driver-error">فشل تسجيل الدخول: '+esc(error.message)+'</span>';return;}
+    document.getElementById('driver-password').value='';
+    loginMsg.innerHTML='<span class="driver-success">تم تسجيل الدخول.</span>';
+    await load();
+  }
+
+  async function logout(){await sb.auth.signOut();showLogin();}
+
+  onlineBtn.onclick=async()=>{
+    try{
+      const {data:{user}}=await sb.auth.getUser();
+      if(!user){showLogin();return;}
+      const goOnline=onlineBtn.textContent==='ONLINE';
+      await ensureDriver(user,goOnline);
+      await load();
+    }catch(e){msg.textContent=e.message||'فشل تحديث الحالة';}
+  };
+
+  document.addEventListener('click',async e=>{
+    const b=e.target.closest('[data-action]');if(!b)return;
+    try{
+      if(b.dataset.action==='accept') await BingoDelivery.decideAssignment(b.dataset.id,true);
+      else if(b.dataset.action==='reject') await BingoDelivery.decideAssignment(b.dataset.id,false);
+      else if(b.dataset.action==='pickup') await BingoDelivery.setAssignmentStatus(b.dataset.id,'picked_up');
+      else if(b.dataset.action==='delivered') await BingoDelivery.setAssignmentStatus(b.dataset.id,'delivered');
+      msg.textContent='تم تحديث الطلب بنجاح';
+      await load();
+    }catch(err){msg.textContent=err.message||'تعذر تحديث الطلب';}
+  });
+
+  document.getElementById('driver-login-form').addEventListener('submit',login);
+
+  async function boot(){
+    if(!sb?.auth){setTimeout(boot,100);return;}
+    await load().catch(e=>{console.error('Driver:',e);showLogin();loginMsg.textContent=e.message||'تعذر تحميل صفحة المندوب';});
+    sb.auth.onAuthStateChange((event)=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED')setTimeout(()=>load().catch(console.error),0);});
+    setInterval(()=>{if(!appEl.classList.contains('driver-hidden'))load().catch(console.error)},15000);
+  }
+  boot();
 })();
 </script>
 </body></html>
