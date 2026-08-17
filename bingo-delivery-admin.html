@@ -1,1 +1,82 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bingo Delivery Admin</title><link rel="stylesheet" href="bingo-delivery.css"></head><body><div class="bd-shell"><header class="bd-topbar"><div class="bd-brand">BINGO Delivery<small data-bd-i18n="admin">إدارة التوصيل</small></div><nav class="bd-nav"><a href="#orders" data-bd-i18n="orders">الطلبات</a><a href="#drivers" data-bd-i18n="drivers">المندوبون</a><a href="#stores" data-bd-i18n="stores">المتاجر</a><a href="#zones" data-bd-i18n="zones">المناطق</a><a href="#complaints" data-bd-i18n="complaints">الشكاوى</a><a href="javascript:BingoDelivery.setLang(BingoDelivery.getLang()==='ar'?'en':'ar')" data-bd-language>EN</a></nav></header><main class="bd-main"><div class="bd-grid cards"><section class="bd-card"><div class="bd-muted" data-bd-i18n="totalOrders">إجمالي الطلبات</div><div class="bd-stat">18</div></section><section class="bd-card"><div class="bd-muted" data-bd-i18n="onlineDrivers">المندوبون المتصلون</div><div class="bd-stat">24</div></section><section class="bd-card"><div class="bd-muted" data-bd-i18n="deliveryRevenue">إيرادات التوصيل</div><div class="bd-stat">126.500 OMR</div></section><section class="bd-card"><div class="bd-muted" data-bd-i18n="activeDeliveries">التوصيلات النشطة</div><div class="bd-stat">9</div></section></div><div class="bd-grid two" style="margin-top:18px"><section class="bd-card"><h2 data-bd-i18n="liveMap">الخريطة المباشرة</h2><div class="bd-map"><span class="bd-marker" style="top:22%;left:26%">🛵</span><span class="bd-marker" style="top:48%;left:58%">🛵</span><span class="bd-marker" style="top:70%;left:38%">🛵</span><span class="bd-marker" style="top:34%;left:78%">📦</span></div></section><section class="bd-card" id="orders"><h2 data-bd-i18n="activeDeliveries">التوصيلات النشطة</h2><div class="bd-list"><div class="bd-row"><div><strong>#BGO-1042</strong><div class="bd-muted">Bingo Store → Al Khuwair</div></div><span class="bd-badge warning" data-bd-i18n="onDelivery">قيد التوصيل</span></div><div class="bd-row"><div><strong>#BGO-1043</strong><div class="bd-muted">Local Market → Muscat</div></div><span class="bd-badge success" data-bd-i18n="pickup">استلام</span></div><div class="bd-row"><div><strong>#BGO-1044</strong><div class="bd-muted">Fashion Store → Ghubrah</div></div><span class="bd-badge warning" data-bd-i18n="preparing">قيد التجهيز</span></div></div></section></div><section class="bd-card" id="drivers" style="margin-top:18px"><h2 data-bd-i18n="drivers">المندوبون</h2><table class="bd-table"><thead><tr><th data-bd-i18n="driverName">المندوب</th><th data-bd-i18n="status">الحالة</th><th data-bd-i18n="distance">المسافة</th><th data-bd-i18n="earning">الأرباح</th></tr></thead><tbody><tr><td>Ahmed</td><td><span class="bd-badge success" data-bd-i18n="online">متصل</span></td><td>0.8 km</td><td>12.400 OMR</td></tr><tr><td>Ali</td><td><span class="bd-badge success" data-bd-i18n="online">متصل</span></td><td>1.4 km</td><td>9.750 OMR</td></tr><tr><td>Salim</td><td><span class="bd-badge" data-bd-i18n="offline">غير متصل</span></td><td>—</td><td>18.100 OMR</td></tr></tbody></table></section><section class="bd-card" id="zones" style="margin-top:18px"><h2 data-bd-i18n="fees">رسوم التوصيل</h2><div class="bd-grid cards"><div class="bd-row"><span>0–3 km</span><strong>1.000 OMR</strong></div><div class="bd-row"><span>3–5 km</span><strong>1.250 OMR</strong></div><div class="bd-row"><span>5–8 km</span><strong>1.500 OMR</strong></div><div class="bd-row"><span>8–12 km</span><strong>2.000 OMR</strong></div></div></section></main></div><script src="bingo-delivery.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bingo Delivery Admin</title>
+<link rel="stylesheet" href="bingo-delivery.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase-client.js"></script><script src="auth.js"></script>
+<style>
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}.admin-stat{font-size:28px;font-weight:800}.admin-table{width:100%;border-collapse:collapse}.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid rgba(0,0,0,.08);text-align:start}.admin-table th{font-weight:800}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.admin-error{padding:12px;border-radius:10px;background:#fff1f1;color:#a00}.admin-ok{padding:12px;border-radius:10px;background:#effcf3;color:#176b32}.admin-muted{opacity:.7}.admin-section{margin-top:18px}.admin-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.admin-pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef2f7}.admin-pill.success{background:#e8f7ee}.admin-pill.warning{background:#fff4db}.admin-pill.danger{background:#ffe9e9}
+</style>
+</head>
+<body>
+<div class="bd-shell">
+<header class="bd-topbar">
+<div class="bd-brand">BINGO Delivery<small data-bd-i18n="admin">إدارة التوصيل</small></div>
+<nav class="bd-nav">
+<a href="#orders" data-bd-i18n="orders">الطلبات</a><a href="#drivers" data-bd-i18n="drivers">المندوبون</a><a href="#stores" data-bd-i18n="stores">المتاجر</a><a href="#earnings" data-bd-i18n="earnings">الأرباح</a><a href="javascript:BingoDelivery.setLang(BingoDelivery.getLang()==='ar'?'en':'ar')" data-bd-language>EN</a>
+</nav>
+</header>
+<main class="bd-main">
+<section class="bd-card">
+<div class="admin-toolbar"><div><h2 style="margin:0">لوحة إدارة التوصيل</h2><div class="admin-muted">Live Delivery Operations</div></div><button class="bd-btn ghost" id="admin-refresh">تحديث</button></div>
+<div id="admin-message" style="margin-top:12px"></div>
+</section>
+<section class="admin-grid admin-section">
+<div class="bd-card"><div class="bd-muted">إجمالي الطلبات</div><div class="admin-stat" id="stat-orders">0</div></div>
+<div class="bd-card"><div class="bd-muted">التوصيلات النشطة</div><div class="admin-stat" id="stat-active">0</div></div>
+<div class="bd-card"><div class="bd-muted">المندوبون المتصلون</div><div class="admin-stat" id="stat-online">0</div></div>
+<div class="bd-card"><div class="bd-muted">أرباح المندوبين</div><div class="admin-stat" id="stat-earnings">0.000 OMR</div></div>
+</section>
+<section class="bd-card admin-section" id="orders"><div class="admin-toolbar"><h2>الطلبات</h2><span id="orders-count" class="admin-muted"></span></div><div style="overflow:auto"><table class="admin-table"><thead><tr><th>الطلب</th><th>الحالة</th><th>المتجر</th><th>العميل</th><th>الإجمالي</th><th>التوصيل</th><th>أجر المندوب</th><th>التاريخ</th></tr></thead><tbody id="orders-body"><tr><td colspan="8">جاري التحميل...</td></tr></tbody></table></div></section>
+<section class="bd-card admin-section" id="drivers"><div class="admin-toolbar"><h2>المندوبون</h2><span id="drivers-count" class="admin-muted"></span></div><div style="overflow:auto"><table class="admin-table"><thead><tr><th>المندوب</th><th>الهاتف</th><th>المركبة</th><th>Online</th><th>متاح</th><th>التوصيلات</th><th>التقييم</th></tr></thead><tbody id="drivers-body"><tr><td colspan="7">جاري التحميل...</td></tr></tbody></table></div></section>
+<section class="bd-card admin-section" id="stores"><div class="admin-toolbar"><h2>المتاجر</h2><span id="stores-count" class="admin-muted"></span></div><div style="overflow:auto"><table class="admin-table"><thead><tr><th>المتجر</th><th>العنوان</th><th>نشط</th><th>المالك</th></tr></thead><tbody id="stores-body"><tr><td colspan="4">جاري التحميل...</td></tr></tbody></table></div></section>
+<section class="bd-card admin-section" id="earnings"><div class="admin-toolbar"><h2>آخر أرباح المندوبين</h2></div><div style="overflow:auto"><table class="admin-table"><thead><tr><th>المندوب</th><th>الطلب</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody id="earnings-body"><tr><td colspan="5">جاري التحميل...</td></tr></tbody></table></div></section>
+</main></div>
+<script>
+(async function(){
+  'use strict';
+  const sb=window.sb;
+  const $=s=>document.querySelector(s);
+  const money=v=>Number(v||0).toFixed(3)+' OMR';
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+  const statusClass=s=>['delivered','accepted','on_delivery','picked_up','ready'].includes(s)?'success':(['cancelled'].includes(s)?'danger':'warning');
+  async function load(){
+    const msg=$('#admin-message');
+    try{
+      msg.className='';msg.textContent='جاري تحديث البيانات...';
+      const session=(await sb.auth.getSession()).data.session;
+      if(!session){msg.className='admin-error';msg.textContent='يجب تسجيل الدخول بحساب الإدارة';return;}
+      const [ordersR,driversR,storesR,earningsR]=await Promise.all([
+        sb.from('delivery_orders').select('id,order_number,status,customer_id,store_id,total,delivery_fee,driver_share,created_at,delivery_address').order('created_at',{ascending:false}).limit(100),
+        sb.from('delivery_drivers').select('id,display_name,phone,vehicle_type,is_online,is_available,rating,total_deliveries,updated_at').order('created_at',{ascending:false}),
+        sb.from('delivery_stores').select('id,store_name,store_name_ar,store_name_en,address,is_active,owner_id').order('created_at',{ascending:false}),
+        sb.from('delivery_earnings').select('id,driver_id,order_id,amount,status,created_at').order('created_at',{ascending:false}).limit(100)
+      ]);
+      const err=[ordersR,driversR,storesR,earningsR].find(r=>r.error);
+      if(err) throw err.error;
+      const orders=ordersR.data||[],drivers=driversR.data||[],stores=storesR.data||[],earnings=earningsR.data||[];
+      const storeMap=new Map(stores.map(s=>[s.id,s.store_name_ar||s.store_name_en||s.store_name]));
+      const driverMap=new Map(drivers.map(d=>[d.id,d.display_name||d.phone||d.id]));
+      $('#stat-orders').textContent=orders.length;
+      $('#stat-active').textContent=orders.filter(o=>['pending','confirmed','preparing','ready','assigned','picked_up','on_delivery'].includes(o.status)).length;
+      $('#stat-online').textContent=drivers.filter(d=>d.is_online).length;
+      $('#stat-earnings').textContent=money(earnings.reduce((n,e)=>n+Number(e.amount||0),0));
+      $('#orders-count').textContent=orders.length+' طلب';
+      $('#drivers-count').textContent=drivers.length+' مندوب';
+      $('#stores-count').textContent=stores.length+' متجر';
+      $('#orders-body').innerHTML=orders.length?orders.map(o=>`<tr><td><strong>#${esc(o.order_number||o.id)}</strong></td><td><span class="admin-pill ${statusClass(o.status)}">${esc(o.status)}</span></td><td>${esc(storeMap.get(o.store_id)||o.store_id)}</td><td>${esc(o.customer_id)}</td><td>${money(o.total)}</td><td>${money(o.delivery_fee)}</td><td>${money(o.driver_share)}</td><td>${new Date(o.created_at).toLocaleString('ar-OM')}</td></tr>`).join(''):'<tr><td colspan="8">لا توجد طلبات</td></tr>';
+      $('#drivers-body').innerHTML=drivers.length?drivers.map(d=>`<tr><td><strong>${esc(d.display_name||'—')}</strong></td><td>${esc(d.phone||'—')}</td><td>${esc(d.vehicle_type||'—')}</td><td><span class="admin-pill ${d.is_online?'success':''}">${d.is_online?'متصل':'غير متصل'}</span></td><td><span class="admin-pill ${d.is_available?'success':'warning'}">${d.is_available?'متاح':'مشغول'}</span></td><td>${Number(d.total_deliveries||0)}</td><td>${Number(d.rating||0).toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="7">لا يوجد مندوبون</td></tr>';
+      $('#stores-body').innerHTML=stores.length?stores.map(s=>`<tr><td><strong>${esc(s.store_name_ar||s.store_name_en||s.store_name)}</strong></td><td>${esc(s.address||'—')}</td><td>${s.is_active?'نعم':'لا'}</td><td>${esc(s.owner_id||'—')}</td></tr>`).join(''):'<tr><td colspan="4">لا توجد متاجر</td></tr>';
+      $('#earnings-body').innerHTML=earnings.length?earnings.map(e=>`<tr><td>${esc(driverMap.get(e.driver_id)||e.driver_id)}</td><td>${esc(e.order_id)}</td><td><strong>${money(e.amount)}</strong></td><td><span class="admin-pill ${statusClass(e.status)}">${esc(e.status)}</span></td><td>${new Date(e.created_at).toLocaleString('ar-OM')}</td></tr>`).join(''):'<tr><td colspan="5">لا توجد أرباح</td></tr>';
+      msg.className='admin-ok';msg.textContent='تم تحديث لوحة الإدارة';
+    }catch(e){msg.className='admin-error';msg.textContent='تعذر تحميل بيانات الإدارة: '+(e.message||e);}
+  }
+  $('#admin-refresh').addEventListener('click',load);
+  window.addEventListener('bingo:language',load);
+  await load();
+})();
+</script>
+<script src="bingo-delivery.js"></script>
+</body></html>
