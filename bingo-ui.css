@@ -1,0 +1,23 @@
+/* BINGO Oman shared UI normalization — loaded after page styles */
+:root{--bingo-navy:#092a82;--bingo-navy2:#061a50;--bingo-orange:#ff7900;--bingo-line:#e6eaf1;--bingo-soft:#f6f8fc;--bingo-muted:#718096;--bingo-radius:16px}
+html{scroll-behavior:smooth}body{font-family:Inter,"Noto Kufi Arabic",Arial,sans-serif;-webkit-font-smoothing:antialiased}body.rtl{font-family:"Noto Kufi Arabic",Inter,Arial,sans-serif}
+.container{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+.header{z-index:100}.header .nav{min-height:76px;gap:24px}.header .logo{flex:0 0 auto}.header .navlinks{align-items:center;gap:22px}.header .actions{display:flex;align-items:center;gap:10px;min-height:40px}
+.header .actions .lang-switch-extra,.header .actions .lang-switch{order:-1}
+button,.btn,.btnx,.mini,.mini-btn{transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease}.btn:hover,.btnx:hover,.mini:hover,.mini-btn:hover{transform:translateY(-1px)}
+input,select,textarea{border-color:#dce3ee!important;border-radius:10px!important;background:#fff}input:focus,select:focus,textarea:focus{border-color:#9eb4e8!important;box-shadow:0 0 0 3px rgba(9,42,130,.08)!important;outline:0}
+.card,.admin-card,.erp-card,.panel,.section,.toolbar,.side,.erp-side,.hr-side,.authbox{border-color:var(--bingo-line)!important;border-radius:var(--bingo-radius)!important;box-shadow:0 8px 26px rgba(7,30,80,.06)}
+.table,.admin-table,.fin-table{width:100%}.table th,.table td,.admin-table th,.admin-table td,.fin-table th,.fin-table td{vertical-align:middle}
+.pagehead{padding:48px 0}.pagebody{padding:42px 0 76px}.section{padding:24px}
+/* Consistent private/admin/ERP shells */
+.admin-wrap,.erp-wrap,.hr-wrap,.dash{min-height:calc(100vh - 110px)}
+.admin-hero,.erp-hero,.hr-hero{padding-top:4px}.admin-hero h1,.erp-hero h1,.hr-hero h1{letter-spacing:-.02em}
+.admin-layout,.erp-layout,.hr-layout,.dashgrid{gap:18px}.admin-side,.erp-side,.hr-side,.side{border-radius:16px!important}
+.admin-side button,.erp-side button,.hr-side button,.side a{margin:2px 0}.admin-side button.active,.admin-side button:hover,.erp-side button.active,.erp-side button:hover,.hr-side button.active,.hr-side button:hover,.side a.active,.side a:hover{background:#eef3ff!important;color:var(--bingo-navy)!important}
+.kpi,.kpi strong,.stat,.admin-stat,.fin-kpi,.report-box{border-radius:14px}
+/* RTL: keep navigation and controls visually mirrored without changing business logic */
+html[dir="rtl"] .navlinks{margin-right:0;margin-left:auto}html[dir="rtl"] .navlinks a.active:after{left:0;right:0}html[dir="rtl"] .admin-side button,html[dir="rtl"] .erp-side button,html[dir="rtl"] .hr-side button{text-align:right}html[dir="rtl"] .admin-table th,html[dir="rtl"] .admin-table td{text-align:right}
+html[dir="rtl"] .modalhead,html[dir="rtl"] .toolbar,html[dir="rtl"] .admin-toolbar,html[dir="rtl"] .erp-hero,html[dir="rtl"] .hr-hero{direction:rtl}
+/* Mobile consistency */
+@media(max-width:900px){.container{width:calc(100% - 28px)}.header .nav{min-height:70px}.admin-layout,.erp-layout,.hr-layout,.dashgrid{grid-template-columns:1fr}.admin-side,.erp-side,.hr-side,.side{position:static;display:flex;overflow:auto;gap:5px;padding:8px}.admin-side button,.erp-side button,.hr-side button,.side a{white-space:nowrap;width:auto;min-width:max-content}.admin-side a,.erp-side a,.hr-side a{white-space:nowrap}.grid,.featuregrid{gap:14px}}
+@media(max-width:650px){.header .actions{gap:7px}.lang-switch-extra,.lang-switch{padding:8px 9px!important}.pagehead h1{font-size:32px}.section{padding:18px}.admin-card,.erp-card,.card,.panel{padding:16px}}
