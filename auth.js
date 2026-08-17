@@ -12,6 +12,15 @@
   document.addEventListener('DOMContentLoaded',()=>{refresh();setTimeout(refresh,500);setTimeout(refresh,1500);sb.auth.onAuthStateChange((event)=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){setTimeout(refresh,0);setTimeout(refresh,300);}});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(refresh,0);});window.addEventListener('pageshow',()=>setTimeout(refresh,0));});
   function loadScriptOnce(src){return new Promise((resolve)=>{if(document.querySelector('script[src="'+src+'"]'))return resolve();const s=document.createElement('script');s.src=src;s.async=false;s.onload=resolve;s.onerror=resolve;document.head.appendChild(s);});}
   function loadCssOnce(href){if(document.querySelector('link[href="'+href+'"]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}
-  async function loadGlobalUI(){loadCssOnce('bingo-ui.css');await loadScriptOnce('language.js');if(document.body&&(/erp\.html$/i.test(location.pathname)||/hr\.html$/i.test(location.pathname)))await loadScriptOnce('erp-hr-static-i18n.js');}
+  async function loadStableLanguage(){
+    const scoped=/erp\.html$|hr\.html$/i.test(location.pathname);
+    if(!scoped){await loadScriptOnce('language.js');return;}
+    // language.js contains a DOM MutationObserver. Disable only that observer
+    // while the script is evaluated, then restore the native constructor.
+    const NativeMO=window.MutationObserver;
+    window.MutationObserver=class StableLanguageObserver{constructor(){}observe(){}disconnect(){}takeRecords(){return[];}};
+    try{await loadScriptOnce('language.js');}finally{window.MutationObserver=NativeMO;}
+  }
+  async function loadGlobalUI(){loadCssOnce('bingo-ui.css');await loadStableLanguage();if(/erp\.html$|hr\.html$/i.test(location.pathname))await loadScriptOnce('erp-hr-static-i18n.js');}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadGlobalUI,{once:true});else loadGlobalUI();
 })();
