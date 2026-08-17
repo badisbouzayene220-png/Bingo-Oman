@@ -5,6 +5,11 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   css('bingo-ui.css');
   js('bingo-page-i18n.js','bingo-page-i18n-loader');
 
+  if(location.pathname.endsWith('bingo-delivery-admin.html')){
+    const t=setInterval(()=>{if(window.sb){clearInterval(t);js('admin-driver-management.js','admin-driver-management-loader');}},100);
+    setTimeout(()=>clearInterval(t),15000);
+  }
+
   function addSummary(){
     if(!location.pathname.endsWith('bingo-delivery-admin.html')) return;
     const earnings=document.querySelector('#earnings');
