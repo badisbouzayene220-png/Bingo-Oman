@@ -21,7 +21,7 @@
 <section class="bd-card" style="margin-top:18px"><h2 data-bd-i18n="checkout">إتمام الطلب</h2><div class="bd-form">
 <label data-bd-i18n="deliveryAddress">عنوان التوصيل<input id="delivery-address" data-bd-placeholder="search" placeholder="بحث"></label>
 <label data-bd-i18n="location">الموقع<button id="use-location" class="bd-btn ghost" type="button" data-delivery-action="use-location">📍 استخدام موقعي الحالي</button></label>
-<label data-bd-i18n="deliveryOption">خيار التوصيل<select id="delivery-option"><option value="1.500">Standard Delivery · 1.500 OMR</option><option value="2.000">Express Delivery · 2.000 OMR</option></select></label>
+<label data-bd-i18n="deliveryOption">خيار التوصيل<select id="delivery-option"><option value="1.500" selected>Standard Delivery · 1.500 OMR</option><option value="2.000">Express Delivery · 2.000 OMR</option></select></label>
 <input id="delivery-lat" type="hidden"><input id="delivery-lng" type="hidden"><input id="delivery-distance" type="hidden" value="0"><input id="delivery-store-id" type="hidden">
 <textarea id="delivery-items" rows="4" hidden></textarea>
 <div class="bd-row"><span data-bd-i18n="subtotal">الإجمالي الفرعي</span><strong id="delivery-subtotal">0.000 OMR</strong></div>
@@ -47,8 +47,10 @@ function syncOrderItems(){
   const items=[...cart.values()].map(x=>({description:x.title,quantity:x.quantity,unit_price:Number(x.price)}));
   document.querySelector('#delivery-items').value=JSON.stringify(items);
   document.querySelector('#delivery-store-id').value=selectedStore?.id||'';
+  const option=document.querySelector('#delivery-option');
+  if(option && (!option.value || !['1.500','2.000'].includes(option.value))) option.value='1.500';
   const subtotal=items.reduce((n,x)=>n+(Number(x.quantity)||0)*(Number(x.unit_price)||0),0);
-  const fee=Number(document.querySelector('#delivery-option')?.value||0);
+  const fee=Number(option?.value||'1.500');
   const total=subtotal+fee;
   document.querySelector('#delivery-subtotal').textContent=subtotal.toFixed(3)+' OMR';
   document.querySelector('#delivery-fee').textContent=fee.toFixed(3)+' OMR';
@@ -59,9 +61,9 @@ async function loadCatalog(){if(!sb?.from)return;const [sr,pr]=await Promise.all
 document.addEventListener('DOMContentLoaded',()=>{
   const itemsEl=document.querySelector('#delivery-items');
   const optionEl=document.querySelector('#delivery-option');
-  // Customer owns checkout totals. Prevent the shared Delivery listener from overwriting them.
+  optionEl.value='1.500';
   itemsEl?.addEventListener('input',event=>event.stopPropagation(),true);
-  optionEl?.addEventListener('change',event=>event.stopPropagation(),true);
+  optionEl?.addEventListener('change',event=>event.stopImmediatePropagation(),true);
   optionEl?.addEventListener('change',syncOrderItems);
   loadCatalog();
   window.addEventListener('bingo:language',()=>{renderStores();renderProducts();renderCart();syncOrderItems();});
