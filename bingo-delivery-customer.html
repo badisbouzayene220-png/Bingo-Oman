@@ -43,9 +43,27 @@ function renderStores(){const el=document.querySelector('#store-list'),c=documen
 function renderProducts(){const el=document.querySelector('#product-list');document.querySelector('#selected-store-name').textContent=selectedStore?name(selectedStore,selectedStore.store_name_ar,selectedStore.store_name_en):'';const list=products.filter(p=>p.store_id===selectedStore?.id);if(!selectedStore){el.innerHTML='<p class="bd-muted">اختر متجرًا لعرض المنتجات</p>';return}if(!list.length){el.innerHTML='<p>لا توجد منتجات متاحة في هذا المتجر</p>';return}el.innerHTML=list.map(p=>{const q=cart.get(p.id)?.quantity||0;return `<article class="bd-product-card"><h3>${esc(p.title)}</h3><p>${esc(p.description||'')}</p><div class="price">${Number(p.price).toFixed(3)} OMR</div><small>المخزون: ${p.stock}</small><div class="bd-qty"><button type="button" data-minus="${p.id}">−</button><strong>${q}</strong><button type="button" data-plus="${p.id}">+</button></div></article>`}).join('');el.querySelectorAll('[data-plus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.plus,1));el.querySelectorAll('[data-minus]').forEach(b=>b.onclick=()=>changeQty(b.dataset.minus,-1));}
 function changeQty(id,d){const p=products.find(x=>x.id===id);if(!p)return;let q=(cart.get(id)?.quantity||0)+d;q=Math.max(0,Math.min(q,p.stock||0));if(!q)cart.delete(id);else cart.set(id,{...p,quantity:q});renderProducts();renderCart();syncOrderItems();}
 function renderCart(){const el=document.querySelector('#cart-list'),arr=[...cart.values()];document.querySelector('#cart-count').textContent=arr.reduce((n,x)=>n+x.quantity,0);if(!arr.length){el.innerHTML='<p class="bd-muted">السلة فارغة</p>';return}el.innerHTML=arr.map(x=>`<div class="bd-cart-line"><span>${esc(x.title)} × ${x.quantity}</span><strong>${(x.quantity*Number(x.price)).toFixed(3)} OMR</strong></div>`).join('');}
-function syncOrderItems(){const items=[...cart.values()].map(x=>({description:x.title,quantity:x.quantity,unit_price:Number(x.price)}));const ta=document.querySelector('#delivery-items');ta.value=JSON.stringify(items);document.querySelector('#delivery-store-id').value=selectedStore?.id||'';const sub=items.reduce((n,x)=>n+x.quantity*x.unit_price,0);const fee=Number(document.querySelector('#delivery-option').value||1.5);const total=sub+fee;document.querySelector('#delivery-subtotal').textContent=sub.toFixed(3)+' OMR';document.querySelector('#delivery-fee').textContent=fee.toFixed(3)+' OMR';document.querySelector('#delivery-total').textContent=total.toFixed(3)+' OMR';
-// Keep the shared Delivery totals engine synchronized with the cart.
-ta.dispatchEvent(new Event('input',{bubbles:true}));
+function syncOrderItems(){
+  const items=[...cart.values()].map(x=>({description:x.title,quantity:x.quantity,unit_price:Number(x.price)}));
+  document.querySelector('#delivery-items').value=JSON.stringify(items);
+  document.querySelector('#delivery-store-id').value=selectedStore?.id||'';
+  const subtotal=items.reduce((n,x)=>n+(Number(x.quantity)||0)*(Number(x.unit_price)||0),0);
+  const fee=Number(document.querySelector('#delivery-option')?.value||0);
+  const total=subtotal+fee;
+  document.querySelector('#delivery-subtotal').textContent=subtotal.toFixed(3)+' OMR';
+  document.querySelector('#delivery-fee').textContent=fee.toFixed(3)+' OMR';
+  document.querySelector('#delivery-total').textContent=total.toFixed(3)+' OMR';
+  // Shared bingo-delivery.js may recalculate from the hidden textarea.
+  document.querySelector('#delivery-items').dispatchEvent(new Event('input',{bubbles:true}));
+  // Make Customer the final authority after the shared listener finishes.
+  requestAnimationFrame(()=>{
+    const finalItems=JSON.parse(document.querySelector('#delivery-items').value||'[]');
+    const finalSubtotal=finalItems.reduce((n,x)=>n+(Number(x.quantity)||0)*(Number(x.unit_price)||0),0);
+    const finalFee=Number(document.querySelector('#delivery-option')?.value||0);
+    document.querySelector('#delivery-subtotal').textContent=finalSubtotal.toFixed(3)+' OMR';
+    document.querySelector('#delivery-fee').textContent=finalFee.toFixed(3)+' OMR';
+    document.querySelector('#delivery-total').textContent=(finalSubtotal+finalFee).toFixed(3)+' OMR';
+  });
 }
 async function selectStore(id){selectedStore=stores.find(s=>s.id===id)||null;cart.clear();renderStores();renderProducts();renderCart();syncOrderItems();}
 async function loadCatalog(){if(!sb?.from)return;const [sr,pr]=await Promise.all([sb.from('delivery_stores').select('id,owner_id,store_name,store_name_ar,store_name_en,phone,address,latitude,longitude,is_active').eq('is_active',true).order('created_at',{ascending:false}),sb.from('store_products').select('id,store_id,title,description,price,image_url,category,stock,is_active,sort_order').eq('is_active',true).gt('stock',0).order('sort_order',{ascending:true})]);if(sr.error){console.error(sr.error);document.querySelector('#store-list').innerHTML='<p>تعذر تحميل المتاجر</p>';return}stores=sr.data||[];products=pr.error?[]:(pr.data||[]);renderStores();renderProducts();renderCart();syncOrderItems();if(stores.length)selectStore(stores[0].id);}
