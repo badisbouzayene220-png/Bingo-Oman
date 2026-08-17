@@ -28,6 +28,9 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
       if(Object.prototype.hasOwnProperty.call(totals,status))totals[status]+=amount;
       totals.total+=amount;
     });
+    const signature=[totals.pending,totals.approved,totals.paid,totals.total].join('|');
+    if(box.dataset.signature===signature)return;
+    box.dataset.signature=signature;
     const card=(title,value,cls)=>`<div class="bd-card" style="margin:0"><div style="opacity:.7">${title}</div><div style="font-size:24px;font-weight:800" class="${cls||''}">${value.toFixed(3)} OMR</div></div>`;
     box.innerHTML=card('Pending',totals.pending,'warning')+card('Approved',totals.approved,'warning')+card('Paid',totals.paid,'success')+card('الإجمالي',totals.total,'');
   }
