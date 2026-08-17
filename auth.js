@@ -82,8 +82,6 @@
     if(!user) return;
 
     updateMessageBadge(user);
-
-    // Fallback refresh every 15 seconds keeps the badge correct across tabs.
     unreadTimer=setInterval(()=>updateMessageBadge(user),15000);
 
     try{
@@ -124,8 +122,6 @@
   }
   window.BingoAuth={getSession,getUser,refresh};
   document.addEventListener('DOMContentLoaded',()=>{
-    // Initialize the header from the persisted Supabase session on every page.
-    // A short retry handles pages where Supabase restores the session just after DOM load.
     refresh();
     setTimeout(refresh,500);
     setTimeout(refresh,1500);
@@ -137,10 +133,20 @@
       }
     });
 
-    // Re-check when the user returns to a tab or navigates back/forward.
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState==='visible') setTimeout(refresh,0);
     });
     window.addEventListener('pageshow',()=>setTimeout(refresh,0));
   });
+
+  // Load the bilingual engine on every page that uses the shared auth layer.
+  // Pages that already include language.js are left untouched; all other pages
+  // receive it automatically, followed by the shared ERP/HR/Admin translations.
+  function loadScriptOnce(src){
+    return new Promise((resolve)=>{
+      if(document.querySelector('script[src="'+src+'"]')) return resolve();
+      const s=document.createElement('script'); s.src=src; s.async=false; s.onload=resolve; s.onerror=resolve; document.head.appendChild(s);
+    });
+  }
+  loadScriptOnce('language.js').then(()=>loadScriptOnce('bingo-extra-i18n.js'));
 })();
