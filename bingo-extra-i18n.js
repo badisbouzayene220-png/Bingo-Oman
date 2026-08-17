@@ -20,14 +20,17 @@
   function lang(){return localStorage.getItem('bingo-language')||localStorage.getItem('bingo-lang')||'en';}
   function shouldSkip(n){return !n.parentElement || /^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION)$/i.test(n.parentElement.tagName) || n.parentElement.closest('[data-no-translate]');}
   function translateNode(root,to){
-    const map=to==='ar'?EN_AR:AR_EN;
-    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-    const nodes=[]; let n; while((n=walker.nextNode())) nodes.push(n);
-    nodes.forEach(t=>{if(shouldSkip(t))return; const raw=t.nodeValue.trim(); if(!raw)return; const key=raw.replace(/\s+/g,' '); if(map[key]) t.nodeValue=t.nodeValue.replace(raw,map[key]);});
+    const map=to==='ar'?EN_AR:AR_EN; const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT); const nodes=[]; let n;
+    while((n=walker.nextNode()))nodes.push(n);
+    nodes.forEach(t=>{if(shouldSkip(t))return;const raw=t.nodeValue.trim();if(!raw)return;const key=raw.replace(/\s+/g,' ');if(map[key])t.nodeValue=t.nodeValue.replace(raw,map[key]);});
     root.querySelectorAll?.('[placeholder],[title],[aria-label]').forEach(el=>['placeholder','title','aria-label'].forEach(attr=>{const v=el.getAttribute(attr);if(v&&map[v])el.setAttribute(attr,map[v]);}));
   }
   function apply(){const l=lang();document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';document.body.classList.toggle('rtl',l==='ar');translateNode(document.body,l);}
-  function switcher(){let s=document.querySelector('.lang-switch-extra');if(!s){const actions=document.querySelector('.actions');if(!actions)return;s=document.createElement('button');s.className='lang-switch lang-switch-extra';s.type='button';s.dataset.noTranslate='true';s.onclick=()=>{const next=lang()==='ar'?'en':'ar';localStorage.setItem('bingo-language',next);localStorage.setItem('bingo-lang',next);apply();switcher();};actions.appendChild(s);}s.textContent=lang()==='ar'?'EN':'العربية';}
+  function switcher(){
+    const existing=document.querySelector('.lang-switch:not(.lang-switch-extra)');
+    if(existing){existing.dataset.noTranslate='true';return;}
+    let s=document.querySelector('.lang-switch-extra');if(!s){const actions=document.querySelector('.actions');if(!actions)return;s=document.createElement('button');s.className='lang-switch lang-switch-extra';s.type='button';s.dataset.noTranslate='true';s.onclick=()=>{const next=lang()==='ar'?'en':'ar';localStorage.setItem('bingo-language',next);localStorage.setItem('bingo-lang',next);apply();switcher();};actions.appendChild(s);}s.textContent=lang()==='ar'?'EN':'العربية';
+  }
   function adminLinks(){if(!/admin\.html$/i.test(location.pathname))return;const side=document.querySelector('.admin-side');if(!side||side.querySelector('.hr-link'))return;const a=document.createElement('a');a.className='hr-link';a.href='hr.html';a.textContent=lang()==='ar'?'👥 الموارد البشرية':'👥 Human Resources';a.style.cssText='display:block;text-align:left;text-decoration:none;padding:12px;border-radius:10px;font-weight:800;color:#667085';side.appendChild(a);}
   function style(){if(document.getElementById('bingo-extra-ui-style'))return;const s=document.createElement('style');s.id='bingo-extra-ui-style';s.textContent='.lang-switch-extra{border:1px solid #dce3ee;background:#fff;color:#092a82;border-radius:10px;padding:9px 11px;font-size:11px;font-weight:900;cursor:pointer}.rtl .lang-switch-extra{font-family:"Noto Kufi Arabic",Inter,sans-serif}.hr-link:hover{background:#eef3ff!important;color:#092a82!important}.header .actions{gap:10px}.header .actions>*{flex-shrink:0}.erp-side,.hr-side{z-index:2}.erp-card,.card,.admin-card,.panel,.section{box-shadow:0 8px 24px rgba(7,30,80,.07)}input,select,textarea,button{max-width:100%}';document.head.appendChild(s);}
   function init(){style();apply();switcher();adminLinks();const obs=new MutationObserver(()=>{apply();switcher();adminLinks();});obs.observe(document.body,{childList:true,subtree:true});}
