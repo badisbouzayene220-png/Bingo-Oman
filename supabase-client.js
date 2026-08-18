@@ -26,4 +26,15 @@
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadCustomerTracking,{once:true});else loadCustomerTracking();
   }
+
+  if(/bingo-delivery-driver\.html$/i.test(location.pathname)){
+    const loadDriverExperience=()=>{
+      if(document.querySelector('script[data-bingo-driver-experience]')) return;
+      const s=document.createElement('script');
+      s.src='bingo-driver-experience.js?v=20260818-1';
+      s.setAttribute('data-bingo-driver-experience','1');
+      document.body.appendChild(s);
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadDriverExperience,{once:true});else loadDriverExperience();
+  }
 })();
