@@ -17,9 +17,25 @@
     return [...document.querySelectorAll('.bct-order')].find(card=>card.textContent.includes('#'+orderNumber)||card.textContent.includes(orderNumber));
   }
 
+  function fillAddress(card,row){
+    if(!row.delivery_address)return;
+    const infos=[...card.querySelectorAll('.bct-info')];
+    const addressBox=infos.find(x=>/Delivery address|عنوان التوصيل/i.test(x.textContent));
+    if(!addressBox)return;
+    const strong=addressBox.querySelector('strong');
+    if(strong)strong.textContent=row.delivery_address;
+  }
+
   function renderRow(row){
     const card=findOrderCard(row.order_number);
     if(!card)return;
+
+    fillAddress(card,row);
+
+    // Remove the generic driver box created by the base tracking script.
+    // The live RPC card below is the single source of driver details.
+    card.querySelectorAll('.bct-driver').forEach(el=>el.remove());
+
     let box=card.querySelector('.bcld-box');
     if(!box){box=document.createElement('div');box.className='bcld-box';card.appendChild(box);}
     if(!row.driver_id){box.innerHTML='<div class="bcld-muted">لم يتم تعيين مندوب لهذا الطلب بعد.</div>';return;}
