@@ -23,7 +23,21 @@
       if(!document.querySelector('script[data-bingo-customer-eta]')){
         const e=document.createElement('script');e.src='bingo-delivery-customer-eta.js?v=20260818-2305';e.setAttribute('data-bingo-customer-eta','1');document.body.appendChild(e);
       }
+      if(!document.querySelector('script[data-bingo-customer-code]')){
+        const c=document.createElement('script');c.src='bingo-delivery-customer-code.js?v=20260818-1';c.setAttribute('data-bingo-customer-code','1');document.body.appendChild(c);
+      }
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadCustomerTracking,{once:true});else loadCustomerTracking();
+  }
+
+  if(/bingo-delivery-driver\.html$/i.test(location.pathname)){
+    const loadDriverExperience=()=>{
+      if(document.querySelector('script[data-bingo-driver-experience]')) return;
+      const s=document.createElement('script');
+      s.src='bingo-driver-experience.js?v=20260818-2';
+      s.setAttribute('data-bingo-driver-experience','1');
+      document.body.appendChild(s);
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadDriverExperience,{once:true});else loadDriverExperience();
   }
 })();
