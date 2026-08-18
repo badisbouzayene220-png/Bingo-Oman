@@ -20,6 +20,9 @@
       if(!document.querySelector('script[data-bingo-customer-tracking-v5]')){
         const s=document.createElement('script');s.src='bingo-delivery-customer-tracking.js?v=20260818-2215';s.setAttribute('data-bingo-customer-tracking-v5','1');document.body.appendChild(s);
       }
+      if(!document.querySelector('script[data-bingo-customer-eta]')){
+        const e=document.createElement('script');e.src='bingo-delivery-customer-eta.js?v=20260818-2305';e.setAttribute('data-bingo-customer-eta','1');document.body.appendChild(e);
+      }
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadCustomerTracking,{once:true});else loadCustomerTracking();
   }
