@@ -15,10 +15,10 @@ if(/bingo-delivery-customer\.html$/i.test(location.pathname)){
       s.setAttribute('data-bingo-customer-tracking','1');
       document.body.appendChild(s);
     }
-    if(!document.querySelector('script[data-bingo-customer-live-driver]')){
+    if(!document.querySelector('script[data-bingo-customer-live-driver-v2]')){
       const s2=document.createElement('script');
-      s2.src='bingo-delivery-customer-live-driver.js?v=20260818-3';
-      s2.setAttribute('data-bingo-customer-live-driver','1');
+      s2.src='bingo-delivery-customer-live-driver.js?v=20260818-6';
+      s2.setAttribute('data-bingo-customer-live-driver-v2','1');
       document.body.appendChild(s2);
     }
     if(!document.querySelector('script[data-bingo-customer-driver-overlay]')){
