@@ -13,7 +13,7 @@
     if(!side||side.querySelector('.bingo-delivery-admin-link'))return;
     const a=document.createElement('a');
     a.className='bingo-delivery-admin-link';
-    a.href='bingo-delivery-admin.html';
+    a.href='bingo-delivery-control.html';
     a.textContent='🚚 BINGO Delivery';
     a.style.cssText='display:block;text-align:left;text-decoration:none;padding:12px;border-radius:10px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff8a16,#ff5b00);margin:6px 0;box-shadow:0 8px 18px rgba(255,91,0,.18)';
     side.appendChild(a);
