@@ -5,7 +5,7 @@
 <title>Bingo Customer Delivery</title>
 <link rel="stylesheet" href="bingo-delivery.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script><script src="supabase-client.js"></script><script src="auth.js"></script>
+<script src="config.js"></script><script src="supabase-client.js?v=20260818-1637"></script><script src="auth.js"></script>
 <style>.bd-store-grid,.bd-product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:14px}.bd-shop-card,.bd-product-card{border:1px solid rgba(0,0,0,.1);border-radius:16px;padding:16px;background:#fff}.bd-shop-card{cursor:pointer;transition:.2s}.bd-shop-card:hover,.bd-shop-card.active{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}.bd-shop-card h3,.bd-product-card h3{margin:0 0 8px}.bd-product-card .price{font-weight:700;margin:10px 0}.bd-qty{display:flex;align-items:center;gap:8px;margin-top:10px}.bd-qty button{min-width:34px}.bd-section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.bd-muted{opacity:.7}.bd-cart-line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.08)}.bd-error{padding:12px;border-radius:10px;background:#fff1f1;color:#a00}</style>
 </head>
 <body>
@@ -30,37 +30,11 @@ function changeQty(id,d){const p=products.find(x=>x.id===id);if(!p)return;let q=
 function renderCart(){const el=document.querySelector('#cart-list'),arr=[...cart.values()];document.querySelector('#cart-count').textContent=arr.reduce((n,x)=>n+x.quantity,0);if(!arr.length){el.innerHTML='<p class="bd-muted">السلة فارغة</p>';return}el.innerHTML=arr.map(x=>`<div class="bd-cart-line"><span>${esc(x.title)} × ${x.quantity}</span><strong>${(x.quantity*Number(x.price)).toFixed(3)} OMR</strong></div>`).join('');}
 function syncOrderItems(){const items=[...cart.values()].map(x=>({product_id:x.id,description:x.title,quantity:x.quantity,unit_price:Number(x.price)}));const itemsEl=document.querySelector('#delivery-items'),storeEl=document.querySelector('#delivery-store-id'),option=document.querySelector('#delivery-option');if(itemsEl)itemsEl.value=JSON.stringify(items);if(storeEl)storeEl.value=selectedStore?.id||'';if(option&&!['1.500','2.000'].includes(option.value))option.value='1.500';const subtotal=items.reduce((n,x)=>n+(Number(x.quantity)||0)*(Number(x.unit_price)||0),0);const fee=Number(option?.value||'1.500');document.querySelector('#delivery-subtotal').textContent=subtotal.toFixed(3)+' OMR';document.querySelector('#delivery-fee').textContent=fee.toFixed(3)+' OMR';document.querySelector('#delivery-total').textContent=(subtotal+fee).toFixed(3)+' OMR';}
 function selectStore(id){selectedStore=stores.find(s=>s.id===id)||null;cart.clear();renderStores();renderProducts();renderCart();syncOrderItems();}
-async function placeOrder(){
- const msg=document.querySelector('#checkout-message'),btn=document.querySelector('#create-delivery-order');
- msg.textContent='';
- if(!sb?.auth){msg.textContent=text('Supabase غير متاح','Supabase is unavailable');return;}
- const {data:{session}}=await sb.auth.getSession();
- if(!session?.user){msg.textContent=text('يرجى تسجيل الدخول أولًا','Please log in first');return;}
- if(!selectedStore){msg.textContent=text('اختر متجرًا أولًا','Please select a store first');return;}
- const items=[...cart.values()].map(x=>({product_id:x.id,description:x.title,quantity:x.quantity,unit_price:Number(x.price)}));
- if(!items.length){msg.textContent=text('السلة فارغة','Your cart is empty');return;}
- const address=document.querySelector('#delivery-address')?.value?.trim()||'';
- if(!address){msg.textContent=text('أدخل عنوان التوصيل','Enter a delivery address');return;}
- const fee=Number(document.querySelector('#delivery-option')?.value||1.5);
- if(!Number.isFinite(fee)||fee<0){msg.textContent=text('رسوم توصيل غير صحيحة','Invalid delivery fee');return;}
- // V1 pricing rule: 1.500 OMR => driver 1.100 + Bingo 0.400.
- // For other fees, keep the split balanced while preserving the 1.500 rule as the baseline.
- const driverShare=fee===1.5?1.1:Number((fee*(1.1/1.5)).toFixed(3));
- const bingoShare=Number((fee-driverShare).toFixed(3));
- const lat=Number(document.querySelector('#delivery-lat')?.value||0)||0;
- const lng=Number(document.querySelector('#delivery-lng')?.value||0)||0;
- const distance=Number(document.querySelector('#delivery-distance')?.value||0)||0;
- btn.disabled=true;
- try{
-   const {data,error}=await sb.rpc('delivery_create_order',{p_store_id:selectedStore.id,p_address:address,p_latitude:lat,p_longitude:lng,p_distance_km:distance,p_items:items,p_delivery_fee:fee,p_driver_share:driverShare,p_bingo_share:bingoShare,p_store_commission:0,p_payment_status:'pending',p_notes:null});
-   if(error)throw error;
-   msg.textContent=text('تم إنشاء الطلب بنجاح رقم: ','Order created successfully: ')+String(data);
-   cart.clear();renderProducts();renderCart();syncOrderItems();
- }catch(e){console.error('delivery_create_order:',e);msg.textContent=text('تعذر إنشاء الطلب: ','Could not create order: ')+(e?.message||String(e));}
- finally{btn.disabled=false;}
-}
+async function placeOrder(){const msg=document.querySelector('#checkout-message'),btn=document.querySelector('#create-delivery-order');msg.textContent='';if(!sb?.auth){msg.textContent=text('Supabase غير متاح','Supabase is unavailable');return;}const {data:{session}}=await sb.auth.getSession();if(!session?.user){msg.textContent=text('يرجى تسجيل الدخول أولًا','Please log in first');return;}if(!selectedStore){msg.textContent=text('اختر متجرًا أولًا','Please select a store first');return;}const items=[...cart.values()].map(x=>({product_id:x.id,description:x.title,quantity:x.quantity,unit_price:Number(x.price)}));if(!items.length){msg.textContent=text('السلة فارغة','Your cart is empty');return;}const address=document.querySelector('#delivery-address')?.value?.trim()||'';if(!address){msg.textContent=text('أدخل عنوان التوصيل','Enter a delivery address');return;}const fee=Number(document.querySelector('#delivery-option')?.value||1.5);if(!Number.isFinite(fee)||fee<0){msg.textContent=text('رسوم توصيل غير صحيحة','Invalid delivery fee');return;}const driverShare=fee===1.5?1.1:Number((fee*(1.1/1.5)).toFixed(3));const bingoShare=Number((fee-driverShare).toFixed(3));const lat=Number(document.querySelector('#delivery-lat')?.value||0)||0;const lng=Number(document.querySelector('#delivery-lng')?.value||0)||0;const distance=Number(document.querySelector('#delivery-distance')?.value||0)||0;btn.disabled=true;try{const {data,error}=await sb.rpc('delivery_create_order',{p_store_id:selectedStore.id,p_address:address,p_latitude:lat,p_longitude:lng,p_distance_km:distance,p_items:items,p_delivery_fee:fee,p_driver_share:driverShare,p_bingo_share:bingoShare,p_store_commission:0,p_payment_status:'pending',p_notes:null});if(error)throw error;msg.textContent=text('تم إنشاء الطلب بنجاح رقم: ','Order created successfully: ')+String(data);cart.clear();renderProducts();renderCart();syncOrderItems();}catch(e){console.error('delivery_create_order:',e);msg.textContent=text('تعذر إنشاء الطلب: ','Could not create order: ')+(e?.message||String(e));}finally{btn.disabled=false;}}
 async function loadCatalog(){const el=document.querySelector('#store-list');if(!sb?.from){el.innerHTML='<p class="bd-error">Supabase غير متاح. تحقق من تحميل supabase-client.js.</p>';return}try{const sr=await sb.from('delivery_stores').select('id,owner_id,store_name,store_name_ar,store_name_en,phone,address,latitude,longitude,is_active').eq('is_active',true).order('created_at',{ascending:false});if(sr.error)throw sr.error;stores=sr.data||[];let pr=await sb.from('store_products').select('id,store_id,title,description,price,image_url,category,stock,is_active,sort_order').eq('is_active',true).gt('stock',0).order('sort_order',{ascending:true});if(pr.error)console.error('Products:',pr.error);products=pr.error?[]:(pr.data||[]);renderStores();renderProducts();renderCart();syncOrderItems();if(stores.length)selectStore(stores[0].id);}catch(e){console.error('Customer catalog:',e);el.innerHTML='<p class="bd-error">تعذر تحميل المتاجر. افتح Console لمعرفة الخطأ.</p>';}}
 document.addEventListener('DOMContentLoaded',()=>{const optionEl=document.querySelector('#delivery-option');if(optionEl)optionEl.value='1.500';optionEl?.addEventListener('change',e=>{e.stopImmediatePropagation();syncOrderItems();},true);document.querySelector('#create-delivery-order')?.addEventListener('click',placeOrder);loadCatalog();window.addEventListener('bingo:language',()=>{renderStores();renderProducts();renderCart();syncOrderItems();});});
 })();
 </script>
+<script src="bingo-delivery-customer-tracking.js?v=20260818-1637"></script>
+<script src="bingo-delivery-customer-live-driver.js?v=20260818-1637"></script>
 </body></html>
