@@ -1,14 +1,15 @@
 (function(){
   'use strict';
-  if(window.__bingoCustomerLiveDriverLoaded)return;
-  window.__bingoCustomerLiveDriverLoaded=true;
+  // v2 guard: intentionally different from the old cached script guard.
+  if(window.__bingoCustomerLiveDriverV2Loaded)return;
+  window.__bingoCustomerLiveDriverV2Loaded=true;
   const sb=window.sb;
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function style(){
-    if(document.getElementById('bingo-live-driver-style'))return;
+    if(document.getElementById('bingo-live-driver-style-v2'))return;
     const s=document.createElement('style');
-    s.id='bingo-live-driver-style';
+    s.id='bingo-live-driver-style-v2';
     s.textContent='.bcld-box{margin-top:10px;padding:13px;border-radius:14px;background:#eef6ff;border:1px solid #d7e8fb}.bcld-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.bcld-name{font-weight:900}.bcld-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px;font-size:13px;color:#62738a}.bcld-map{display:inline-block;margin-top:9px;padding:9px 12px;border-radius:10px;background:#153d70;color:#fff;text-decoration:none;font-weight:800}.bcld-muted{color:#738196;font-size:12px;margin-top:7px}';
     document.head.appendChild(s);
   }
@@ -29,16 +30,20 @@
   function renderRow(row){
     const card=findOrderCard(row.order_number);
     if(!card)return;
-
     fillAddress(card,row);
 
-    // Remove the generic driver box created by the base tracking script.
-    // The live RPC card below is the single source of driver details.
-    card.querySelectorAll('.bct-driver').forEach(el=>el.remove());
+    // Remove every old/generic driver block so one authoritative RPC block remains.
+    card.querySelectorAll('.bct-driver,.bcld-box').forEach(el=>el.remove());
 
-    let box=card.querySelector('.bcld-box');
-    if(!box){box=document.createElement('div');box.className='bcld-box';card.appendChild(box);}
-    if(!row.driver_id){box.innerHTML='<div class="bcld-muted">لم يتم تعيين مندوب لهذا الطلب بعد.</div>';return;}
+    const box=document.createElement('div');
+    box.className='bcld-box';
+    card.appendChild(box);
+
+    if(!row.driver_id){
+      box.innerHTML='<div class="bcld-muted">لم يتم تعيين مندوب لهذا الطلب بعد.</div>';
+      return;
+    }
+
     const online=row.driver_online===true?'🟢 متصل':'⚫ غير متصل';
     const phone=row.driver_phone?`<span>📞 ${esc(row.driver_phone)}</span>`:'';
     const rating=row.driver_rating!=null?`<span>⭐ ${Number(row.driver_rating).toFixed(2)}</span>`:'';
@@ -58,10 +63,10 @@
       rows=Array.isArray(rows)?rows:[];
       rows.forEach(renderRow);
     }catch(e){
-      console.warn('BINGO customer live driver:',e);
+      console.warn('BINGO customer live driver v2:',e);
     }
   }
 
-  function init(){style();setTimeout(refresh,500);setTimeout(refresh,1800);setInterval(refresh,15000);}
+  function init(){style();setTimeout(refresh,350);setTimeout(refresh,1200);setTimeout(refresh,2500);setInterval(refresh,15000);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
