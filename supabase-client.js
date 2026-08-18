@@ -5,7 +5,7 @@ if(/bingo-delivery-customer\.html$/i.test(location.pathname)){
   const loadCustomerTracking=()=>{
     if(!document.querySelector('script[data-bingo-customer-checkout-fix]')){
       const sc=document.createElement('script');
-      sc.src='bingo-delivery-customer-checkout-fix.js?v=20260818-1';
+      sc.src='bingo-delivery-customer-checkout-fix.js?v=20260818-2';
       sc.setAttribute('data-bingo-customer-checkout-fix','1');
       document.body.appendChild(sc);
     }
