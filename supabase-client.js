@@ -17,8 +17,8 @@
       if(!document.querySelector('script[data-bingo-customer-checkout-fix]')){
         const sc=document.createElement('script');sc.src='bingo-delivery-customer-checkout-fix.js?v=20260818-2';sc.setAttribute('data-bingo-customer-checkout-fix','1');document.body.appendChild(sc);
       }
-      if(!document.querySelector('script[data-bingo-customer-tracking-v4]')){
-        const s=document.createElement('script');s.src='bingo-delivery-customer-tracking.js?v=20260818-2205';s.setAttribute('data-bingo-customer-tracking-v4','1');document.body.appendChild(s);
+      if(!document.querySelector('script[data-bingo-customer-tracking-v5]')){
+        const s=document.createElement('script');s.src='bingo-delivery-customer-tracking.js?v=20260818-2215';s.setAttribute('data-bingo-customer-tracking-v5','1');document.body.appendChild(s);
       }
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadCustomerTracking,{once:true});else loadCustomerTracking();
