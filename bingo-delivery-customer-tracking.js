@@ -65,7 +65,10 @@
     try{
       const {data:{session}}=await sb.auth.getSession();
       if(!session?.user){host.innerHTML='<div class="bct-empty">سجّل الدخول لمتابعة طلباتك.</div>';return;}
-      const q=await sb.from('delivery_orders').select('id,order_number,status,total,delivery_fee,delivery_address,created_at').eq('customer_id',session.user.id).order('created_at',{ascending:false}).limit(10);
+
+      // Use the same delivery_orders read path that already powers "My Orders".
+      // RLS remains the authority for which rows the signed-in customer may see.
+      const q=await sb.from('delivery_orders').select('id,order_number,status,total,delivery_fee,delivery_address,created_at').order('created_at',{ascending:false}).limit(10);
       if(q.error)throw q.error;
       const orders=q.data||[];
       if(!orders.length){host.innerHTML='<div class="bct-empty">لا توجد طلبات للمتابعة حاليًا.</div>';return;}
