@@ -1,5 +1,7 @@
 -- BINGO Delivery: secure customer tracking RPC
 -- Returns only delivery/driver data for orders owned by auth.uid().
+-- For orders with more than one assignment, prefer the active/accepted assignment
+-- so the customer sees the driver immediately after acceptance.
 
 create or replace function public.customer_delivery_tracking()
 returns jsonb
@@ -48,7 +50,15 @@ begin
       select da.*
       from public.delivery_assignments da
       where da.order_id = o.id
-      order by da.offered_at desc
+      order by
+        case da.status
+          when 'on_delivery' then 1
+          when 'picked_up' then 2
+          when 'accepted' then 3
+          when 'delivered' then 4
+          else 9
+        end,
+        da.offered_at desc
       limit 1
     ) a on true
     left join public.delivery_drivers d on d.id = a.driver_id
