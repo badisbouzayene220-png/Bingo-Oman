@@ -5,10 +5,9 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   css('bingo-ui.css');
   js('bingo-page-i18n.js','bingo-page-i18n-loader');
 
-  if(location.pathname.endsWith('bingo-delivery-admin.html')){
-    const t=setInterval(()=>{if(window.sb){clearInterval(t);js('admin-driver-management.js','admin-driver-management-loader');}},100);
-    setTimeout(()=>clearInterval(t),15000);
-  }
+  // Delivery admin driver management is handled entirely by bingo-delivery-admin.html.
+  // Do NOT load admin-driver-management.js here: it reads delivery_drivers directly
+  // and can overwrite the RPC-rendered table while RLS is enabled.
 
   function addSummary(){
     if(!location.pathname.endsWith('bingo-delivery-admin.html')) return;
