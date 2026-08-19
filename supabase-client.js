@@ -64,6 +64,7 @@
       if(!document.querySelector('script[data-bingo-admin-leaderboard]')){const s=document.createElement('script');s.src='bingo-delivery-admin-leaderboard.js?v=20260819-1';s.setAttribute('data-bingo-admin-leaderboard','1');document.body.appendChild(s)}
       if(!document.querySelector('script[data-bingo-admin-rewards-drivers]')){const a=document.createElement('script');a.src='bingo-delivery-admin-rewards-drivers.js?v=20260819-2';a.setAttribute('data-bingo-admin-rewards-drivers','1');document.body.appendChild(a)}
       if(!document.querySelector('script[data-bingo-admin-driver-button]')){const b=document.createElement('script');b.src='bingo-delivery-admin-driver-button.js?v=20260819-1';b.setAttribute('data-bingo-admin-driver-button','1');document.body.appendChild(b)}
+      if(!document.querySelector('script[data-bingo-admin-dispatch-control]')){const d=document.createElement('script');d.src='bingo-delivery-admin-dispatch-control.js?v=20260819-1';d.setAttribute('data-bingo-admin-dispatch-control','1');document.body.appendChild(d)}
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadAdminRewards,{once:true});else loadAdminRewards();
   }
