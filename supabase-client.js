@@ -39,16 +39,16 @@
 
   if(/bingo-delivery-driver\.html$/i.test(location.pathname)){
     const loadDriverExperience=()=>{
-      if(!document.querySelector('script[data-bingo-driver-experience]')){
-        const s=document.createElement('script');s.src='bingo-driver-experience.js?v=20260819-3';s.setAttribute('data-bingo-driver-experience','1');document.body.appendChild(s);
-      }
-      if(!document.querySelector('script[data-bingo-driver-phase3]')){
-        const p=document.createElement('script');p.src='bingo-driver-phase3.js?v=20260819-4';p.setAttribute('data-bingo-driver-phase3','1');document.body.appendChild(p);
-      }
-      if(!document.querySelector('script[data-bingo-driver-badges]')){
-        const b=document.createElement('script');b.src='bingo-driver-badges.js?v=20260819-1';b.setAttribute('data-bingo-driver-badges','1');document.body.appendChild(b);
-      }
+      if(!document.querySelector('script[data-bingo-driver-experience]')){const s=document.createElement('script');s.src='bingo-driver-experience.js?v=20260819-3';s.setAttribute('data-bingo-driver-experience','1');document.body.appendChild(s)}
+      if(!document.querySelector('script[data-bingo-driver-phase3]')){const p=document.createElement('script');p.src='bingo-driver-phase3.js?v=20260819-4';p.setAttribute('data-bingo-driver-phase3','1');document.body.appendChild(p)}
+      if(!document.querySelector('script[data-bingo-driver-badges]')){const b=document.createElement('script');b.src='bingo-driver-badges.js?v=20260819-1';b.setAttribute('data-bingo-driver-badges','1');document.body.appendChild(b)}
+      if(!document.querySelector('script[data-bingo-driver-levels]')){const r=document.createElement('script');r.src='bingo-driver-levels-rewards.js?v=20260819-1';r.setAttribute('data-bingo-driver-levels','1');document.body.appendChild(r)}
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadDriverExperience,{once:true});else loadDriverExperience();
+  }
+
+  if(/bingo-delivery-(control|admin)\.html$/i.test(location.pathname)){
+    const loadAdminRewards=()=>{if(!document.querySelector('script[data-bingo-admin-leaderboard]')){const s=document.createElement('script');s.src='bingo-delivery-admin-leaderboard.js?v=20260819-1';s.setAttribute('data-bingo-admin-leaderboard','1');document.body.appendChild(s)}};
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadAdminRewards,{once:true});else loadAdminRewards();
   }
 })();
