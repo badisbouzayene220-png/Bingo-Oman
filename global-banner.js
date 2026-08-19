@@ -1,5 +1,17 @@
 (function(){
   'use strict';
+
+  /* Shared responsive layer. Loaded here so every public page that already
+     includes global-banner.js receives the same mobile/tablet adjustments. */
+  (function loadResponsiveLayer(){
+    if(document.querySelector('link[data-bingo-responsive]')) return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='responsive.css?v=20260819-1';
+    link.setAttribute('data-bingo-responsive','1');
+    document.head.appendChild(link);
+  })();
+
   if(location.pathname.endsWith('/admin.html')) return;
   let items=[], index=0, timer=null;
 
