@@ -1,0 +1,25 @@
+BINGO Oman — Home / Firefox performance fix
+Date: 2026-08-19
+
+Root cause found:
+1) language.js installed a MutationObserver on the whole document body.
+   Every dynamic Home mutation triggered a full-document translation scan via TreeWalker.
+2) config.js loaded bingo-page-i18n.js on every page.
+   That file also observed the whole body and re-scanned all page text on every DOM mutation.
+3) Home mounts several dynamic sections at startup (global banner, Oman place cards,
+   nearby listings, featured offers, home upgrade), so the two global translators repeatedly
+   rescanned a much larger/more dynamic DOM than Marketplace.
+4) config.js also installed a Delivery-admin MutationObserver on every page even though
+   its callback immediately returned outside the delivery admin page.
+
+Fixes applied:
+- Removed the full-body MutationObserver from language.js.
+- Language switching remains functional via the existing switch and explicit widget hooks.
+- bingo-page-i18n.js is now loaded only on ERP / HR / Admin pages.
+- Delivery earnings MutationObserver now starts only on bingo-delivery-admin.html.
+- Intro remains completely removed.
+
+Expected result:
+- Home opens directly.
+- Firefox main thread is no longer repeatedly rescanning the full Home DOM.
+- Marketplace / Store / Delivery behavior remains unchanged.

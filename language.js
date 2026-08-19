@@ -718,27 +718,16 @@
     setLanguage(currentLanguage());
 
     /*
-     * auth.js can replace .actions after authentication.
-     * A small observer re-adds the language button without
-     * interfering with the authentication code.
+     * IMPORTANT PERFORMANCE FIX:
+     * Do not observe the entire document body. The Home page mounts several
+     * dynamic sections (banner, nearby listings, featured offers, Oman cards).
+     * The previous MutationObserver re-scanned and re-translated the full DOM
+     * after every mutation, which could keep Firefox's main thread busy.
+     *
+     * auth.js already calls BingoLang.addSwitch() whenever it rebuilds .actions,
+     * and Home widgets handle their own language-change updates. A lightweight
+     * delayed refresh is enough here.
      */
-    let translateTimer = null;
-    const observer = new MutationObserver(function () {
-      addSwitch();
-      updateButton(currentLanguage());
-      changeLogos(currentLanguage());
-      clearTimeout(translateTimer);
-      translateTimer = setTimeout(function () {
-        translateDataAttributes(currentLanguage());
-        translateLegacyText(currentLanguage());
-      }, 40);
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
     window.setTimeout(function () {
       addSwitch();
       updateButton(currentLanguage());

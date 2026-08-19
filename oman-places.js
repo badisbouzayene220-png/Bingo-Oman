@@ -22,16 +22,17 @@
   }
 
   function init(){
-    const links=[...document.querySelectorAll('a[href*="place.html?place="]')].filter(a=>places[slugFrom(a)] && !a.classList.contains('hero-photo-main') && !a.classList.contains('hero-photo-mini'));
-    if(links.length<8) return;
-    const parent=links[0].parentElement;
+    const parent=document.querySelector('.oman-strip');
     if(!parent) return;
+    const links=[...parent.querySelectorAll(':scope > a[href*="place.html?place="]')].filter(a=>places[slugFrom(a)]);
+    if(!links.length) return;
     parent.classList.add('oman-governorates-photo-grid');
 
     if(!document.getElementById('oman-governorate-photo-style')){
       const style=document.createElement('style');
       style.id='oman-governorate-photo-style';
       style.textContent=`
+      .hero .gov-photo-card{display:none!important}
       .oman-governorates-photo-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;border:0!important;background:transparent!important;overflow:visible!important}
       .oman-governorates-photo-grid>a.gov-photo-card{position:relative!important;display:block!important;min-height:190px!important;padding:0!important;border:0!important;border-radius:18px!important;overflow:hidden!important;background:#092a82!important;box-shadow:0 10px 28px rgba(6,26,80,.10)!important;isolation:isolate!important;transition:transform .25s ease,box-shadow .25s ease!important}
       .gov-photo-card .gov-photo{position:absolute;inset:0;display:block}.gov-photo-card .gov-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease}.gov-photo-card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,16,42,.02) 28%,rgba(3,16,42,.84) 100%);z-index:1}.gov-photo-card>b,.gov-photo-card>span:not(.gov-photo):not(.gov-credit){position:relative;z-index:2;display:block!important;margin:0!important;padding-left:16px!important;padding-right:16px!important;color:#fff!important;text-shadow:0 2px 10px rgba(0,0,0,.35)}.gov-photo-card>b{position:absolute!important;left:0;right:0;bottom:34px;font-size:15px!important}.gov-photo-card>span:not(.gov-photo):not(.gov-credit){position:absolute!important;left:0;right:0;bottom:15px;font-size:10px!important;color:#dce6f7!important}.gov-photo-card .gov-credit{position:absolute;z-index:3;top:9px;right:9px;font-size:8px;color:#fff;background:rgba(0,0,0,.38);padding:4px 6px;border-radius:999px;backdrop-filter:blur(5px)}

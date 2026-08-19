@@ -1,0 +1,27 @@
+BINGO OMAN - SAFE INTRO V1
+
+Built on top of the HOME-PERFORMANCE-FIXED version.
+
+Design:
+- BINGO Oman logo
+- Lightweight Oman map outline
+- Omani BINGO character holding the phone
+- Marketplace / Cars / Property / Auctions / Delivery chips
+- Start Now and Discover Oman buttons
+- Skip button
+- Automatic close after 5 seconds
+
+Performance rules:
+- No MutationObserver
+- No particles
+- No blur animation
+- No body/html scroll lock
+- No dependency on characters.js
+- No intro HTML embedded in index.html
+- The intro is created only by bingo-intro-safe.js
+- If the script fails, Home still loads normally
+- Intro DOM is removed after close
+
+Display behavior:
+- Shows once per browser tab/session using sessionStorage key bingoSafeIntroSeen
+- To test again, open a new Private window/tab session or clear sessionStorage.

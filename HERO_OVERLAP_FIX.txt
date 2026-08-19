@@ -1,0 +1,9 @@
+BINGO Oman — Hero overlapping text fix
+
+Cause:
+oman-places.js was selecting every place.html?place=... link on the home page and applying governorate-card markup/styles beyond the intended Oman strip. This could create stacked governorate labels in unintended areas.
+
+Fix:
+- Governorate photo transformation now targets only direct links inside .oman-strip.
+- Added a defensive rule preventing any .gov-photo-card from rendering inside .hero.
+- No changes to search, mascot, quick actions, nearby listings, or intro timing.

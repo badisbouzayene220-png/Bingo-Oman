@@ -1,0 +1,26 @@
+BINGO Oman - Intro Removal Fix
+Date: 2026-08-19
+
+Problem found:
+1. The old intro CSS was embedded directly inside index.html.
+2. The intro HTML was also embedded directly inside index.html.
+3. A JavaScript block in index.html locked the page with bingo-intro-lock.
+4. Its automatic close timer was set to 30000 ms (30 seconds).
+5. global-banner.js was simultaneously trying to remove the intro later, creating conflicting behavior.
+6. Several obsolete intro implementations also remained in the project (intro-lite, intro-v4, intro-recovery).
+7. The old intro contained continuous animations, blur, glow, particles and filters that could make Firefox report that the page was slowing down.
+
+Fix applied:
+- Removed all intro CSS from index.html.
+- Removed the intro HTML from index.html.
+- Removed all intro JavaScript from index.html.
+- Removed intro lock logic.
+- Removed intro cleanup workaround from global-banner.js because it is no longer needed.
+- Removed intro-lite.js / intro-lite.css.
+- Removed intro-v4.js / intro-v4.css.
+- Removed intro-recovery.js.
+- Removed obsolete bingo-intro-lock CSS rules from style.css and characters.css.
+- Kept the rest of the website features unchanged.
+
+Result:
+The home page now opens directly without an intro, without a Skip screen, and without intro-related page locking.

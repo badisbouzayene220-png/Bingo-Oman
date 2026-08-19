@@ -2,22 +2,317 @@
    BINGO OMAN — LOGO + LANGUAGE SWITCH
    ========================================================= */
 
-:root { --bingo-navy:#092a82; --bingo-orange:#ff7900; --bingo-line:#dfe5ef; }
+:root {
+  --bingo-navy: #092a82;
+  --bingo-orange: #ff7900;
+  --bingo-line: #dfe5ef;
+}
 
-/* INTRO REMOVED — hard stop at first paint.
-   index.html still contains legacy intro markup/JS, so this rule prevents
-   it and all expensive animations from ever being rendered. */
-#bingoIntro { display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
-#bingoIntro, #bingoIntro * { animation:none !important; transition:none !important; filter:none !important; backdrop-filter:none !important; }
-html.bingo-intro-lock, body.bingo-intro-lock { overflow:auto !important; height:auto !important; position:static !important; }
+/* ---------------- Header logo ---------------- */
 
-.header .logo,.header .main-logo,.bingo-logo{display:inline-flex!important;align-items:center;justify-content:flex-start;width:150px;height:72px;padding:0;margin:0;flex:0 0 150px;background:transparent!important;border:0!important;box-shadow:none!important;text-decoration:none}
-.header .logo img,.header .main-logo img,.bingo-logo img,#headerLogo{display:block!important;width:145px!important;height:auto!important;max-width:145px!important;max-height:66px!important;object-fit:contain!important;object-position:center;opacity:1!important;visibility:visible!important;filter:none!important;mix-blend-mode:normal!important;background:transparent!important;border:0!important;box-shadow:none!important;animation:bingoLogoIn .35s ease both}
-.footergrid>div:first-child{min-width:0}.footergrid>div:first-child>a,.footer-logo{display:inline-flex!important;align-items:center;justify-content:flex-start;width:175px;height:82px;padding:0;margin:0 0 12px;background:transparent!important;border:0!important;box-shadow:none!important;text-decoration:none}.footergrid>div:first-child>a img,.footer-logo img,#footerLogo{display:block!important;width:170px!important;height:auto!important;max-width:170px!important;max-height:78px!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;filter:none!important;mix-blend-mode:normal!important;background:transparent!important;border:0!important;box-shadow:none!important;animation:bingoLogoIn .35s ease both}
-.authbrand{display:flex!important;justify-content:center;align-items:center;min-height:82px}.authbrand img{display:block!important;width:175px!important;height:auto!important;max-height:85px!important;object-fit:contain!important;filter:none!important;background:transparent!important}
-.lang-switch,.bingo-language,#langSwitch,#bingoLanguageButton{appearance:none;-webkit-appearance:none;display:inline-flex!important;align-items:center;justify-content:center;min-width:64px;height:38px;padding:0 12px;margin:0;border:1px solid var(--bingo-line)!important;border-radius:10px;background:#fff!important;color:var(--bingo-navy)!important;font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:800;line-height:1;cursor:pointer;white-space:nowrap;opacity:1!important;visibility:visible!important;position:relative;z-index:100;transition:background .2s ease,border-color .2s ease,color .2s ease,transform .2s ease}.lang-switch:hover,.bingo-language:hover,#langSwitch:hover,#bingoLanguageButton:hover{background:var(--bingo-navy)!important;border-color:var(--bingo-navy)!important;color:#fff!important;transform:translateY(-1px)}.lang-switch:active,.bingo-language:active,#langSwitch:active,#bingoLanguageButton:active{transform:translateY(0) scale(.97)}
-.floating-language{position:fixed!important;top:18px;right:18px;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,.14)}html[dir="rtl"] .floating-language{right:auto;left:18px}html[dir="rtl"] .header .logo,html[dir="rtl"] .header .main-logo,html[dir="rtl"] .bingo-logo{justify-content:flex-end}html[dir="rtl"] .footergrid>div:first-child{text-align:right}html[dir="rtl"] .footergrid>div:first-child>a,html[dir="rtl"] .footer-logo{justify-content:flex-end}html[dir="rtl"] body,html[dir="rtl"] button,html[dir="rtl"] input,html[dir="rtl"] select,html[dir="rtl"] textarea,html[dir="rtl"] .lang-switch,html[dir="rtl"] .bingo-language,html[dir="rtl"] #langSwitch,html[dir="rtl"] #bingoLanguageButton{font-family:"Noto Kufi Arabic",Tahoma,Arial,sans-serif}
-@media(max-width:900px){.header .logo,.header .main-logo,.bingo-logo{width:125px;height:62px;flex-basis:125px}.header .logo img,.header .main-logo img,.bingo-logo img,#headerLogo{width:120px!important;max-width:120px!important;max-height:58px!important}.footergrid>div:first-child>a,.footer-logo{width:150px}.footergrid>div:first-child>a img,.footer-logo img,#footerLogo{width:145px!important;max-width:145px!important}}
-@media(max-width:600px){.header .logo,.header .main-logo,.bingo-logo{width:105px;height:58px;flex-basis:105px}.header .logo img,.header .main-logo img,.bingo-logo img,#headerLogo{width:100px!important;max-width:100px!important}.footergrid>div:first-child{text-align:center}.footergrid>div:first-child>a,.footer-logo{justify-content:center;margin-left:auto;margin-right:auto}.lang-switch,.bingo-language,#langSwitch,#bingoLanguageButton{min-width:56px;height:36px;padding:0 9px;font-size:11px}}
-@keyframes bingoLogoIn{from{opacity:0;transform:translateY(5px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(prefers-reduced-motion:reduce){.header .logo img,.header .main-logo img,.bingo-logo img,#headerLogo,.footer-logo img,#footerLogo{animation:none!important;transition:none!important}}
+.header .logo,
+.header .main-logo,
+.bingo-logo {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  width: 150px;
+  height: 72px;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 150px;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none;
+}
+
+.header .logo img,
+.header .main-logo img,
+.bingo-logo img,
+#headerLogo {
+  display: block !important;
+  width: 145px !important;
+  height: auto !important;
+  max-width: 145px !important;
+  max-height: 66px !important;
+  object-fit: contain !important;
+  object-position: center;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  animation: bingoLogoIn .35s ease both;
+}
+
+/* ---------------- Footer logo ---------------- */
+
+.footergrid > div:first-child {
+  min-width: 0;
+}
+
+.footergrid > div:first-child > a,
+.footer-logo {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  width: 175px;
+  height: 82px;
+  padding: 0;
+  margin: 0 0 12px;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none;
+}
+
+.footergrid > div:first-child > a img,
+.footer-logo img,
+#footerLogo {
+  display: block !important;
+  width: 170px !important;
+  height: auto !important;
+  max-width: 170px !important;
+  max-height: 78px !important;
+  object-fit: contain !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  animation: bingoLogoIn .35s ease both;
+}
+
+/* ---------------- Auth page logo ---------------- */
+
+.authbrand {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  min-height: 82px;
+}
+
+.authbrand img {
+  display: block !important;
+  width: 175px !important;
+  height: auto !important;
+  max-height: 85px !important;
+  object-fit: contain !important;
+  filter: none !important;
+  background: transparent !important;
+}
+
+/* ---------------- Language button ---------------- */
+
+.lang-switch,
+.bingo-language,
+#langSwitch,
+#bingoLanguageButton {
+  appearance: none;
+  -webkit-appearance: none;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 64px;
+  height: 38px;
+
+  padding: 0 12px;
+  margin: 0;
+
+  border: 1px solid var(--bingo-line) !important;
+  border-radius: 10px;
+
+  background: #fff !important;
+  color: var(--bingo-navy) !important;
+
+  font-family: Inter, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  position: relative;
+  z-index: 100;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+.lang-switch:hover,
+.bingo-language:hover,
+#langSwitch:hover,
+#bingoLanguageButton:hover {
+  background: var(--bingo-navy) !important;
+  border-color: var(--bingo-navy) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.lang-switch:active,
+.bingo-language:active,
+#langSwitch:active,
+#bingoLanguageButton:active {
+  transform: translateY(0) scale(.97);
+}
+
+/* Auth pages do not have a normal header.
+   The language button is placed in the upper corner. */
+
+.floating-language {
+  position: fixed !important;
+  top: 18px;
+  right: 18px;
+  z-index: 9999;
+  box-shadow: 0 10px 30px rgba(0,0,0,.14);
+}
+
+html[dir="rtl"] .floating-language {
+  right: auto;
+  left: 18px;
+}
+
+/* ---------------- RTL ---------------- */
+
+html[dir="rtl"] .header .logo,
+html[dir="rtl"] .header .main-logo,
+html[dir="rtl"] .bingo-logo {
+  justify-content: flex-end;
+}
+
+html[dir="rtl"] .footergrid > div:first-child {
+  text-align: right;
+}
+
+html[dir="rtl"] .footergrid > div:first-child > a,
+html[dir="rtl"] .footer-logo {
+  justify-content: flex-end;
+}
+
+/* Arabic needs a proper Arabic UI font. */
+html[dir="rtl"] body,
+html[dir="rtl"] button,
+html[dir="rtl"] input,
+html[dir="rtl"] select,
+html[dir="rtl"] textarea {
+  font-family: "Noto Kufi Arabic", Tahoma, Arial, sans-serif;
+}
+
+html[dir="rtl"] .lang-switch,
+html[dir="rtl"] .bingo-language,
+html[dir="rtl"] #langSwitch,
+html[dir="rtl"] #bingoLanguageButton {
+  font-family: "Noto Kufi Arabic", Tahoma, Arial, sans-serif;
+}
+
+/* ---------------- Mobile ---------------- */
+
+@media (max-width: 900px) {
+  .header .logo,
+  .header .main-logo,
+  .bingo-logo {
+    width: 125px;
+    height: 62px;
+    flex-basis: 125px;
+  }
+
+  .header .logo img,
+  .header .main-logo img,
+  .bingo-logo img,
+  #headerLogo {
+    width: 120px !important;
+    max-width: 120px !important;
+    max-height: 58px !important;
+  }
+
+  .footergrid > div:first-child > a,
+  .footer-logo {
+    width: 150px;
+  }
+
+  .footergrid > div:first-child > a img,
+  .footer-logo img,
+  #footerLogo {
+    width: 145px !important;
+    max-width: 145px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .header .logo,
+  .header .main-logo,
+  .bingo-logo {
+    width: 105px;
+    height: 58px;
+    flex-basis: 105px;
+  }
+
+  .header .logo img,
+  .header .main-logo img,
+  .bingo-logo img,
+  #headerLogo {
+    width: 100px !important;
+    max-width: 100px !important;
+  }
+
+  .footergrid > div:first-child {
+    text-align: center;
+  }
+
+  .footergrid > div:first-child > a,
+  .footer-logo {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .lang-switch,
+  .bingo-language,
+  #langSwitch,
+  #bingoLanguageButton {
+    min-width: 56px;
+    height: 36px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
+}
+
+/* ---------------- Logo animation ---------------- */
+
+@keyframes bingoLogoIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header .logo img,
+  .header .main-logo img,
+  .bingo-logo img,
+  #headerLogo,
+  .footer-logo img,
+  #footerLogo {
+    animation: none !important;
+    transition: none !important;
+  }
+}
