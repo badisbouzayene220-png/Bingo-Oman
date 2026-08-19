@@ -17,8 +17,8 @@
 
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="logo.css">
-  <link rel="stylesheet" href="bingo-intro-safe.css?v=2">
-  <script src="bingo-intro-safe.js?v=2" defer></script>
+  <link rel="stylesheet" href="bingo-intro-safe.css?v=4">
+  <script src="bingo-intro-safe.js?v=4" defer></script>
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -234,56 +234,12 @@
 
 
           <select id="location">
-
-            <option
-              value="all"
-              data-i18n="all_oman"
-            >
-              All Oman
-            </option>
-
-            <option
-              value="muscat"
-              data-i18n="muscat"
-            >
-              Muscat
-            </option>
-
-            <option
-              value="seeb"
-              data-i18n="seeb"
-            >
-              Seeb
-            </option>
-
-            <option
-              value="salalah"
-              data-i18n="salalah"
-            >
-              Salalah
-            </option>
-
-            <option
-              value="sohar"
-              data-i18n="sohar"
-            >
-              Sohar
-            </option>
-
-            <option
-              value="nizwa"
-              data-i18n="nizwa"
-            >
-              Nizwa
-            </option>
-
-            <option
-              value="sur"
-              data-i18n="sur"
-            >
-              Sur
-            </option>
-
+            <option value="all">All Oman</option>
+            <option value="Muscat">Muscat</option>
+            <option value="Salalah">Salalah</option>
+            <option value="Sohar">Sohar</option>
+            <option value="Nizwa">Nizwa</option>
+            <option value="Sur">Sur</option>
           </select>
 
 
@@ -302,280 +258,29 @@
 
         <div class="popular">
 
-          <span data-i18n="popular">
-            Popular:
-          </span>
+          <span data-i18n="popular">Popular:</span>
 
-          <a
-            href="marketplace.html?category=cars"
-            data-i18n="cars"
-          >
-            Cars
-          </a>
-
-          <a
-            href="marketplace.html?category=phones"
-            data-i18n="phones"
-          >
-            Phones
-          </a>
-
-          <a
-            href="marketplace.html?category=property"
-            data-i18n="properties"
-          >
-            Properties
-          </a>
-
-          <a
-            href="marketplace.html?category=furniture"
-            data-i18n="furniture"
-          >
-            Furniture
-          </a>
+          <a href="marketplace.html?category=cars" data-i18n="cars">Cars</a>
+          <a href="marketplace.html?category=phones" data-i18n="phones">Phones</a>
+          <a href="marketplace.html?category=property" data-i18n="property">Property</a>
+          <a href="marketplace.html?category=furniture" data-i18n="furniture">Furniture</a>
 
         </div>
 
       </div>
 
 
-      <!-- HERO PHOTO -->
-      <div class="hero-art oman-hero-photo">
-        <a class="hero-photo-main place-photo-link" href="place.html?place=muscat" aria-label="تعرف على مسقط">
-          <img src="assets/oman/muscat-grand-mosque.jpg" alt="Sultan Qaboos Grand Mosque in Muscat" fetchpriority="high">
-          <div class="hero-photo-overlay"></div>
-          <div class="hero-photo-copy">
-            <span class="photo-location">🇴🇲 MUSCAT, OMAN</span>
-            <strong>عُمان تبدأ من هنا</strong>
-            <small>Real places. Local people. Better deals.</small>
-          </div>
-        </a>
-        <a class="hero-photo-mini mini-nizwa place-photo-link" href="place.html?place=nizwa">
-          <img src="assets/oman/nizwa-fort.jpg" alt="Nizwa Fort">
-          <span><b>Nizwa</b><small>Heritage & Souq</small></span>
-        </a>
-        <a class="hero-photo-mini mini-salalah place-photo-link" href="place.html?place=salalah">
-          <img src="assets/oman/salalah-beach.jpg" alt="Salalah beach">
-          <span><b>Salalah</b><small>Beach & Khareef</small></span>
-        </a>
-        <div class="hero-stat"><b>11+</b><span>محافظة ومدينة</span></div>
-      </div>
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       EXPLORE
-  ========================== -->
-
-  <section class="section">
-
-    <div class="container">
-
-      <div class="sectiontitle">
-
-        <div>
-
-          <div
-            class="kicker"
-            data-i18n="explore_bingo"
-          >
-            EXPLORE BINGO
-          </div>
-
-          <h2 data-i18n="what_are_you_looking_for">
-            What are you looking for?
-          </h2>
-
+      <div class="hero-art">
+        <div class="glow g1"></div>
+        <div class="glow g2"></div>
+        <div class="artback"></div>
+        <div class="artcard">
+          <small>BINGO OMAN</small>
+          <div class="mini"><i class="mi o">🛍️</i><div><strong>Marketplace</strong><small>Buy & sell across Oman</small></div><span>›</span></div>
+          <div class="mini"><i class="mi b">🔨</i><div><strong>Auctions</strong><small>Bid and win</small></div><span>›</span></div>
+          <div class="mini"><i class="mi r">📋</i><div><strong>Tenders</strong><small>Business opportunities</small></div><span>›</span></div>
+          <div class="badge">Made for Oman 🇴🇲</div>
         </div>
-
-
-        <a
-          href="marketplace.html"
-          data-i18n="view_marketplace"
-        >
-          View marketplace →
-        </a>
-
-      </div>
-
-
-      <div class="grid">
-
-        <!-- CARS -->
-
-        <a
-          class="card"
-          href="marketplace.html?category=cars"
-        >
-
-          <div class="thumb category-photo">
-            <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=85" alt="Cars and vehicles" loading="lazy">
-          </div>
-
-          <div class="cardbody">
-
-            <h3 data-i18n="cars_vehicles">
-              Cars & Vehicles
-            </h3>
-
-            <p
-              class="meta"
-              data-i18n="find_next_ride"
-            >
-              Find your next ride
-            </p>
-
-          </div>
-
-        </a>
-
-
-        <!-- ELECTRONICS -->
-
-        <a
-          class="card"
-          href="marketplace.html?category=electronics"
-        >
-
-          <div class="thumb category-photo">
-            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=85" alt="Electronics" loading="lazy">
-          </div>
-
-          <div class="cardbody">
-
-            <h3 data-i18n="electronics">
-              Electronics
-            </h3>
-
-            <p
-              class="meta"
-              data-i18n="phones_laptops"
-            >
-              Phones, laptops & more
-            </p>
-
-          </div>
-
-        </a>
-
-
-        <!-- PROPERTY -->
-
-        <a
-          class="card"
-          href="marketplace.html?category=property"
-        >
-
-          <div class="thumb category-photo">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85" alt="Property" loading="lazy">
-          </div>
-
-          <div class="cardbody">
-
-            <h3 data-i18n="property">
-              Property
-            </h3>
-
-            <p
-              class="meta"
-              data-i18n="homes_land_offices"
-            >
-              Homes, land & offices
-            </p>
-
-          </div>
-
-        </a>
-
-
-        <!-- FURNITURE -->
-
-        <a
-          class="card"
-          href="marketplace.html?category=furniture"
-        >
-
-          <div class="thumb category-photo">
-            <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85" alt="Home and furniture" loading="lazy">
-          </div>
-
-          <div class="cardbody">
-
-            <h3 data-i18n="home_furniture">
-              Home & Furniture
-            </h3>
-
-            <p
-              class="meta"
-              data-i18n="make_space_better"
-            >
-              Make your space better
-            </p>
-
-          </div>
-
-        </a>
-
-
-        <!-- JOBS -->
-
-        <a
-          class="card"
-          href="marketplace.html?category=jobs"
-        >
-
-          <div class="thumb category-photo">
-            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85" alt="Jobs and services" loading="lazy">
-          </div>
-
-          <div class="cardbody">
-
-            <h3 data-i18n="jobs_services">
-              Jobs & Services
-            </h3>
-
-            <p
-              class="meta"
-              data-i18n="work_opportunities"
-            >
-              Work and opportunities
-            </p>
-
-          </div>
-
-        </a>
-
-
-        <!-- MORE -->
-
-        <a
-          class="card"
-          href="marketplace.html"
-        >
-
-          <div class="thumb category-photo">
-            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=85" alt="Everything else" loading="lazy">
-          </div>
-
-          <div class="cardbody">
-
-            <h3 data-i18n="everything_else">
-              Everything Else
-            </h3>
-
-            <p
-              class="meta"
-              data-i18n="discover_more"
-            >
-              Discover more
-            </p>
-
-          </div>
-
-        </a>
-
       </div>
 
     </div>
@@ -1102,7 +807,6 @@ async function loadHomeAds(){
 }
 document.addEventListener('DOMContentLoaded',loadHomeAds);
 </script>
-
 <script src="characters.js"></script>
 
 <script>
@@ -1152,7 +856,6 @@ document.addEventListener('DOMContentLoaded',loadHomeAds);
   });
 })();
 </script>
-
 
 </body>
 </html>
