@@ -18,9 +18,17 @@ async function refreshCapacity(){
     const q=await sb.rpc('admin_delivery_driver_capacities');
     if(q.error)throw q.error;
     rows=Array.isArray(q.data)?q.data:[];
+    fillDriverSelect();
     host.innerHTML=rows.length?rows.map(x=>`<span class="admin-pill ${Number(x.remaining_capacity)>0?'success':'warning'}" style="padding:7px 10px"><strong>${esc(x.driver_name)}</strong> — الحد ${Number(x.max_concurrent_orders||1)} — الحمل ${Number(x.active_load||0)}/${Number(x.max_concurrent_orders||1)} — المتبقي ${Number(x.remaining_capacity||0)}</span>`).join(''):'<span class="admin-muted">لا يوجد مندوبون</span>';
     syncSelected();
   }catch(e){host.innerHTML=`<span class="admin-error">تعذر قراءة الحد المحفوظ: ${esc(e.message||e)}</span>`;}
+}
+function fillDriverSelect(){
+  const driver=document.getElementById('dispatch-cap-driver');
+  if(!driver)return;
+  const previous=driver.value;
+  driver.innerHTML=rows.length?rows.map(x=>`<option value="${esc(x.driver_id)}">${esc(x.driver_name||'BINGO Driver')}</option>`).join(''):'<option value="">لا يوجد مندوبون</option>';
+  if(rows.some(x=>x.driver_id===previous))driver.value=previous;
 }
 function syncSelected(){
   const driver=document.getElementById('dispatch-cap-driver');
