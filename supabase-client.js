@@ -32,6 +32,7 @@
       if(!document.querySelector('script[data-bingo-customer-tracking-v5]')){const s=document.createElement('script');s.src='bingo-delivery-customer-tracking.js?v=20260818-2215';s.setAttribute('data-bingo-customer-tracking-v5','1');document.body.appendChild(s)}
       if(!document.querySelector('script[data-bingo-customer-eta]')){const s=document.createElement('script');s.src='bingo-delivery-customer-eta.js?v=20260818-2305';s.setAttribute('data-bingo-customer-eta','1');document.body.appendChild(s)}
       if(!document.querySelector('script[data-bingo-customer-code]')){const s=document.createElement('script');s.src='bingo-delivery-customer-code.js?v=20260818-1';s.setAttribute('data-bingo-customer-code','1');document.body.appendChild(s)}
+      if(!document.querySelector('script[data-bingo-customer-rating]')){const s=document.createElement('script');s.src='bingo-delivery-customer-rating.js?v=20260819-1';s.setAttribute('data-bingo-customer-rating','1');document.body.appendChild(s)}
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadCustomerTracking,{once:true});else loadCustomerTracking();
   }
@@ -43,6 +44,9 @@
       }
       if(!document.querySelector('script[data-bingo-driver-phase3]')){
         const p=document.createElement('script');p.src='bingo-driver-phase3.js?v=20260819-4';p.setAttribute('data-bingo-driver-phase3','1');document.body.appendChild(p);
+      }
+      if(!document.querySelector('script[data-bingo-driver-badges]')){
+        const b=document.createElement('script');b.src='bingo-driver-badges.js?v=20260819-1';b.setAttribute('data-bingo-driver-badges','1');document.body.appendChild(b);
       }
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadDriverExperience,{once:true});else loadDriverExperience();
