@@ -14,12 +14,12 @@
 
   /* Home-only visual layer for Oman governorate photo cards. */
   (function loadOmanPlaces(){
-    const path=location.pathname.replace(/\/+$/,'');
-    if(path && !/\/(index\.html)?$/i.test(path)) return;
+    const last=(location.pathname.split('/').pop()||'').toLowerCase();
+    if(last && last!=='index.html') return;
     if(document.querySelector('script[data-bingo-oman-places]')) return;
     const script=document.createElement('script');
-    script.src='oman-places.js?v=20260819-1';
-    script.defer=true;
+    script.src='oman-places.js?v=20260819-2';
+    script.async=false;
     script.setAttribute('data-bingo-oman-places','1');
     document.head.appendChild(script);
   })();
@@ -27,7 +27,7 @@
   if(location.pathname.endsWith('/admin.html')) return;
   let items=[], index=0, timer=null;
 
-  function esc(s){return String(s??'').replace(/[&<>\'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+  function esc(s){return String(s??'').replace(/[&<>\'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt',"'":'&#39;','\"':'&quot;'}[c]));}
 
   function resolveMediaUrl(value){
     const raw=String(value||'').trim();
