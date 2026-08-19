@@ -1,4 +1,23 @@
 (function(){
+  // Repair legacy/malformed tracking links where &store= was encoded inside delivery.
+  // Example: ?delivery=BGO-XXXX%26store%3DBO-YYYY
+  try{
+    if(/order-tracking\.html$/i.test(location.pathname)){
+      const q=new URLSearchParams(location.search);
+      let delivery=q.get('delivery')||'';
+      let store=q.get('store')||'';
+      const marker='&store=';
+      const pos=delivery.indexOf(marker);
+      if(pos>-1){
+        if(!store)store=delivery.slice(pos+marker.length);
+        delivery=delivery.slice(0,pos);
+        q.set('delivery',delivery);
+        if(store)q.set('store',store);
+        history.replaceState(null,'',location.pathname+'?'+q.toString());
+      }
+    }
+  }catch(e){console.warn('BINGO tracking URL repair:',e);}
+
   let refreshing = false;
   async function getSession(){try{const {data,error}=await sb.auth.getSession();if(error)throw error;return data?.session||null;}catch(e){console.warn('BINGO auth session:',e);return null;}}
   async function getUser(){const session=await getSession();return session?.user||null;}
