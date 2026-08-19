@@ -15,14 +15,24 @@
   if(/bingo-delivery-driver\.html$/i.test(location.pathname) && window.sb?.auth?.getUser){
     const originalGetUser=window.sb.auth.getUser.bind(window.sb.auth);
     window.sb.auth.getUser=async function(...args){
-      const result=await originalGetUser(...args);
-      if(result?.error && /auth session missing/i.test(String(result.error.message||''))){
-        const sessionResult=await window.sb.auth.getSession();
-        if(sessionResult?.error && !/auth session missing/i.test(String(sessionResult.error.message||''))) return {data:{user:null},error:sessionResult.error};
-        return {data:{user:sessionResult?.data?.session?.user||null},error:null};
+      try{
+        const result=await originalGetUser(...args);
+        if(result?.error && /auth session missing/i.test(String(result.error.message||''))){
+          return {data:{user:null},error:null};
+        }
+        return result;
+      }catch(e){
+        if(/auth session missing/i.test(String(e?.message||''))) return {data:{user:null},error:null};
+        throw e;
       }
-      return result;
     };
+
+    if(!document.querySelector('script[data-driver-auth-hotfix]')){
+      const h=document.createElement('script');
+      h.src='driver-auth-hotfix.js?v=20260819-2';
+      h.setAttribute('data-driver-auth-hotfix','1');
+      document.head.appendChild(h);
+    }
   }
 
   if(/bingo-delivery-customer\.html$/i.test(location.pathname)){
@@ -47,7 +57,7 @@
     const loadDriverExperience=()=>{
       if(document.querySelector('script[data-bingo-driver-experience]')) return;
       const s=document.createElement('script');
-      s.src='bingo-driver-experience.js?v=20260819-1';
+      s.src='bingo-driver-experience.js?v=20260819-2';
       s.setAttribute('data-bingo-driver-experience','1');
       document.body.appendChild(s);
     };
