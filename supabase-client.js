@@ -65,7 +65,8 @@
       if(!document.querySelector('script[data-bingo-admin-rewards-drivers]')){const a=document.createElement('script');a.src='bingo-delivery-admin-rewards-drivers.js?v=20260819-2';a.setAttribute('data-bingo-admin-rewards-drivers','1');document.body.appendChild(a)}
       if(!document.querySelector('script[data-bingo-admin-driver-button]')){const b=document.createElement('script');b.src='bingo-delivery-admin-driver-button.js?v=20260819-1';b.setAttribute('data-bingo-admin-driver-button','1');document.body.appendChild(b)}
       if(!document.querySelector('script[data-bingo-admin-dispatch-control]')){const d=document.createElement('script');d.src='bingo-delivery-admin-dispatch-control.js?v=20260819-1';d.setAttribute('data-bingo-admin-dispatch-control','1');document.body.appendChild(d)}
-      if(!document.querySelector('script[data-bingo-admin-capacity-fix]')){const c=document.createElement('script');c.src='bingo-delivery-admin-capacity-fix.js?v=20260819-2';c.setAttribute('data-bingo-admin-capacity-fix','1');document.body.appendChild(c)}
+      if(!document.querySelector('script[data-bingo-admin-capacity-fix]')){const c=document.createElement('script');c.src='bingo-delivery-admin-capacity-fix.js?v=20260819-3';c.setAttribute('data-bingo-admin-capacity-fix','1');document.body.appendChild(c)}
+      if(!document.querySelector('script[data-bingo-admin-priority]')){const p=document.createElement('script');p.src='bingo-delivery-admin-priority.js?v=20260819-1';p.setAttribute('data-bingo-admin-priority','1');document.body.appendChild(p)}
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadAdminRewards,{once:true});else loadAdminRewards();
   }
