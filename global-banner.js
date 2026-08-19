@@ -12,6 +12,18 @@
     document.head.appendChild(link);
   })();
 
+  /* Home-only visual layer for Oman governorate photo cards. */
+  (function loadOmanPlaces(){
+    const path=location.pathname.replace(/\/+$/,'');
+    if(path && !/\/(index\.html)?$/i.test(path)) return;
+    if(document.querySelector('script[data-bingo-oman-places]')) return;
+    const script=document.createElement('script');
+    script.src='oman-places.js?v=20260819-1';
+    script.defer=true;
+    script.setAttribute('data-bingo-oman-places','1');
+    document.head.appendChild(script);
+  })();
+
   if(location.pathname.endsWith('/admin.html')) return;
   let items=[], index=0, timer=null;
 
