@@ -4,7 +4,7 @@ if(!/bingo-delivery-driver\.html$/i.test(location.pathname)) return;
 
 const css=document.createElement('link');
 css.rel='stylesheet';
-css.href='bingo-driver-experience.css?v=20260818-2';
+css.href='bingo-driver-experience.css?v=20260819-1';
 document.head.appendChild(css);
 
 const $=s=>document.querySelector(s);
@@ -13,6 +13,7 @@ let lastPosition=null;
 let distanceMeters=null;
 let geoWatch=null;
 let lastSuccessPay='';
+let refreshQueued=false;
 
 function haversineMeters(lat1,lon1,lat2,lon2){
   const R=6371000,toRad=v=>v*Math.PI/180;
@@ -48,9 +49,7 @@ function inject(){
   box.className='bingo-xp';
   box.innerHTML=`<div class="bingo-xp-card bingo-xp-hero"><div class="bingo-xp-copy"><h2>مرحباً بك في BINGO Driver</h2><p>مساعدك الذكي للتوصيل في عُمان. تابع الطلب من لحظة الاستلام حتى لحظة BINGO!</p><div class="bingo-xp-assistant">🟠 BINGO <span id="bingo-assistant-text">أنا جاهز لمساعدتك</span></div></div><img class="bingo-xp-mascot" src="assets/bingo-omani-driver.jpg" alt="BINGO Oman Driver"></div><div class="bingo-xp-card bingo-xp-side"><div class="bingo-ring-wrap"><div class="bingo-ring bingo-pulse" id="bingo-ring"><div class="bingo-ring-core"><div class="bingo-ring-state">حالة الرحلة</div><div class="bingo-ring-value" id="bingo-ring-value">جاهز</div><div class="bingo-ring-sub" id="bingo-ring-sub">بانتظار طلب جديد</div></div></div></div><h3>رحلة BINGO</h3><div class="bingo-stage-list"><div class="bingo-stage" data-stage="offer"><i class="bingo-stage-dot"></i>طلب جديد</div><div class="bingo-stage" data-stage="accepted"><i class="bingo-stage-dot"></i>التوجه للمتجر</div><div class="bingo-stage" data-stage="pickup"><i class="bingo-stage-dot"></i>تم الاستلام</div><div class="bingo-stage" data-stage="delivery"><i class="bingo-stage-dot"></i>Smart Arrival</div></div><div class="bingo-smart-card"><strong>📍 Smart Arrival</strong><span id="bingo-smart-text">يتفعّل تلقائياً أثناء التوصيل.</span></div><button class="bingo-code-btn" id="bingo-code-open" disabled>BINGO Code</button></div>`;
   app.prepend(box);
-
   document.body.insertAdjacentHTML('beforeend',`<div class="bingo-code-modal" id="bingo-code-modal"><div class="bingo-code-box"><h3>BINGO Code</h3><p>اطلب الرمز المكوّن من 4 أرقام من العميل لتأكيد التسليم.</p><input class="bingo-code-input" id="bingo-code-input" inputmode="numeric" maxlength="4" autocomplete="one-time-code" placeholder="••••"><div class="bingo-code-actions"><button class="bingo-code-confirm" id="bingo-code-confirm">تأكيد التسليم</button><button class="bingo-code-cancel" id="bingo-code-cancel">إلغاء</button></div><small id="bingo-code-msg"></small></div></div><div class="bingo-success" id="bingo-success"><div class="bingo-success-card"><div class="bingo-success-word"><span>B</span><span>I</span><span>N</span><span>G</span><span>O!</span></div><h2>تم التسليم بنجاح 🎉</h2><p>أحسنت! تمت إضافة التوصيلة إلى إنجازاتك.</p><strong id="bingo-success-pay"></strong></div></div>`);
-
   $('#bingo-code-open').onclick=openCode;
   $('#bingo-code-cancel').onclick=closeCode;
   $('#bingo-code-confirm').onclick=confirmCode;
@@ -58,13 +57,7 @@ function inject(){
   refresh();
 }
 
-function openCode(){
-  if(!activeContext||activeContext.assignment_status!=='on_delivery') return;
-  $('#bingo-code-msg').textContent='';
-  $('#bingo-code-input').value='';
-  $('#bingo-code-modal').classList.add('is-open');
-  setTimeout(()=>$('#bingo-code-input')?.focus(),80);
-}
+function openCode(){if(!activeContext||activeContext.assignment_status!=='on_delivery')return;$('#bingo-code-msg').textContent='';$('#bingo-code-input').value='';$('#bingo-code-modal').classList.add('is-open');setTimeout(()=>$('#bingo-code-input')?.focus(),80)}
 function closeCode(){ $('#bingo-code-modal')?.classList.remove('is-open'); }
 
 async function confirmCode(){
@@ -94,6 +87,8 @@ async function confirmCode(){
 async function loadContext(){
   if(!window.sb?.rpc) return;
   try{
+    const session=await window.sb.auth.getSession();
+    if(!session?.data?.session) return;
     const r=await window.sb.rpc('delivery_driver_active_context');
     if(r.error) throw r.error;
     const row=Array.isArray(r.data)?r.data[0]:r.data;
@@ -101,9 +96,7 @@ async function loadContext(){
     computeDistance();
     protectDeliveredButton();
     refresh();
-  }catch(e){
-    console.warn('BINGO active context unavailable',e);
-  }
+  }catch(e){console.warn('BINGO active context unavailable',e)}
 }
 
 function computeDistance(){
@@ -116,12 +109,7 @@ function startSmartArrival(){
   geoWatch=navigator.geolocation.watchPosition(pos=>{lastPosition=pos;computeDistance();refresh();},()=>{}, {enableHighAccuracy:true,maximumAge:8000,timeout:15000});
 }
 
-function protectDeliveredButton(){
-  document.querySelectorAll('[data-a="delivered"]').forEach(btn=>{
-    btn.dataset.a='bingo-code';
-    btn.textContent='🔐 تأكيد بواسطة BINGO Code';
-  });
-}
+function protectDeliveredButton(){document.querySelectorAll('[data-a="delivered"]').forEach(btn=>{btn.dataset.a='bingo-code';btn.textContent='🔐 تأكيد بواسطة BINGO Code';});}
 
 function refresh(){
   if(!$('#bingo-xp')) return;
@@ -131,32 +119,26 @@ function refresh(){
   $('#bingo-ring-value').textContent=s.label;
   $('#bingo-ring-sub').textContent=s.sub;
   document.querySelectorAll('.bingo-stage').forEach(x=>x.classList.toggle('is-active',x.dataset.stage===s.key));
-  const codeBtn=$('#bingo-code-open');
-  if(codeBtn) codeBtn.disabled=!(activeContext?.assignment_status==='on_delivery');
+  const codeBtn=$('#bingo-code-open');if(codeBtn)codeBtn.disabled=!(activeContext?.assignment_status==='on_delivery');
   const text=$('#bingo-assistant-text');
-  if(text){
-    if(activeContext?.assignment_status==='on_delivery'&&distanceMeters!=null&&distanceMeters<=180) text.textContent='أنت قريب جداً. ابحث عن مدخل العميل ثم اطلب BINGO Code';
-    else text.textContent=({ready:'أنت جاهز لاستقبال الطلبات',offer:'لديك طلب جديد، راجع التفاصيل',accepted:'توجه إلى المتجر لاستلام الطلب',pickup:'تم الاستلام، الآن إلى العميل',delivery:'أنا أتابع المسافة حتى نقطة الوصول'}[s.key]||'أنا معك');
-  }
+  if(text){if(activeContext?.assignment_status==='on_delivery'&&distanceMeters!=null&&distanceMeters<=180)text.textContent='أنت قريب جداً. ابحث عن مدخل العميل ثم اطلب BINGO Code';else text.textContent=({ready:'أنت جاهز لاستقبال الطلبات',offer:'لديك طلب جديد، راجع التفاصيل',accepted:'توجه إلى المتجر لاستلام الطلب',pickup:'تم الاستلام، الآن إلى العميل',delivery:'أنا أتابع المسافة حتى نقطة الوصول'}[s.key]||'أنا معك');}
   const smart=$('#bingo-smart-text');
-  if(smart){
-    if(activeContext?.assignment_status==='on_delivery'&&distanceMeters!=null) smart.textContent=distanceMeters<1000?'المسافة إلى العميل: '+Math.round(distanceMeters)+' متر':'المسافة إلى العميل: '+(distanceMeters/1000).toFixed(1)+' كم';
-    else if(activeContext?.assignment_status==='on_delivery') smart.textContent='جاري تحديد المسافة إلى العميل...';
-    else smart.textContent='يتفعّل تلقائياً أثناء التوصيل.';
-  }
+  if(smart){if(activeContext?.assignment_status==='on_delivery'&&distanceMeters!=null)smart.textContent=distanceMeters<1000?'المسافة إلى العميل: '+Math.round(distanceMeters)+' متر':'المسافة إلى العميل: '+(distanceMeters/1000).toFixed(1)+' كم';else if(activeContext?.assignment_status==='on_delivery')smart.textContent='جاري تحديد المسافة إلى العميل...';else smart.textContent='يتفعّل تلقائياً أثناء التوصيل.';}
 }
+
+function queueRefresh(){if(refreshQueued)return;refreshQueued=true;requestAnimationFrame(()=>{refreshQueued=false;protectDeliveredButton();refresh();});}
 
 function boot(){
   inject();
-  startSmartArrival();
-  loadContext();
   const target=$('#app');
-  if(target)new MutationObserver(()=>{protectDeliveredButton();refresh();}).observe(target,{childList:true,subtree:true,attributes:true});
+  if(target)new MutationObserver(queueRefresh).observe(target,{childList:true,subtree:true});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-a="bingo-code"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();openCode();},true);
+  const startWhenSignedIn=async()=>{const session=await window.sb?.auth?.getSession?.();if(session?.data?.session){startSmartArrival();loadContext();}};
+  startWhenSignedIn();
+  window.sb?.auth?.onAuthStateChange?.((_event,session)=>{if(session){startSmartArrival();loadContext();}});
   setInterval(loadContext,7000);
-  setInterval(refresh,1800);
+  setInterval(refresh,2200);
 }
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,400),{once:true});
-else setTimeout(boot,400);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,400),{once:true});else setTimeout(boot,400);
 })();
