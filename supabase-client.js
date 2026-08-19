@@ -42,7 +42,7 @@
         const s=document.createElement('script');s.src='bingo-driver-experience.js?v=20260819-3';s.setAttribute('data-bingo-driver-experience','1');document.body.appendChild(s);
       }
       if(!document.querySelector('script[data-bingo-driver-phase3]')){
-        const p=document.createElement('script');p.src='bingo-driver-phase3.js?v=20260819-1';p.setAttribute('data-bingo-driver-phase3','1');document.body.appendChild(p);
+        const p=document.createElement('script');p.src='bingo-driver-phase3.js?v=20260819-4';p.setAttribute('data-bingo-driver-phase3','1');document.body.appendChild(p);
       }
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadDriverExperience,{once:true});else loadDriverExperience();
