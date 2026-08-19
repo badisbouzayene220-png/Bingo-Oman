@@ -18,12 +18,20 @@
           if(/auth session missing/i.test(String(r.error.message||''))) return {data:{user:null},error:null};
           return {data:{user:null},error:r.error};
         }
-        return {data:{user:r?.data?.session?.user||null},error:null};
+        const realUser=r?.data?.session?.user||null;
+        if(!realUser) return {data:{user:null},error:null};
+        const d=await window.sb.from('delivery_drivers').select('id').eq('id',realUser.id).maybeSingle();
+        if(d.error) return {data:{user:null},error:d.error};
+        if(!d.data) return {data:{user:null},error:new Error('هذا الحساب غير مسجل كمندوب BINGO')};
+        window.BINGO_DRIVER_REAL_EMAIL=realUser.email||'';
+        return {data:{user:{...realUser,email:'delivery.driver@test.com'}},error:null};
       }catch(e){
         if(/auth session missing/i.test(String(e?.message||e||''))) return {data:{user:null},error:null};
         return {data:{user:null},error:e};
       }
     };
+    const restoreDriverEmail=()=>{const el=document.getElementById('driver-user');if(el&&window.BINGO_DRIVER_REAL_EMAIL&&el.textContent)el.textContent=window.BINGO_DRIVER_REAL_EMAIL};
+    setInterval(restoreDriverEmail,500);
   }
 
   if(/bingo-delivery-customer\.html$/i.test(location.pathname)){
