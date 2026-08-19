@@ -24,6 +24,18 @@
     document.head.appendChild(script);
   })();
 
+  /* Place-page hero fallback: governorates added later did not have place.image. */
+  (function loadPlaceHeroImages(){
+    const last=(location.pathname.split('/').pop()||'').toLowerCase();
+    if(last!=='place.html') return;
+    if(document.querySelector('script[data-bingo-place-hero-images]')) return;
+    const script=document.createElement('script');
+    script.src='place-hero-images.js?v=20260819-1';
+    script.async=false;
+    script.setAttribute('data-bingo-place-hero-images','1');
+    document.head.appendChild(script);
+  })();
+
   if(location.pathname.endsWith('/admin.html')) return;
   let items=[], index=0, timer=null;
 
