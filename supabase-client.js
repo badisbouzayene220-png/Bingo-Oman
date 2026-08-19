@@ -3,8 +3,9 @@
   const path=(location.pathname||'').toLowerCase();
   const isDriver=path.endsWith('/bingo-delivery-driver.html');
   let storageKey=null;
-  if(path.endsWith('/bingo-delivery-customer.html')) storageKey='bingo-delivery-auth-customer';
-  else if(isDriver) storageKey='bingo-delivery-auth-driver';
+  // Customer Delivery intentionally uses the default Supabase auth storage so the
+  // BINGO Oman Store account continues seamlessly into delivery tracking.
+  if(isDriver) storageKey='bingo-delivery-auth-driver';
   else if(path.endsWith('/bingo-delivery-seller.html')) storageKey='bingo-delivery-auth-seller';
   else if(path.endsWith('/bingo-delivery-admin.html')||path.endsWith('/bingo-delivery-control.html')) storageKey='bingo-delivery-auth-admin';
   const authOptions=storageKey?{storageKey,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}:null;
