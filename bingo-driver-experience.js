@@ -4,7 +4,7 @@ if(!/bingo-delivery-driver\.html$/i.test(location.pathname)) return;
 
 const css=document.createElement('link');
 css.rel='stylesheet';
-css.href='bingo-driver-experience.css?v=20260818-2';
+css.href='bingo-driver-experience.css?v=20260819-1';
 document.head.appendChild(css);
 
 const $=s=>document.querySelector(s);
@@ -13,6 +13,7 @@ let lastPosition=null;
 let distanceMeters=null;
 let geoWatch=null;
 let lastSuccessPay='';
+let refreshQueued=false;
 
 function haversineMeters(lat1,lon1,lat2,lon2){
   const R=6371000,toRad=v=>v*Math.PI/180;
@@ -94,6 +95,8 @@ async function confirmCode(){
 async function loadContext(){
   if(!window.sb?.rpc) return;
   try{
+    const session=await window.sb.auth.getSession();
+    if(!session?.data?.session) return;
     const r=await window.sb.rpc('delivery_driver_active_context');
     if(r.error) throw r.error;
     const row=Array.isArray(r.data)?r.data[0]:r.data;
@@ -146,15 +149,26 @@ function refresh(){
   }
 }
 
+function queueRefresh(){
+  if(refreshQueued) return;
+  refreshQueued=true;
+  requestAnimationFrame(()=>{refreshQueued=false;protectDeliveredButton();refresh();});
+}
+
 function boot(){
   inject();
-  startSmartArrival();
-  loadContext();
   const target=$('#app');
-  if(target)new MutationObserver(()=>{protectDeliveredButton();refresh();}).observe(target,{childList:true,subtree:true,attributes:true});
+  if(target)new MutationObserver(queueRefresh).observe(target,{childList:true,subtree:true});
   document.addEventListener('click',e=>{const b=e.target.closest('[data-a="bingo-code"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();openCode();},true);
+  // Start GPS/context only after the driver is actually signed in and the app is visible.
+  const startWhenSignedIn=async()=>{
+    const session=await window.sb?.auth?.getSession?.();
+    if(session?.data?.session){startSmartArrival();loadContext();}
+  };
+  startWhenSignedIn();
+  window.sb?.auth?.onAuthStateChange?.((_event,session)=>{if(session){startSmartArrival();loadContext();}});
   setInterval(loadContext,7000);
-  setInterval(refresh,1800);
+  setInterval(refresh,2200);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,400),{once:true});
