@@ -7,7 +7,7 @@ function shouldShow(){
   if(!isHome()) return false;
   const params=new URLSearchParams(location.search);
   if(params.get('intro')==='1') return true;
-  try{return sessionStorage.getItem('bingoCinematicIntroSeenV3')!=='1'}catch(e){return true}
+  try{return sessionStorage.getItem('bingoCinematicIntroSeenV4')!=='1'}catch(e){return true}
 }
 function init(){
   if(!shouldShow()||document.getElementById('bingoSafeIntro')) return;
@@ -21,7 +21,7 @@ function init(){
     <button class="bsi-skip" type="button" aria-label="${ar?'تخطي المقدمة':'Skip introduction'}">${ar?'تخطي':'Skip'} <span>›</span></button>
     <div class="bsi-stage">
       <div class="bsi-phase bsi-map-phase" aria-hidden="true">
-        <svg class="bsi-map" viewBox="0 0 460 550">
+        <svg class="bsi-map" viewBox="0 0 460 550" role="img" aria-label="Oman map">
           <path class="bsi-main" pathLength="1" d="M256 87 L227 90 L236 139 L216 142 L216 164 L203 179 L199 209 L223 261 L191 356 L42 411 L34 425 L75 497 L74 516 L96 535 L141 519 L191 517 L209 474 L258 468 L284 421 L329 410 L330 345 L341 331 L369 333 L370 344 L379 339 L379 299 L404 275 L411 245 L425 230 L424 215 L402 206 L366 154 L289 136 Z"/>
           <path class="bsi-musandam" pathLength="1" d="M256 9 L253 9 L253 11 L251 14 L246 14 L246 16 L244 18 L243 20 L245 23 L245 41 L244 46 L246 49 L250 49 L250 45 L254 41 L256 36 L260 34 L259 32 L259 17 L257 15 Z"/>
         </svg>
@@ -39,12 +39,13 @@ function init(){
       </div>
 
       <div class="bsi-phase bsi-logo-phase">
-        <img class="bsi-logo" src="assets/bingo-oman-intro-lite.webp?v=3" alt="BINGO Oman">
+        <div class="bsi-logo-fallback" aria-hidden="true">BINGO <span>OMAN</span></div>
+        <img class="bsi-logo" src="assets/bingo-oman-intro.png?v=4" alt="BINGO Oman">
       </div>
 
       <div class="bsi-phase bsi-mascot-phase">
         <div class="bsi-mascot-card">
-          <img class="bsi-mascot" src="assets/characters/bingo-intro-omani-lite.webp?v=3" alt="BINGO Oman">
+          <img class="bsi-mascot" src="assets/characters/bingo-mascot-phone-v2.png?v=4" alt="BINGO Oman mascot">
         </div>
       </div>
 
@@ -60,11 +61,28 @@ function init(){
     </div>`;
   document.body.appendChild(root);
 
+  const logo=root.querySelector('.bsi-logo');
+  const mascot=root.querySelector('.bsi-mascot');
+  if(logo){
+    logo.addEventListener('load',()=>root.classList.add('bsi-logo-loaded'),{once:true});
+    logo.addEventListener('error',()=>{
+      logo.src='logo-en.png?v=4';
+      logo.addEventListener('error',()=>logo.style.display='none',{once:true});
+    },{once:true});
+  }
+  if(mascot){
+    mascot.addEventListener('load',()=>root.classList.add('bsi-mascot-loaded'),{once:true});
+    mascot.addEventListener('error',()=>{
+      mascot.src='assets/characters/main.png?v=4';
+      mascot.addEventListener('error',()=>mascot.style.display='none',{once:true});
+    },{once:true});
+  }
+
   let closed=false;
   const close=()=>{
     if(closed) return;
     closed=true;
-    try{sessionStorage.setItem('bingoCinematicIntroSeenV3','1')}catch(e){}
+    try{sessionStorage.setItem('bingoCinematicIntroSeenV4','1')}catch(e){}
     root.classList.add('is-closing');
     window.setTimeout(()=>root.remove(),620);
   };
