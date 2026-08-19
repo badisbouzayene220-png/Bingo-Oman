@@ -1,12 +1,15 @@
 (function(){
   'use strict';
   const path=(location.pathname||'').toLowerCase();
+  const isDriver=path.endsWith('/bingo-delivery-driver.html');
   let storageKey=null;
   if(path.endsWith('/bingo-delivery-customer.html')) storageKey='bingo-delivery-auth-customer';
-  else if(path.endsWith('/bingo-delivery-driver.html')) storageKey='bingo-delivery-auth-driver';
+  else if(isDriver) storageKey='bingo-delivery-auth-driver';
   else if(path.endsWith('/bingo-delivery-seller.html')) storageKey='bingo-delivery-auth-seller';
   else if(path.endsWith('/bingo-delivery-admin.html')||path.endsWith('/bingo-delivery-control.html')) storageKey='bingo-delivery-auth-admin';
-  const options=storageKey?{auth:{storageKey,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}:undefined;
+  const authOptions=storageKey?{storageKey,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}:null;
+  if(isDriver && authOptions && window.sessionStorage) authOptions.storage=window.sessionStorage;
+  const options=authOptions?{auth:authOptions}:undefined;
   window.sb=window.supabase.createClient(window.BINGO_CONFIG.SUPABASE_URL,window.BINGO_CONFIG.SUPABASE_PUBLISHABLE_KEY,options);
   window.supabaseClient=window.sb;
 
