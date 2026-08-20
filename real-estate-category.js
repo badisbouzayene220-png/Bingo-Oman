@@ -1,0 +1,57 @@
+(function(){
+'use strict';
+const page=(location.pathname.split('/').pop()||'').toLowerCase();
+const ar=()=>((document.documentElement.lang||'').toLowerCase().startsWith('ar')||document.documentElement.dir==='rtl');
+const t=(en,aa)=>ar()?aa:en;
+const val=id=>document.getElementById(id)?.value||'';
+const isRealEstateSelect=sel=>{const o=sel?.selectedOptions?.[0],s=((o?.dataset?.slug||'')+' '+(o?.textContent||'')).toLowerCase();return s.includes('real-estate')||s.includes('real estate')||s.includes('العقارات')};
+
+function initAdd(){
+ const form=document.getElementById('listingForm'),cat=document.getElementById('category');if(!form||!cat)return false;
+ if(document.getElementById('bingoRealEstateDetails'))return true;
+ const details=[...form.querySelectorAll('.form-section')].find(x=>x.querySelector('#brand'))||form.querySelector('.form-section');if(!details)return false;
+ const p=document.createElement('section');p.id='bingoRealEstateDetails';p.className='bingo-category-panel bingo-property-panel';p.hidden=true;
+ p.innerHTML=`<div class="bingo-category-panel-head"><div><span>🏠</span><div><h4>${t('Property details','تفاصيل العقار')}</h4><p>${t('Add the details buyers and tenants need most.','أضف أهم التفاصيل التي يحتاجها المشتري أو المستأجر.')}</p></div></div></div>
+ <div class="bingo-property-grid">
+ <label>${t('Property type','نوع العقار')}<select id="propertyType"><option value="">${t('Select type','اختر النوع')}</option><option value="apartment">${t('Apartment','شقة')}</option><option value="villa">${t('Villa','فيلا')}</option><option value="townhouse">${t('Townhouse','تاون هاوس')}</option><option value="land">${t('Land','أرض')}</option><option value="office">${t('Office','مكتب')}</option><option value="shop">${t('Shop','محل')}</option><option value="warehouse">${t('Warehouse','مخزن')}</option><option value="farm">${t('Farm','مزرعة')}</option></select></label>
+ <label>${t('Offer type','نوع العرض')}<select id="propertyOffer"><option value="">${t('Select offer','اختر العرض')}</option><option value="sale">${t('For sale','للبيع')}</option><option value="rent">${t('For rent','للإيجار')}</option></select></label>
+ <label>${t('Area (m²)','المساحة (م²)')}<input id="propertyArea" type="number" min="0" step="1" placeholder="250"></label>
+ <label>${t('Bedrooms','غرف النوم')}<input id="propertyBedrooms" type="number" min="0" step="1" placeholder="3"></label>
+ <label>${t('Bathrooms','الحمامات')}<input id="propertyBathrooms" type="number" min="0" step="1" placeholder="2"></label>
+ <label>${t('Furnishing','التأثيث')}<select id="propertyFurnishing"><option value="">${t('Select','اختر')}</option><option value="furnished">${t('Furnished','مفروش')}</option><option value="semi_furnished">${t('Semi furnished','نصف مفروش')}</option><option value="unfurnished">${t('Unfurnished','غير مفروش')}</option></select></label>
+ <label>${t('Parking spaces','مواقف السيارات')}<input id="propertyParking" type="number" min="0" step="1" placeholder="2"></label>
+ <label>${t('Building year','سنة البناء')}<input id="propertyYear" type="number" min="1900" max="2100" placeholder="2022"></label>
+ <label>${t('Floor','الطابق')}<input id="propertyFloor" type="number" min="0" step="1" placeholder="1"></label>
+ <label>${t('Governorate / Area','المحافظة / المنطقة')}<input id="propertyAreaName" maxlength="100" placeholder="${t('e.g. Al Mouj, Muscat','مثال: الموج، مسقط')}"></label>
+ </div><div class="bingo-property-checks"><label><input id="propertyPool" type="checkbox"> 🏊 ${t('Swimming pool','مسبح')}</label><label><input id="propertyGarden" type="checkbox"> 🌿 ${t('Garden','حديقة')}</label><label><input id="propertyElevator" type="checkbox"> 🛗 ${t('Elevator','مصعد')}</label><label><input id="propertySecurity" type="checkbox"> 🛡️ ${t('Security','حراسة')}</label></div>`;
+ details.appendChild(p);
+ function toggle(){const yes=isRealEstateSelect(cat);p.hidden=!yes;document.body.classList.toggle('bingo-category-property',yes)}
+ cat.addEventListener('change',toggle);new MutationObserver(toggle).observe(cat,{childList:true});toggle();
+ // Wrap the existing submit flow: temporarily enrich attributes just before Supabase insert.
+ const wait=setInterval(()=>{if(typeof window.sb==='undefined'||!form.onsubmit)return;clearInterval(wait);const original=form.onsubmit;form.onsubmit=async function(e){
+   if(!isRealEstateSelect(cat))return original.call(this,e);
+   const oldFrom=sb.from.bind(sb);
+   sb.from=function(table){const q=oldFrom(table);if(table==='listings'&&q&&typeof q.insert==='function'){const ins=q.insert.bind(q);q.insert=function(payload,...rest){const row=Array.isArray(payload)?payload[0]:payload;if(row&&row.attributes){Object.assign(row.attributes,{property_type:val('propertyType')||null,offer_type:val('propertyOffer')||null,area_sqm:Number(val('propertyArea'))||null,bedrooms:Number(val('propertyBedrooms'))||null,bathrooms:Number(val('propertyBathrooms'))||null,furnishing:val('propertyFurnishing')||null,parking_spaces:Number(val('propertyParking'))||null,building_year:Number(val('propertyYear'))||null,floor:Number(val('propertyFloor'))||null,area_name:val('propertyAreaName').trim()||null,swimming_pool:!!document.getElementById('propertyPool')?.checked,garden:!!document.getElementById('propertyGarden')?.checked,elevator:!!document.getElementById('propertyElevator')?.checked,security:!!document.getElementById('propertySecurity')?.checked,listing_kind:'property'});}return ins(payload,...rest)};}return q};
+   try{return await original.call(this,e)}finally{sb.from=oldFrom}
+ };},80);
+ return true;
+}
+
+function initMarket(){
+ const cat=document.getElementById('cat'),extra=document.getElementById('extra');if(!cat||!extra||document.getElementById('bingoPropertyFilters'))return false;
+ const box=document.createElement('div');box.id='bingoPropertyFilters';box.className='bingo-property-filters';box.hidden=true;box.innerHTML=`<select id="pfType"><option value="">${t('Any property type','كل أنواع العقار')}</option><option value="apartment">${t('Apartment','شقة')}</option><option value="villa">${t('Villa','فيلا')}</option><option value="townhouse">${t('Townhouse','تاون هاوس')}</option><option value="land">${t('Land','أرض')}</option><option value="office">${t('Office','مكتب')}</option><option value="shop">${t('Shop','محل')}</option><option value="warehouse">${t('Warehouse','مخزن')}</option></select><select id="pfOffer"><option value="">${t('Sale or rent','بيع أو إيجار')}</option><option value="sale">${t('For sale','للبيع')}</option><option value="rent">${t('For rent','للإيجار')}</option></select><input id="pfMinArea" type="number" placeholder="${t('Min area m²','أقل مساحة م²')}"><input id="pfMaxArea" type="number" placeholder="${t('Max area m²','أكبر مساحة م²')}"><input id="pfBedrooms" type="number" min="0" placeholder="${t('Min bedrooms','أقل غرف نوم')}"><input id="pfBathrooms" type="number" min="0" placeholder="${t('Min bathrooms','أقل حمامات')}"><select id="pfFurnishing"><option value="">${t('Any furnishing','أي تأثيث')}</option><option value="furnished">${t('Furnished','مفروش')}</option><option value="semi_furnished">${t('Semi furnished','نصف مفروش')}</option><option value="unfurnished">${t('Unfurnished','غير مفروش')}</option></select><input id="pfAreaName" placeholder="${t('Area / neighborhood','المنطقة / الحي')}">`;
+ extra.insertAdjacentElement('afterend',box);
+ function real(){return isRealEstateSelect(cat)}
+ function toggle(){box.hidden=!real();if(real())extra.classList.add('show')}
+ cat.addEventListener('change',()=>{toggle();setTimeout(filterCards,0)});toggle();
+ function filters(){return{type:val('pfType'),offer:val('pfOffer'),min:Number(val('pfMinArea'))||0,max:Number(val('pfMaxArea'))||0,bed:Number(val('pfBedrooms'))||0,bath:Number(val('pfBathrooms'))||0,furn:val('pfFurnishing'),area:val('pfAreaName').trim().toLowerCase()}}
+ function passes(x,f){const a=x.attributes||{};return(!f.type||a.property_type===f.type)&&(!f.offer||a.offer_type===f.offer)&&(!f.min||Number(a.area_sqm)>=f.min)&&(!f.max||Number(a.area_sqm)<=f.max)&&(!f.bed||Number(a.bedrooms)>=f.bed)&&(!f.bath||Number(a.bathrooms)>=f.bath)&&(!f.furn||a.furnishing===f.furn)&&(!f.area||String(a.area_name||'').toLowerCase().includes(f.area))}
+ function filterCards(){if(!real()||typeof allListings==='undefined')return;const f=filters(),allowed=new Set(allListings.filter(x=>passes(x,f)).map(x=>String(x.id)));document.querySelectorAll('#listings .listing-card').forEach(card=>{const a=card.querySelector('a[href*="listing.html?id="]');const id=new URL(a?.href||location.href).searchParams.get('id');card.style.display=allowed.has(String(id))?'':'none'});const visible=[...document.querySelectorAll('#listings .listing-card')].filter(x=>x.style.display!=='none').length;const s=document.getElementById('status');if(s)s.textContent=visible+' '+t('property listings','إعلان عقاري')}
+ box.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{if(typeof render==='function')render();setTimeout(filterCards,0)}));
+ document.getElementById('searchBtn')?.addEventListener('click',()=>setTimeout(filterCards,0));document.getElementById('clearBtn')?.addEventListener('click',()=>{box.querySelectorAll('input,select').forEach(x=>x.value='');setTimeout(filterCards,0)});
+ return true;
+}
+
+function boot(){if(page==='add-listing.html'){let n=0,timer=setInterval(()=>{if(initAdd()||++n>80)clearInterval(timer)},100)}else if(page==='marketplace.html'){let n=0,timer=setInterval(()=>{if(initMarket()||++n>80)clearInterval(timer)},100)}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
