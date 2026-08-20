@@ -11,3 +11,10 @@
 })();
 
 (function(){function addHrLink(){if(!/\/admin(?:\.html)?$/i.test(window.location.pathname))return;const side=document.querySelector('.admin-side');if(!side||side.querySelector('[data-bingo-hr-link]'))return;const link=document.createElement('a');link.href='hr.html';link.setAttribute('data-bingo-hr-link','1');link.textContent='👥 HR / الموارد البشرية';link.style.cssText='display:block;text-align:left;text-decoration:none;padding:12px;border-radius:10px;font-weight:800;color:#667085';link.addEventListener('mouseenter',()=>{link.style.background='#eef3ff';link.style.color='#092a82'});link.addEventListener('mouseleave',()=>{link.style.background='';link.style.color='#667085'});side.appendChild(link)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addHrLink);else addHrLink()})();
+
+(function(){
+  const page=(location.pathname.split('/').pop()||'').toLowerCase();
+  if(page!=='marketplace.html')return;
+  if(!document.querySelector('link[data-bingo-car-filters]')){const l=document.createElement('link');l.rel='stylesheet';l.href='marketplace-car-filters.css?v=20260820-1';l.setAttribute('data-bingo-car-filters','1');document.head.appendChild(l)}
+  if(!document.querySelector('script[data-bingo-car-filters]')){const s=document.createElement('script');s.src='marketplace-car-filters.js?v=20260820-1';s.defer=true;s.setAttribute('data-bingo-car-filters','1');document.head.appendChild(s)}
+})();
