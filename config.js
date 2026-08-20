@@ -8,6 +8,9 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   if(/(?:^|\/)(?:erp|hr|admin)\.html$/i.test(location.pathname)){
     js('bingo-page-i18n.js','bingo-page-i18n-loader');
   }
+  if(/(?:^|\/)admin\.html$/i.test(location.pathname)){
+    js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');
+  }
 
   // Delivery admin driver management is handled entirely by bingo-delivery-admin.html.
   // Do NOT load admin-driver-management.js here: it reads delivery_drivers directly
