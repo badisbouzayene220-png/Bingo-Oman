@@ -1,6 +1,7 @@
 (function(){
 'use strict';
 if(!/bingo-delivery-(control|admin)\.html$/i.test(location.pathname))return;
+function loadSellers(){if(document.getElementById('bingo-admin-sellers-script'))return;const s=document.createElement('script');s.id='bingo-admin-sellers-script';s.src='bingo-delivery-admin-sellers.js?v=20260820-1';s.defer=true;document.head.appendChild(s)}
 function place(){
   if(document.getElementById('bingo-add-driver-section'))return;
   const tbody=document.getElementById('drivers');
@@ -25,6 +26,6 @@ function place(){
   });
   wrap.appendChild(btn);
 }
-function boot(){place();const app=document.getElementById('admin-app');if(app)new MutationObserver(()=>place()).observe(app,{childList:true,subtree:true});setInterval(place,2500)}
+function boot(){loadSellers();place();const app=document.getElementById('admin-app');if(app)new MutationObserver(()=>place()).observe(app,{childList:true,subtree:true});setInterval(place,2500)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,700),{once:true});else setTimeout(boot,700);
 })();
