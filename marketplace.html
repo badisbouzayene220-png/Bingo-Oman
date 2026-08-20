@@ -5,7 +5,7 @@
 <title>BINGO Oman | Marketplace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="logo.css">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="logo.css"><link rel="stylesheet" href="real-estate-category.css?v=20260820-1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script><script src="global-banner.js" defer></script><script src="auth.js"></script><script src="language.js"></script>
 <style>
 .advanced{background:#fff;border:1px solid #e4e8ef;border-radius:18px;padding:18px;margin-bottom:22px;box-shadow:0 6px 20px #092a8208}
@@ -51,44 +51,11 @@ let categories=[], allListings=[], myLat=null,myLng=null;
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const km=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=(c-a)*p,y=(d-b)*p;return R*2*Math.atan2(Math.sqrt(Math.sin(x/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2),Math.sqrt(1-Math.sin(x/2)**2-Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2))};
 function attrs(x){return x.attributes||{}}
-async function loadAds(){
-  try{
-    const {data,error}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','marketplace_top').order('sort_order').limit(3);
-    if(error){console.warn('Company ads load error:',error);return}
-    $('ads').innerHTML=(data||[]).map(a=>`<a href="${esc(a.link_url||'#')}" target="_blank" rel="noopener"><img src="${esc(a.image_url)}" alt="${esc(a.title||'Advertisement')}"></a>`).join('');
-  }catch(err){console.warn('Company ads load error:',err)}
-}
-async function load(){
-  $('status').textContent='Loading listings…';
-  try{
-    const [{data:c,error:ce},{data:l,error:le}]=await Promise.all([
-      sb.from('categories').select('id,name_en,name_ar').eq('is_active',true).order('name_en'),
-      sb.from('listings').select('id,title,description,price,city,condition,created_at,category_id,latitude,longitude,attributes,listing_images(image_url,sort_order)').eq('status','published').order('created_at',{ascending:false})
-    ]);
-    if(ce) throw ce;
-    if(le) throw le;
-    categories=c||[];
-    const sel=$('cat');
-    sel.innerHTML='<option value="">All categories</option>'+categories.map(x=>`<option value="${x.id}">${esc(x.name_en)}</option>`).join('');
-    allListings=l||[];
-    await loadAds();
-    render();
-  }catch(err){
-    console.error('Marketplace load error:',err);
-    $('status').textContent='Could not load listings: '+(err?.message||err);
-    $('listings').innerHTML='<div class="empty-state"><h3>Could not load listings</h3><p>Open the browser console for the exact error.</p></div>';
-  }
-}
-
-function render(){const q=$('search').value.trim().toLowerCase(),cat=$('cat').value,city=$('city').value,cond=$('condition').value,brand=$('brand').value.trim().toLowerCase(),model=$('model').value.trim().toLowerCase(),year=Number($('year').value)||null,min=Number($('minPrice').value),max=Number($('maxPrice').value),sort=$('sort').value;
-let d=allListings.map(x=>{const a=attrs(x),text=Object.values(a).join(' ').toLowerCase();return {...x,_a:a,_text:text,_dist:(myLat!=null&&x.latitude!=null)?km(myLat,myLng,Number(x.latitude),Number(x.longitude)):Infinity}})
-.filter(x=>(!q||`${x.title} ${x.description||''} ${x._text}`.toLowerCase().includes(q))&&(!cat||x.category_id===cat)&&(!city||x.city===city)&&(!cond||x.condition===cond)&&(!brand||String(x._a.brand||x._a.make||'').toLowerCase().includes(brand))&&(!model||String(x._a.model||'').toLowerCase().includes(model))&&(!year||Number(x._a.year)===year)&&(!min||Number(x.price)>=min)&&(!max||Number(x.price)<=max));
-if(sort==='price_low')d.sort((a,b)=>a.price-b.price);else if(sort==='price_high')d.sort((a,b)=>b.price-a.price);else if(sort==='near')d.sort((a,b)=>a._dist-b._dist);
-$('status').textContent=`${d.length} listings`;if(myLat!=null)$('locationStatus').textContent='Showing results with location data where available';
-$('listings').innerHTML=d.map(x=>{const imgs=(x.listing_images||[]).sort((a,b)=>a.sort_order-b.sort_order),img=imgs[0]?.image_url,cat=categories.find(c=>c.id===x.category_id),distance=Number.isFinite(x._dist)?`${x._dist.toFixed(1)} km away`:'';return `<article class="card listing-card"><a class="thumb ${img?'has-image':''}" href="listing.html?id=${x.id}"><span class="tag">${esc(cat?.name_en||'Other')}</span>${img?`<img src="${esc(img)}" alt="">`:'<span class="empty-thumb">📦</span>'}</a><div class="cardbody"><h3>${esc(x.title)}</h3><div class="price">${Number(x.price||0).toLocaleString('en-OM',{minimumFractionDigits:3})} OMR</div><div class="meta"><span>📍 ${esc(x.city||'Oman')}</span><span>${esc(distance)}</span></div></div></article>`}).join('')||'<div class="empty-state"><h3>No listings found</h3><p>Try another filter or expand the location.</p></div>'}
-$('cat').onchange=()=>{const c=categories.find(x=>x.id===$('cat').value);$('extra').classList.toggle('show',!!c)};$('searchBtn').onclick=render;$('search').onkeydown=e=>{if(e.key==='Enter')render()};['city','condition','sort','brand','model','year','minPrice','maxPrice'].forEach(id=>$(id).addEventListener('change',render));$('clearBtn').onclick=()=>{['search','brand','model','year','minPrice','maxPrice'].forEach(id=>$(id).value='');['cat','city','condition'].forEach(id=>$(id).value='');$('sort').value='newest';render()};
-$('nearBtn').onclick=()=>{if(!navigator.geolocation){alert('Location is not supported by this browser.');return}navigator.geolocation.getCurrentPosition(p=>{myLat=p.coords.latitude;myLng=p.coords.longitude;$('nearBtn').classList.add('active');$('nearText').textContent='Location enabled';$('sort').value='near';render()},e=>alert('Please allow location access in your browser to find nearby listings.'));};
-load();
+async function loadAds(){try{const {data,error}=await sb.from('company_ads').select('id,image_url,link_url,title').eq('status','published').eq('placement','marketplace_top').order('sort_order').limit(3);if(error){console.warn('Company ads load error:',error);return}$('ads').innerHTML=(data||[]).map(a=>`<a href="${esc(a.link_url||'#')}" target="_blank" rel="noopener"><img src="${esc(a.image_url)}" alt="${esc(a.title||'Advertisement')}"></a>`).join('')}catch(err){console.warn('Company ads load error:',err)}}
+async function load(){$('status').textContent='Loading listings…';try{const [{data:c,error:ce},{data:l,error:le}]=await Promise.all([sb.from('categories').select('id,name_en,name_ar').eq('is_active',true).order('name_en'),sb.from('listings').select('id,title,description,price,city,condition,created_at,category_id,latitude,longitude,attributes,listing_images(image_url,sort_order)').eq('status','published').order('created_at',{ascending:false})]);if(ce)throw ce;if(le)throw le;categories=c||[];const sel=$('cat');sel.innerHTML='<option value="">All categories</option>'+categories.map(x=>`<option value="${x.id}">${esc(x.name_en)}</option>`).join('');allListings=l||[];await loadAds();render()}catch(err){console.error('Marketplace load error:',err);$('status').textContent='Could not load listings: '+(err?.message||err);$('listings').innerHTML='<div class="empty-state"><h3>Could not load listings</h3><p>Open the browser console for the exact error.</p></div>'}}
+function render(){const q=$('search').value.trim().toLowerCase(),cat=$('cat').value,city=$('city').value,cond=$('condition').value,brand=$('brand').value.trim().toLowerCase(),model=$('model').value.trim().toLowerCase(),year=Number($('year').value)||null,min=Number($('minPrice').value),max=Number($('maxPrice').value),sort=$('sort').value;let d=allListings.map(x=>{const a=attrs(x),text=Object.values(a).join(' ').toLowerCase();return {...x,_a:a,_text:text,_dist:(myLat!=null&&x.latitude!=null)?km(myLat,myLng,Number(x.latitude),Number(x.longitude)):Infinity}}).filter(x=>(!q||`${x.title} ${x.description||''} ${x._text}`.toLowerCase().includes(q))&&(!cat||x.category_id===cat)&&(!city||x.city===city)&&(!cond||x.condition===cond)&&(!brand||String(x._a.brand||x._a.make||'').toLowerCase().includes(brand))&&(!model||String(x._a.model||'').toLowerCase().includes(model))&&(!year||Number(x._a.year)===year)&&(!min||Number(x.price)>=min)&&(!max||Number(x.price)<=max));if(sort==='price_low')d.sort((a,b)=>a.price-b.price);else if(sort==='price_high')d.sort((a,b)=>b.price-a.price);else if(sort==='near')d.sort((a,b)=>a._dist-b._dist);$('status').textContent=`${d.length} listings`;if(myLat!=null)$('locationStatus').textContent='Showing results with location data where available';$('listings').innerHTML=d.map(x=>{const imgs=(x.listing_images||[]).sort((a,b)=>a.sort_order-b.sort_order),img=imgs[0]?.image_url,cat=categories.find(c=>c.id===x.category_id),distance=Number.isFinite(x._dist)?`${x._dist.toFixed(1)} km away`:'';return `<article class="card listing-card"><a class="thumb ${img?'has-image':''}" href="listing.html?id=${x.id}"><span class="tag">${esc(cat?.name_en||'Other')}</span>${img?`<img src="${esc(img)}" alt="">`:'<span class="empty-thumb">📦</span>'}</a><div class="cardbody"><h3>${esc(x.title)}</h3><div class="price">${Number(x.price||0).toLocaleString('en-OM',{minimumFractionDigits:3})} OMR</div><div class="meta"><span>📍 ${esc(x.city||'Oman')}</span><span>${esc(distance)}</span></div></div></article>`}).join('')||'<div class="empty-state"><h3>No listings found</h3><p>Try another filter or expand the location.</p></div>'}
+$('cat').onchange=()=>{const c=categories.find(x=>x.id===$('cat').value);$('extra').classList.toggle('show',!!c)};$('searchBtn').onclick=render;$('search').onkeydown=e=>{if(e.key==='Enter')render()};['city','condition','sort','brand','model','year','minPrice','maxPrice'].forEach(id=>$(id).addEventListener('change',render));$('clearBtn').onclick=()=>{['search','brand','model','year','minPrice','maxPrice'].forEach(id=>$(id).value='');['cat','city','condition'].forEach(id=>$(id).value='');$('sort').value='newest';render()};$('nearBtn').onclick=()=>{if(!navigator.geolocation){alert('Location is not supported by this browser.');return}navigator.geolocation.getCurrentPosition(p=>{myLat=p.coords.latitude;myLng=p.coords.longitude;$('nearBtn').classList.add('active');$('nearText').textContent='Location enabled';$('sort').value='near';render()},e=>alert('Please allow location access in your browser to find nearby listings.'))};load();
 </script>
 <script src="characters.js"></script>
+<script src="real-estate-category.js?v=20260820-1"></script>
 </body></html>
