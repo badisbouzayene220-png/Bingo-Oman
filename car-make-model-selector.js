@@ -1,17 +1,26 @@
 (function(){'use strict';
-const $=id=>document.getElementById(id);let active=false;
+const $=id=>document.getElementById(id);let active=false,selectedMake='',selectedModel='';
+const featured=['Toyota','Lexus','Nissan','Infiniti','Mitsubishi','Hyundai','Kia','Honda','Ford','GMC','Chevrolet','Mercedes-Benz','BMW','Land Rover','Jeep','Audi','Volkswagen','Porsche','Haval','Geely','Chery','Jetour','BYD'];
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function isCars(){const s=$('category');if(!s)return false;const o=s.options[s.selectedIndex];return /\bcars?\b|السيارات/i.test((o?.textContent||'')+' '+(o?.dataset?.slug||''))}
 function option(v,label){const o=document.createElement('option');o.value=v;o.textContent=label||v;return o}
+function slug(s){return String(s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function logoPath(make){return 'assets/car-brands/'+slug(make)+'.webp'}
+function modelPath(make,model){return 'assets/car-models/'+slug(make)+'/'+slug(model)+'.webp'}
+function imgHTML(src,fallback,cls){return '<div class="'+cls+'"><img loading="lazy" decoding="async" src="'+esc(src)+'" alt="" onerror="this.remove();this.parentNode.insertAdjacentHTML(\'beforeend\',\'<span class=&quot;bcv-logo-fallback&quot;>'+esc(fallback)+'</span>\')"></div>'}
 function setup(){const brand=$('brand'),model=$('model'),category=$('category');if(!brand||!model||!category||!window.BINGO_CARS)return;
- const brandWrap=brand.closest('div')||brand.parentElement,modelWrap=model.closest('div')||model.parentElement;
- const make=document.createElement('select');make.id='carMakeSelect';make.className=brand.className;make.hidden=true;make.append(option('','Select make / اختر الشركة'));
- Object.keys(BINGO_CARS).sort((a,b)=>a.localeCompare(b)).forEach(x=>make.append(option(x)));
- const mod=document.createElement('select');mod.id='carModelSelect';mod.className=model.className;mod.hidden=true;mod.append(option('','Select model / اختر الموديل'));
- brand.insertAdjacentElement('afterend',make);model.insertAdjacentElement('afterend',mod);
- function fillModels(selected){mod.innerHTML='';mod.append(option('','Select model / اختر الموديل'));(BINGO_CARS[selected]||[]).forEach(x=>mod.append(option(x)));mod.disabled=!selected;if(selected&&brand.value!==selected)brand.value=selected;model.value=''}
- function mode(){active=isCars();brand.hidden=active;model.hidden=active;make.hidden=!active;mod.hidden=!active;if(active){brandWrap?.classList.add('bingo-car-selector');modelWrap?.classList.add('bingo-car-selector');if(brand.value&&BINGO_CARS[brand.value]){make.value=brand.value;fillModels(brand.value);if(model.value){mod.value=model.value}}}else{brandWrap?.classList.remove('bingo-car-selector');modelWrap?.classList.remove('bingo-car-selector')}}
- make.addEventListener('change',()=>fillModels(make.value));mod.addEventListener('change',()=>{model.value=mod.value});category.addEventListener('change',mode);mode();
- const form=$('listingForm');form?.addEventListener('submit',()=>{if(active){brand.value=make.value;model.value=mod.value}},true);
+ const make=document.createElement('select');make.id='carMakeSelect';make.className=brand.className;make.hidden=true;make.append(option('','Select make / اختر الشركة'));Object.keys(BINGO_CARS).sort().forEach(x=>make.append(option(x)));
+ const mod=document.createElement('select');mod.id='carModelSelect';mod.className=model.className;mod.hidden=true;mod.append(option('','Select model / اختر الموديل'));brand.insertAdjacentElement('afterend',make);model.insertAdjacentElement('afterend',mod);
+ const visual=document.createElement('section');visual.className='bcv';visual.hidden=true;visual.innerHTML='<div class="bcv-head"><strong class="bcv-title">Choose brand / اختر الشركة</strong><input class="bcv-search" type="search" placeholder="Search brand / ابحث عن الشركة"></div><div class="bcv-grid"></div><div class="bcv-models" hidden><div class="bcv-head"><strong class="bcv-title">Choose model / اختر الموديل</strong><input class="bcv-model-search bcv-search" type="search" placeholder="Search model / ابحث عن الموديل"></div><div class="bcv-model-grid"></div></div>';make.insertAdjacentElement('afterend',visual);
+ const grid=visual.querySelector('.bcv-grid'),modelsBox=visual.querySelector('.bcv-models'),modelGrid=visual.querySelector('.bcv-model-grid'),search=visual.querySelector('.bcv-search'),modelSearch=visual.querySelector('.bcv-model-search');
+ function orderedMakes(){const all=Object.keys(BINGO_CARS);return [...featured.filter(x=>all.includes(x)),...all.filter(x=>!featured.includes(x)).sort()]}
+ function renderMakes(filter=''){const f=filter.trim().toLowerCase();grid.innerHTML='';orderedMakes().filter(x=>!f||x.toLowerCase().includes(f)).forEach(x=>{const b=document.createElement('button');b.type='button';b.className='bcv-card'+(x===selectedMake?' active':'');b.dataset.make=x;b.innerHTML=imgHTML(logoPath(x),x.slice(0,2).toUpperCase(),'bcv-logo')+'<span class="bcv-name">'+esc(x)+'</span>';b.onclick=()=>selectMake(x);grid.appendChild(b)});if(!grid.children.length)grid.innerHTML='<div class="bcv-empty">No brand found</div>'}
+ function renderModels(filter=''){const list=BINGO_CARS[selectedMake]||[],f=filter.trim().toLowerCase();modelGrid.innerHTML='';list.filter(x=>!f||x.toLowerCase().includes(f)).forEach(x=>{const b=document.createElement('button');b.type='button';b.className='bcv-card bcv-model-card'+(x===selectedModel?' active':'');b.innerHTML='<div class="bcv-model-thumb"><img loading="lazy" decoding="async" src="'+esc(modelPath(selectedMake,x))+'" alt="" onerror="this.remove();this.parentNode.innerHTML=\'<span class=&quot;bcv-car-icon&quot;>🚗</span>\'"></div><span class="bcv-name">'+esc(x)+'</span>';b.onclick=()=>selectModel(x);modelGrid.appendChild(b)});if(!modelGrid.children.length)modelGrid.innerHTML='<div class="bcv-empty">No model found</div>'}
+ function selectMake(x){selectedMake=x;selectedModel='';make.value=x;brand.value=x;mod.innerHTML='';mod.append(option('','Select model / اختر الموديل'));(BINGO_CARS[x]||[]).forEach(m=>mod.append(option(m)));mod.disabled=false;model.value='';modelsBox.hidden=false;renderMakes(search.value);renderModels();modelsBox.scrollIntoView({behavior:'smooth',block:'nearest'})}
+ function selectModel(x){selectedModel=x;mod.value=x;model.value=x;renderModels(modelSearch.value)}
+ function mode(){active=isCars();brand.hidden=active;model.hidden=active;make.hidden=true;mod.hidden=true;visual.hidden=!active;if(active){selectedMake=brand.value&&BINGO_CARS[brand.value]?brand.value:'';selectedModel=model.value||'';renderMakes();if(selectedMake){modelsBox.hidden=false;renderModels()}else modelsBox.hidden=true}}
+ search.addEventListener('input',()=>renderMakes(search.value));modelSearch.addEventListener('input',()=>renderModels(modelSearch.value));category.addEventListener('change',mode);mode();
+ $('listingForm')?.addEventListener('submit',()=>{if(active){brand.value=selectedMake;model.value=selectedModel}},true);
 }
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',setup,{once:true}):setup();
 })();
