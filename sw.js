@@ -1,4 +1,4 @@
-const CACHE_NAME='bingo-static-v20260821-1';
+const CACHE_NAME='bingo-static-v20260822-1';
 const STATIC_TYPES=new Set(['style','script','image','font']);
 self.addEventListener('install',()=>self.skipWaiting());
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('bingo-static-')&&k!==CACHE_NAME).map(k=>caches.delete(k)));await self.clients.claim();})())});
