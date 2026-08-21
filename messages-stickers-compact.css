@@ -1,0 +1,24 @@
+/* BINGO Oman - compact BINGO stickers for Messages */
+.sticker-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:240px}
+.sticker-choice{padding:7px;border-radius:12px;min-width:0}
+.sticker-choice img{width:100%;height:96px;max-height:96px;object-fit:contain;border-radius:9px}
+.sticker-choice span{font-size:10px;line-height:1.35;padding-top:5px}
+
+/* Sent/received BINGO sticker: compact, clear and proportional */
+.bubble:has(.bingo-sticker-bubble){padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;max-width:none!important}
+.bingo-sticker-bubble{width:min(180px,46vw)!important;max-width:min(180px,46vw)!important;padding:5px!important;border-radius:14px!important;background:#fff!important;border:1px solid #e7eaf0!important;box-sizing:border-box}
+.bingo-sticker-bubble img{display:block!important;width:100%!important;height:auto!important;max-height:180px!important;object-fit:contain!important;border-radius:10px!important}
+.bingo-sticker-bubble time{padding:2px 4px 0;text-align:end}
+
+@media(max-width:600px){
+  .sticker-grid{gap:7px;max-height:210px}
+  .sticker-choice img{height:82px;max-height:82px}
+  .bingo-sticker-bubble{width:min(145px,42vw)!important;max-width:min(145px,42vw)!important;padding:4px!important}
+  .bingo-sticker-bubble img{max-height:145px!important}
+}
+
+@media(max-width:380px){
+  .sticker-choice img{height:72px;max-height:72px}
+  .bingo-sticker-bubble{width:min(128px,40vw)!important;max-width:min(128px,40vw)!important}
+  .bingo-sticker-bubble img{max-height:128px!important}
+}
