@@ -1,0 +1,9 @@
+@supports (content-visibility:auto){
+  main > section:not(.hero):not(.bingo-intro):not(.intro),
+  body > section:not(.hero):not(.bingo-intro):not(.intro):not(.bingo-global-banner-wrap){
+    content-visibility:auto;
+    contain-intrinsic-size:1px 700px;
+  }
+}
+img{height:auto}
+img[loading="lazy"]{content-visibility:auto}
