@@ -1,4 +1,4 @@
-/* BINGO Oman — lightweight car thumbnails. Toyota + Lexus + Nissan. */
+/* BINGO Oman — lightweight car thumbnails. */
 (function(){
   const commons=file=>'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(file)+'?width=240';
   window.BINGO_CAR_IMAGES={
@@ -27,6 +27,19 @@
         'Maxima':commons('Nissan Maxima granate (3).jpg'),
         '370Z':commons('NISSAN 370Z (3106407273).jpg'),
         'Z':commons('NISSAN 370Z (3106407273).jpg')
+      },
+      'Infiniti':{
+        'QX80':commons('Infiniti QX80.jpg')
+      },
+      'Mitsubishi':{
+        'Pajero':commons('Mitsubishi Pajero.jpg'),
+        'Montero':commons('Mitsubishi Pajero.jpg')
+      },
+      'Hyundai':{
+        'Tucson':commons('Hyundai Tucson.jpg')
+      },
+      'Kia':{
+        'Sportage':commons('Kia Sportage V 001.jpg')
       }
     }
   };
