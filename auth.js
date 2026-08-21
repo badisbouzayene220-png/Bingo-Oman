@@ -1,6 +1,4 @@
 (function(){
-  // Repair legacy/malformed tracking links where &store= was encoded inside delivery.
-  // Example: ?delivery=BGO-XXXX%26store%3DBO-YYYY
   try{
     if(/order-tracking\.html$/i.test(location.pathname)){
       const q=new URLSearchParams(location.search);
@@ -49,6 +47,12 @@
     window.MutationObserver=class StableLanguageObserver{constructor(){}observe(){}disconnect(){}takeRecords(){return[];}};
     try{await loadScriptOnce('language.js');}finally{window.MutationObserver=NativeMO;}
   }
-  async function loadGlobalUI(){loadCssOnce('bingo-ui.css');await loadStableLanguage();if(/erp\.html$|hr\.html$/i.test(location.pathname))await loadScriptOnce('erp-hr-static-i18n.js');}
+  async function loadGlobalUI(){
+    loadCssOnce('bingo-ui.css');
+    await loadStableLanguage();
+    if(/erp\.html$|hr\.html$/i.test(location.pathname))await loadScriptOnce('erp-hr-static-i18n.js');
+    if(/dashboard\.html$/i.test(location.pathname))await loadScriptOnce('bingo-customer-profile-addresses.js?v=20260821-1');
+    if(/checkout\.html$/i.test(location.pathname))await loadScriptOnce('bingo-checkout-saved-addresses.js?v=20260821-1');
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadGlobalUI,{once:true});else loadGlobalUI();
 })();
