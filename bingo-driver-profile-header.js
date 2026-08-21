@@ -2,27 +2,13 @@
 'use strict';
 const sb=window.sb;if(!sb)return;
 const css=`.driver-profile-strip{display:flex!important;align-items:center;gap:12px;margin:0 0 16px;padding:14px 16px;background:#fff;border:1px solid #e7edf5;border-radius:18px;box-shadow:0 8px 30px rgba(21,47,82,.07)}.driver-profile-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#0d3b91;color:#fff;font-size:21px;font-weight:900;flex:0 0 auto}.driver-profile-copy{min-width:0;flex:1}.driver-profile-copy small{display:block;color:#6f7b8d;margin-bottom:3px}.driver-profile-copy strong{display:block;color:#0d2748;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.driver-profile-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}.driver-profile-meta span{padding:5px 8px;border-radius:999px;background:#f1f5fa;color:#41536a;font-size:11px;font-weight:800}.driver-profile-status{margin-inline-start:auto;padding:7px 10px;border-radius:999px;background:#e9f8ef;color:#147a42;font-size:11px;font-weight:900}@media(max-width:600px){.driver-profile-strip{padding:12px}.driver-profile-copy strong{font-size:18px}.driver-profile-status{display:none}}`;
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
 function initials(n){return String(n||'BD').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'BD'}
 function ensureStyle(){if(document.getElementById('driver-profile-style'))return;const s=document.createElement('style');s.id='driver-profile-style';s.textContent=css;document.head.appendChild(s)}
 function ensureBox(){const app=document.getElementById('app');if(!app)return null;let box=document.getElementById('driver-profile-strip');if(!box){box=document.createElement('section');box.id='driver-profile-strip';box.className='driver-profile-strip';app.insertBefore(box,app.firstChild)}return box}
-function ensureJourney(){if(document.getElementById('bingo-driver-journey-v2'))return;const s=document.createElement('script');s.id='bingo-driver-journey-v2';s.src='bingo-driver-journey-v2.js?v=20260821-2';document.body.appendChild(s)}
-function connectBeautifulCodeModal(){
-  if(window.__bingoBeautifulCodeBridge)return;
-  window.__bingoBeautifulCodeBridge=true;
-  document.addEventListener('click',e=>{
-    const journeyButton=e.target?.closest?.('[data-bj2="code"]');
-    if(!journeyButton)return;
-    const prettyButton=document.getElementById('bingo-code-open');
-    const prettyModal=document.getElementById('bingo-code-modal');
-    if(!prettyButton||!prettyModal)return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    prettyButton.click();
-  },true);
-}
+function ensureJourney(){const old=document.getElementById('bingo-driver-journey-v2');if(old)old.remove();const s=document.createElement('script');s.id='bingo-driver-journey-v2';s.src='bingo-driver-journey-v2.js?v=20260821-3';document.body.appendChild(s)}
 async function load(){ensureStyle();const box=ensureBox();try{const g=await sb.auth.getUser(),u=g.data?.user;if(!u)return;const r=await sb.rpc('delivery_driver_identity');if(r.error)throw r.error;const d=r.data||{};const meta=u.user_metadata||{};const name=d.display_name||meta.full_name||meta.name||meta.display_name||String(u.email||'BINGO Driver').split('@')[0];const head=document.getElementById('driver-user');if(head){head.textContent=name;head.title=u.email||''}if(!box)return;const rating=Number(d.rating??5),total=Number(d.total_deliveries??0);const status=d.is_online?(d.is_available?'متصل • جاهز للعمل':'متصل • مشغول'):'غير متصل';box.innerHTML=`<div class="driver-profile-avatar">${esc(initials(name))}</div><div class="driver-profile-copy"><small>مرحبًا بك، مندوب BINGO</small><strong>👤 ${esc(name)}</strong><div class="driver-profile-meta"><span>⭐ ${rating.toFixed(2)}</span><span>🚚 ${total} توصيل</span>${d.vehicle_type?`<span>🛵 ${esc(d.vehicle_type)}</span>`:''}${d.vehicle_plate?`<span>🚘 ${esc(d.vehicle_plate)}</span>`:''}</div></div><span class="driver-profile-status">${esc(status)}</span>`;
 }catch(e){console.warn('Driver identity unavailable',e);if(box)box.innerHTML='<div class="driver-profile-copy"><small>بيانات المندوب</small><strong>تعذر تحميل اسم المندوب</strong><div class="driver-profile-meta"><span>شغّل Migration الخاصة بهوية المندوب</span></div></div>'}}
-function boot(){ensureStyle();ensureBox();connectBeautifulCodeModal();ensureJourney();load();setTimeout(load,700);setInterval(load,8000);sb.auth.onAuthStateChange((_e,s)=>{if(s?.user)setTimeout(load,150)})}
+function boot(){ensureStyle();ensureBox();ensureJourney();load();setTimeout(load,700);setInterval(load,8000);sb.auth.onAuthStateChange((_e,s)=>{if(s?.user)setTimeout(load,150)})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
