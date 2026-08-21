@@ -35,4 +35,6 @@ async function loadCatalog(){const el=document.querySelector('#store-list');if(!
 document.addEventListener('DOMContentLoaded',()=>{const optionEl=document.querySelector('#delivery-option');if(optionEl)optionEl.value='1.500';optionEl?.addEventListener('change',e=>{e.stopImmediatePropagation();syncOrderItems();},true);document.querySelector('#create-delivery-order')?.addEventListener('click',placeOrder);loadCatalog();window.addEventListener('bingo:language',()=>{renderStores();renderProducts();renderCart();syncOrderItems();});});
 })();
 </script>
+<script src="bingo-delivery-customer-tracking.js?v=20260821-6"></script>
+<script src="bingo-delivery-completion-ui.js?v=20260821-1"></script>
 </body></html>
