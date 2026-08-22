@@ -7,7 +7,7 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   if(/(?:^|\/)bingo-delivery-customer\.html$/i.test(location.pathname))js('bingo-customer-location-update-v2.js?v=20260822-2','bingo-customer-location-update-v2-loader');
   if(/(?:^|\/)order-tracking\.html$/i.test(location.pathname))js('bingo-order-tracking-location-v1.js?v=20260822-1','bingo-order-tracking-location-loader');
   if(/(?:^|\/)(?:erp|hr|admin)\.html$/i.test(location.pathname))js('bingo-page-i18n.js','bingo-page-i18n-loader');
-  if(/(?:^|\/)admin\.html$/i.test(location.pathname)){js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader');js('admin-listing-performance.js?v=20260822-1','admin-listing-performance-loader')}
+  if(/(?:^|\/)admin\.html$/i.test(location.pathname)){js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader');js('admin-listing-performance.js?v=20260822-1','admin-listing-performance-loader');js('admin-manual-purchases.js?v=20260822-1','admin-manual-purchases-loader')}
   if(/(?:^|\/)marketplace\.html$/i.test(location.pathname))js('marketplace-promotions-zone.js?v=20260822-1','marketplace-promotions-zone-loader');
   if(/(?:^|\/)listing\.html$/i.test(location.pathname))js('listing-analytics.js?v=20260822-2','listing-analytics-loader');
   if(/(?:^|\/)dashboard\.html$/i.test(location.pathname))js('dashboard-listing-analytics.js?v=20260822-4','dashboard-listing-analytics-loader');
