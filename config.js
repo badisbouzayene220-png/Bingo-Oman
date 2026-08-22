@@ -12,6 +12,12 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
     js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');
   }
 
+  // Delivery Control: load order quantity/unit details without replacing the page itself.
+  if(/(?:^|\/)bingo-delivery-control\.html$/i.test(location.pathname)){
+    js('bingo-order-units-v1.js?v=20260822-1','bingo-order-units-loader');
+    js('bingo-admin-order-items-v1.js?v=20260822-1','bingo-admin-order-items-loader');
+  }
+
   // Delivery admin driver management is handled entirely by bingo-delivery-admin.html.
   // Do NOT load admin-driver-management.js here: it reads delivery_drivers directly
   // and can overwrite the RPC-rendered table while RLS is enabled.
