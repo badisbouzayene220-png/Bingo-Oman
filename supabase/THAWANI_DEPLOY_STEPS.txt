@@ -1,0 +1,35 @@
+BINGO Oman - Thawani Sandbox Deployment
+
+1) Run this SQL in Supabase SQL Editor:
+   supabase/migrations/20260822_set_republish_plan_prices.sql
+
+2) Install/login Supabase CLI, then link the project:
+   supabase login
+   supabase link --project-ref YOUR_PROJECT_REF
+
+3) Add Thawani Sandbox secrets in Supabase:
+   supabase secrets set THAWANI_SECRET_KEY=YOUR_UAT_SECRET_KEY
+   supabase secrets set THAWANI_PUBLISHABLE_KEY=YOUR_UAT_PUBLISHABLE_KEY
+   supabase secrets set THAWANI_BASE_URL=https://uatcheckout.thawani.om/api/v1
+   supabase secrets set BINGO_SITE_URL=https://badisbouzayene220-png.github.io/Bingo-Oman
+
+   SUPABASE_URL, SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY are available automatically to Edge Functions in Supabase.
+
+4) Deploy the payment functions:
+   supabase functions deploy create-republish-checkout
+   supabase functions deploy verify-republish-payment
+
+5) Test flow:
+   - Login to BINGO Oman.
+   - Open listing-plans.html.
+   - Choose Monthly (3.000 OMR) or Yearly (24.000 OMR).
+   - The site should redirect to Thawani UAT Checkout.
+   - Complete a Sandbox payment.
+   - Thawani redirects back to listing-plan-success.html.
+   - The verify-republish-payment Edge Function verifies the session server-side and activates listing_republish_subscriptions.
+   - Return to Dashboard and confirm the Republish button allows one bump every 24 hours.
+
+IMPORTANT SECURITY NOTES
+- Never place THAWANI_SECRET_KEY in config.js, HTML, browser JavaScript, or GitHub Pages.
+- Keep the secret only in Supabase Edge Function secrets.
+- Use UAT keys first. Switch THAWANI_BASE_URL and keys to production only after successful end-to-end testing.
