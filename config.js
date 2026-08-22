@@ -5,6 +5,8 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   css('bingo-ui.css');
   if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){
     css('bingo-delivery-modern-v1.css?v=20260822-1');
+    css('bingo-delivery-modern-v2.css?v=20260822-1');
+    js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');
   }
   // Heavy page-wide translator is only needed in ERP/HR/Admin areas.
   // Loading it on Home caused a full DOM rescan after every dynamic widget mount.
