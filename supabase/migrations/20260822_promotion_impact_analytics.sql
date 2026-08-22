@@ -1,5 +1,6 @@
 -- BINGO Oman: promotion impact analytics
--- PostgreSQL requires dropping an existing function before changing RETURNS TABLE columns.
+-- Adds before/after Promote view counts to owner analytics.
+-- Republish event history is not stored in a dedicated table yet, so republish_count is safely returned as 0.
 begin;
 
 drop function if exists public.my_listing_analytics();
@@ -30,16 +31,16 @@ as $$
     l.promoted_at,
     l.promotion_expires_at,
     case when l.promoted_at is null then 0::bigint else (
-      select count(*)::bigint from public.listing_view_events e
+      select count(*)::bigint
+      from public.listing_view_events e
       where e.listing_id=l.id and e.created_at < l.promoted_at
     ) end as views_before_promotion,
     case when l.promoted_at is null then 0::bigint else (
-      select count(*)::bigint from public.listing_view_events e
+      select count(*)::bigint
+      from public.listing_view_events e
       where e.listing_id=l.id and e.created_at >= l.promoted_at
     ) end as views_after_promotion,
-    case when to_regclass('public.listing_republish_events') is null then 0::bigint else
-      coalesce((select count(*)::bigint from public.listing_republish_events r where r.listing_id=l.id),0::bigint)
-    end as republish_count
+    0::bigint as republish_count
   from public.listings l
   where l.user_id=auth.uid();
 $$;
