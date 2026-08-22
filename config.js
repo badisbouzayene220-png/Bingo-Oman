@@ -3,6 +3,9 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   function css(h){if(document.querySelector('link[href="'+h+'"]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href=h;document.head.appendChild(l);}
   function js(s,id){if(document.getElementById(id)||document.querySelector('script[src="'+s+'"]'))return;const x=document.createElement('script');x.id=id;x.src=s;x.defer=false;document.head.appendChild(x);}
   css('bingo-ui.css');
+  if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){
+    css('bingo-delivery-modern-v1.css?v=20260822-1');
+  }
   // Heavy page-wide translator is only needed in ERP/HR/Admin areas.
   // Loading it on Home caused a full DOM rescan after every dynamic widget mount.
   if(/(?:^|\/)(?:erp|hr|admin)\.html$/i.test(location.pathname)){
