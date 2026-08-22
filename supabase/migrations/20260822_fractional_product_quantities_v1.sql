@@ -1,11 +1,65 @@
 -- BINGO Store fractional quantities V1
 -- piece/pack stay whole-number; kg/g/meter/liter can use decimal quantities.
+-- Safely preserves RLS policies while changing column types.
 
+begin;
+
+-- PostgreSQL does not allow changing a column type while an RLS policy depends on it.
+-- Save ALL policies for the affected tables exactly as they currently exist.
+create temporary table _bingo_saved_policies on commit drop as
+select schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check
+from pg_policies
+where schemaname='public'
+  and tablename in ('store_products','store_order_items');
+
+-- Drop the saved policies temporarily.
+do $$
+declare r record;
+begin
+  for r in select * from _bingo_saved_policies loop
+    execute format('drop policy if exists %I on %I.%I',r.policyname,r.schemaname,r.tablename);
+  end loop;
+end $$;
+
+-- Convert stock/order quantities to decimals.
 alter table public.store_products
   alter column stock type numeric(18,3) using stock::numeric;
 
 alter table public.store_order_items
   alter column quantity type numeric(18,3) using quantity::numeric;
+
+-- Restore every RLS policy with its original role, command and conditions.
+do $$
+declare
+  r record;
+  v_roles text;
+  v_sql text;
+begin
+  for r in select * from _bingo_saved_policies loop
+    select string_agg(case when x='public' then 'public' else quote_ident(x) end, ', ')
+      into v_roles
+    from unnest(r.roles) x;
+
+    v_sql := format(
+      'create policy %I on %I.%I as %s for %s to %s',
+      r.policyname,
+      r.schemaname,
+      r.tablename,
+      r.permissive,
+      r.cmd,
+      coalesce(v_roles,'public')
+    );
+
+    if r.qual is not null then
+      v_sql := v_sql || ' using (' || r.qual || ')';
+    end if;
+    if r.with_check is not null then
+      v_sql := v_sql || ' with check (' || r.with_check || ')';
+    end if;
+
+    execute v_sql;
+  end loop;
+end $$;
 
 create or replace function public.place_store_order(
   p_items jsonb,
@@ -74,3 +128,4 @@ end
 $function$;
 
 notify pgrst,'reload schema';
+commit;
