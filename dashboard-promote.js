@@ -1,0 +1,5 @@
+(function(){'use strict';
+const page=(location.pathname.split('/').pop()||'').toLowerCase();if(page!=='dashboard.html')return;
+function decorate(){document.querySelectorAll('#myListings .my-ad-card').forEach(card=>{if(card.dataset.promoteReady)return;const view=card.querySelector('a[href*="listing.html?id="]');const actions=card.querySelector('.my-ad-actions');const status=card.querySelector('.ad-status')?.textContent?.toLowerCase()||'';if(!view||!actions||!status.includes('published'))return;const u=new URL(view.href,location.href),id=u.searchParams.get('id');if(!id)return;const a=document.createElement('a');a.className='bingo-promote-btn';a.href='listing-promote.html?id='+encodeURIComponent(id);a.textContent='⭐ Promote';actions.appendChild(a);card.dataset.promoteReady='1'})}
+const mo=new MutationObserver(decorate);document.addEventListener('DOMContentLoaded',()=>{decorate();const box=document.getElementById('myListings');if(box)mo.observe(box,{childList:true,subtree:true})},{once:true});
+})();
