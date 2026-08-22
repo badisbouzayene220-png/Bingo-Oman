@@ -22,8 +22,9 @@
     document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
   }
   function updateCount(){
-    const count=read().length;
-    document.querySelectorAll("#cartCount").forEach(x=>x.textContent=count);
+    const count=read().reduce((sum,x)=>sum+Number(x.quantity||0),0);
+    const label=Number.isInteger(count)?String(count):qty(count);
+    document.querySelectorAll("#cartCount").forEach(x=>x.textContent=label);
   }
   function render(){
     const el=document.getElementById("bingoCartOverlay"); if(!el)return;
