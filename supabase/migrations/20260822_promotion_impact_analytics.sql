@@ -1,6 +1,5 @@
 -- BINGO Oman: promotion impact analytics
--- Adds before/after Promote view counts to owner analytics.
--- Republish event history is not stored in a dedicated table yet, so republish_count is safely returned as 0.
+-- Adds before/after Promote view counts and uses the existing listings.republish_count column.
 begin;
 
 drop function if exists public.my_listing_analytics();
@@ -40,7 +39,7 @@ as $$
       from public.listing_view_events e
       where e.listing_id=l.id and e.created_at >= l.promoted_at
     ) end as views_after_promotion,
-    0::bigint as republish_count
+    coalesce(l.republish_count,0)::bigint as republish_count
   from public.listings l
   where l.user_id=auth.uid();
 $$;
