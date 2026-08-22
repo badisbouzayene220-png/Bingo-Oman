@@ -20,6 +20,12 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   if(/(?:^|\/)marketplace\.html$/i.test(location.pathname)){
     js('marketplace-promotions-zone.js?v=20260822-1','marketplace-promotions-zone-loader');
   }
+  if(/(?:^|\/)listing\.html$/i.test(location.pathname)){
+    js('listing-analytics.js?v=20260822-2','listing-analytics-loader');
+  }
+  if(/(?:^|\/)dashboard\.html$/i.test(location.pathname)){
+    js('dashboard-listing-analytics.js?v=20260822-1','dashboard-listing-analytics-loader');
+  }
 
   // Delivery Control: load order quantity/unit details without replacing the page itself.
   if(/(?:^|\/)bingo-delivery-control\.html$/i.test(location.pathname)){
