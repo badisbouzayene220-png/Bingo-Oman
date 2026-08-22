@@ -1,0 +1,33 @@
+/* BINGO Oman — final mobile release overrides */
+html,body{max-width:100%;overflow-x:hidden}img,video,canvas,svg{max-width:100%}button,a,input,select,textarea{touch-action:manipulation}
+@media(max-width:900px){
+  .header .nav{gap:12px}.header .actions{gap:7px;min-width:0}.header .actions .btn.small{padding:9px 11px}.lang-switch{padding:8px 9px}
+  .dash{padding:24px 0}.dashgrid{gap:12px}.panel{padding:18px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:21px}
+  .my-ad-card{min-width:0}.my-ad-body{min-width:0}.my-ad-actions{flex-wrap:wrap}.my-ad-actions .btn,.bingo-promote-btn{min-height:40px}
+  table{max-width:100%}.admin-table{min-width:760px}
+}
+@media(max-width:700px){
+  body{font-size:14px}.container{width:calc(100% - 24px)}
+  .topbar{height:30px}.nav{height:64px}.logo,.main-logo{max-width:112px;flex:0 0 auto}.logo img,.main-logo img{height:auto}
+  .hamb{min-width:42px;min-height:42px;display:grid;place-items:center;margin-left:auto}
+  .navlinks{top:94px;max-height:calc(100vh - 105px);overflow:auto;-webkit-overflow-scrolling:touch}
+  .actions{gap:6px}.actions .avatar{width:38px;height:38px}.header-messages{min-width:38px;min-height:38px;display:grid;place-items:center}
+  .pagehead{padding:32px 0}.pagehead h1{font-size:32px}.pagebody{padding:26px 0 54px}
+  .hero h1{font-size:38px}.hero-art{max-width:100%}.searchbar{max-width:100%}
+  .toolbar,.store-toolbar{gap:8px}.toolbar input,.toolbar select,.store-toolbar input,.store-toolbar select{width:100%;min-height:46px}
+  .product-grid,.grid{gap:12px}.product-img,.thumb{height:190px}
+  .dashgrid{width:100%}.side{margin:0 -12px;padding:8px 12px;border-radius:0;border-left:0;border-right:0}.side a{min-height:42px;display:flex;align-items:center}
+  .panel{padding:14px;border-radius:14px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat{padding:11px 8px}.stat small{font-size:9px}.stat strong{font-size:19px}
+  .favorite-card{grid-template-columns:96px minmax(0,1fr)!important}.favorite-card img,.favorite-card .favorite-empty{min-height:108px!important}.favorite-actions{flex-wrap:wrap}
+  .messages-layout{gap:10px;min-height:0}.messages-list,.chat-panel{border-radius:14px}.chat-panel{min-height:calc(100vh - 190px)!important}.chat-messages{min-height:320px;padding:13px}.chat-form{padding:10px}.bubble{max-width:88%}
+  .bingo-cart-drawer{width:min(94vw,420px)!important;max-width:94vw}.bingo-cart-item{grid-template-columns:52px minmax(0,1fr) auto!important}.bingo-cart-item img{width:48px!important;height:48px!important}
+  .checkout{padding:18px 0!important;gap:12px!important}.checkout .card{padding:15px!important}.cartrow{grid-template-columns:48px minmax(0,1fr) auto!important}.cartrow img{width:48px!important;height:48px!important}
+  .order{padding:15px!important;border-radius:15px!important}.journey{overflow:hidden}.order-actions .btn{min-height:42px}
+  .footergrid{gap:22px}footer{padding:38px 0}
+}
+@media(max-width:430px){
+  .container{width:calc(100% - 18px)}.header .actions .lang-switch{font-size:10px;padding:7px}.header .actions{gap:4px}
+  .hero h1{font-size:34px}.pagehead h1{font-size:29px}.stats{gap:5px}.stat{padding:10px 6px}.stat strong{font-size:18px}
+  .my-ad-actions{gap:6px}.my-ad-actions .btn,.bingo-promote-btn{width:100%;justify-content:center;text-align:center}
+  .emoji-picker{left:8px!important;width:calc(100% - 16px)!important}.emoji-grid{grid-template-columns:repeat(7,1fr)!important}
+}
