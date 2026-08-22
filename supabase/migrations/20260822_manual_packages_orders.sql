@@ -89,7 +89,7 @@ as $$
 declare v_role text;
 begin
  select role::text into v_role from public.profiles where id=auth.uid(); if coalesce(v_role,'')<>'admin' then raise exception 'Admin access required'; end if;
- return query select o.id,o.user_id,coalesce(p.full_name,p.username,'')::text,coalesce(p.email,'')::text,o.package_code,o.package_kind,o.listing_id,l.title::text,o.amount_baisa,o.currency,o.status,o.customer_note,o.admin_note,o.created_at,o.decided_at
+ return query select o.id,o.user_id,coalesce(p.username,'')::text,coalesce(p.email,'')::text,o.package_code,o.package_kind,o.listing_id,l.title::text,o.amount_baisa,o.currency,o.status,o.customer_note,o.admin_note,o.created_at,o.decided_at
  from public.bingo_purchase_orders o left join public.profiles p on p.id=o.user_id left join public.listings l on l.id=o.listing_id order by case when o.status='pending' then 0 else 1 end,o.created_at desc;
 end;$$;
 
