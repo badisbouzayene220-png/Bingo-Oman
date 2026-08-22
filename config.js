@@ -17,6 +17,9 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
     js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');
     js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader');
   }
+  if(/(?:^|\/)marketplace\.html$/i.test(location.pathname)){
+    js('marketplace-promotions-zone.js?v=20260822-1','marketplace-promotions-zone-loader');
+  }
 
   // Delivery Control: load order quantity/unit details without replacing the page itself.
   if(/(?:^|\/)bingo-delivery-control\.html$/i.test(location.pathname)){
