@@ -15,7 +15,7 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   }
   if(/(?:^|\/)admin\.html$/i.test(location.pathname)){
     js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');
-    js('admin-listing-promotions.js?v=20260822-3','admin-listing-promotions-loader');
+    js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader');
   }
 
   // Delivery Control: load order quantity/unit details without replacing the page itself.
