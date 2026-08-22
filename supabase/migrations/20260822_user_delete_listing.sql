@@ -1,6 +1,7 @@
--- BINGO Oman - user-owned listing deletion
--- Allows only the authenticated owner to delete their own listing,
--- regardless of listing status (pending/published/rejected/etc.).
+-- BINGO Oman - robust owner listing deletion
+-- Owner-only. Attempts a real DELETE first.
+-- If a foreign-key relationship prevents hard deletion, the listing is safely archived instead.
+-- Marketplace already shows only published listings, so archived listings disappear publicly.
 
 begin;
 
@@ -32,42 +33,29 @@ begin
     raise exception 'You can only delete your own listing';
   end if;
 
-  -- Remove messages tied to conversations for this listing first, if these tables exist.
-  if to_regclass('public.messages') is not null
-     and to_regclass('public.conversations') is not null then
-    execute 'delete from public.messages where conversation_id in (select id from public.conversations where listing_id = $1)'
-      using p_listing_id;
-  end if;
+  -- Prefer a true delete. If all related FKs are ON DELETE CASCADE (or no children exist),
+  -- this removes the listing completely.
+  begin
+    delete from public.listings
+    where id = p_listing_id
+      and user_id = v_user;
 
-  if to_regclass('public.conversations') is not null then
-    execute 'delete from public.conversations where listing_id = $1'
-      using p_listing_id;
-  end if;
+    get diagnostics v_deleted = row_count;
+    if v_deleted = 1 then
+      return true;
+    end if;
+  exception
+    when foreign_key_violation then
+      -- Some existing BINGO tables intentionally retain history. In that case,
+      -- archive the listing so it disappears from public results and the user's active ads.
+      null;
+  end;
 
-  if to_regclass('public.user_favorites') is not null then
-    execute 'delete from public.user_favorites where listing_id = $1'
-      using p_listing_id;
-  end if;
-
-  if to_regclass('public.listing_images') is not null then
-    execute 'delete from public.listing_images where listing_id = $1'
-      using p_listing_id;
-  end if;
-
-  -- Optional engagement tables: clean only when present.
-  if to_regclass('public.listing_views') is not null then
-    execute 'delete from public.listing_views where listing_id = $1'
-      using p_listing_id;
-  end if;
-
-  if to_regclass('public.listing_likes') is not null then
-    execute 'delete from public.listing_likes where listing_id = $1'
-      using p_listing_id;
-  end if;
-
-  delete from public.listings
-  where id = p_listing_id
-    and user_id = v_user;
+  update public.listings
+     set status = 'archived',
+         updated_at = now()
+   where id = p_listing_id
+     and user_id = v_user;
 
   get diagnostics v_deleted = row_count;
   return v_deleted = 1;
