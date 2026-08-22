@@ -1,8 +1,10 @@
 -- BINGO Oman: promotion impact analytics
--- Adds before/after Promote view counts and republish count to owner analytics.
+-- PostgreSQL requires dropping an existing function before changing RETURNS TABLE columns.
 begin;
 
-create or replace function public.my_listing_analytics()
+drop function if exists public.my_listing_analytics();
+
+create function public.my_listing_analytics()
 returns table(
   listing_id uuid,
   views_count bigint,
@@ -35,11 +37,9 @@ as $$
       select count(*)::bigint from public.listing_view_events e
       where e.listing_id=l.id and e.created_at >= l.promoted_at
     ) end as views_after_promotion,
-    coalesce((
-      select count(*)::bigint
-      from public.listing_republish_events r
-      where r.listing_id=l.id
-    ),0::bigint) as republish_count
+    case when to_regclass('public.listing_republish_events') is null then 0::bigint else
+      coalesce((select count(*)::bigint from public.listing_republish_events r where r.listing_id=l.id),0::bigint)
+    end as republish_count
   from public.listings l
   where l.user_id=auth.uid();
 $$;
