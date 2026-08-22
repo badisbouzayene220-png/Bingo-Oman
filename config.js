@@ -7,6 +7,7 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
     css('bingo-delivery-modern-v1.css?v=20260822-1');css('bingo-delivery-modern-v2.css?v=20260822-1');js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');
   }
   if(/(?:^|\/)bingo-delivery-customer\.html$/i.test(location.pathname))js('bingo-customer-location-update-v2.js?v=20260822-2','bingo-customer-location-update-v2-loader');
+  if(/(?:^|\/)order-tracking\.html$/i.test(location.pathname))js('bingo-order-tracking-location-v1.js?v=20260822-1','bingo-order-tracking-location-loader');
   if(/(?:^|\/)(?:erp|hr|admin)\.html$/i.test(location.pathname))js('bingo-page-i18n.js','bingo-page-i18n-loader');
   if(/(?:^|\/)admin\.html$/i.test(location.pathname)){js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader')}
   if(/(?:^|\/)marketplace\.html$/i.test(location.pathname))js('marketplace-promotions-zone.js?v=20260822-1','marketplace-promotions-zone-loader');
