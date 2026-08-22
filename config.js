@@ -3,13 +3,11 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   function css(h){if(document.querySelector('link[href="'+h+'"]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href=h;document.head.appendChild(l);}
   function js(s,id){if(document.getElementById(id)||document.querySelector('script[src="'+s+'"]'))return;const x=document.createElement('script');x.id=id;x.src=s;x.defer=false;document.head.appendChild(x);}
   css('bingo-ui.css');
-  if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){
-    css('bingo-delivery-modern-v1.css?v=20260822-1');css('bingo-delivery-modern-v2.css?v=20260822-1');js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');
-  }
+  if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){css('bingo-delivery-modern-v1.css?v=20260822-1');css('bingo-delivery-modern-v2.css?v=20260822-1');js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');}
   if(/(?:^|\/)bingo-delivery-customer\.html$/i.test(location.pathname))js('bingo-customer-location-update-v2.js?v=20260822-2','bingo-customer-location-update-v2-loader');
   if(/(?:^|\/)order-tracking\.html$/i.test(location.pathname))js('bingo-order-tracking-location-v1.js?v=20260822-1','bingo-order-tracking-location-loader');
   if(/(?:^|\/)(?:erp|hr|admin)\.html$/i.test(location.pathname))js('bingo-page-i18n.js','bingo-page-i18n-loader');
-  if(/(?:^|\/)admin\.html$/i.test(location.pathname)){js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader')}
+  if(/(?:^|\/)admin\.html$/i.test(location.pathname)){js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader');js('admin-listing-performance.js?v=20260822-1','admin-listing-performance-loader')}
   if(/(?:^|\/)marketplace\.html$/i.test(location.pathname))js('marketplace-promotions-zone.js?v=20260822-1','marketplace-promotions-zone-loader');
   if(/(?:^|\/)listing\.html$/i.test(location.pathname))js('listing-analytics.js?v=20260822-2','listing-analytics-loader');
   if(/(?:^|\/)dashboard\.html$/i.test(location.pathname))js('dashboard-listing-analytics.js?v=20260822-3','dashboard-listing-analytics-loader');
