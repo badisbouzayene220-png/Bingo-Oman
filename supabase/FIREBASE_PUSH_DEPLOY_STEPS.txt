@@ -1,0 +1,30 @@
+BINGO Oman — Android automatic push deployment
+===============================================
+
+1) Firebase Console -> Project settings -> Service accounts.
+2) Click "Generate new private key" and download the service-account JSON.
+   IMPORTANT: never upload this JSON to GitHub and never put it in frontend JavaScript.
+
+3) Supabase Dashboard -> Project Settings -> Edge Functions -> Secrets.
+   Add secret:
+     FIREBASE_SERVICE_ACCOUNT_JSON
+   Value: paste the COMPLETE contents of the downloaded Firebase service-account JSON.
+
+4) Deploy the Edge Function from a terminal with Supabase CLI:
+     supabase functions deploy push-message-notification
+
+   If the local project is not linked yet:
+     supabase login
+     supabase link --project-ref YOUR_PROJECT_REF
+     supabase functions deploy push-message-notification
+
+5) After deployment, the frontend can invoke:
+     sb.functions.invoke('push-message-notification', { body: { message_id: '<new message uuid>' } })
+
+Security notes
+--------------
+- The function requires a signed-in Supabase user.
+- It verifies that the caller is the actual sender of message_id.
+- It derives the recipient from the conversation on the server.
+- Firebase credentials stay only in Supabase secrets.
+- Invalid/unregistered FCM tokens are disabled automatically.
