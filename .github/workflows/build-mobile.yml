@@ -1,0 +1,66 @@
+name: Build BINGO Mobile
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.html'
+      - '**.js'
+      - '**.css'
+      - 'assets/**'
+      - 'images/**'
+      - 'package.json'
+      - 'capacitor.config.ts'
+      - 'scripts/mobile-*.mjs'
+      - '.github/workflows/build-mobile.yml'
+
+jobs:
+  android:
+    name: Android Debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm install
+      - run: npm run mobile:prepare
+      - run: npx cap add android
+      - run: node scripts/mobile-patch-native.mjs android
+      - run: npx cap sync android
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BINGO-Oman-Android-Debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  ios:
+    name: iOS Simulator Build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm install
+      - run: npm run mobile:prepare
+      - run: npx cap add ios
+      - run: node scripts/mobile-patch-native.mjs ios
+      - run: npx cap sync ios
+      - name: Build simulator app
+        run: xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -derivedDataPath ios-build CODE_SIGNING_ALLOWED=NO build
+      - name: Package simulator app
+        run: ditto -c -k --sequesterRsrc --keepParent ios-build/Build/Products/Debug-iphonesimulator/App.app BINGO-Oman-iOS-Simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BINGO-Oman-iOS-Simulator
+          path: BINGO-Oman-iOS-Simulator.zip
