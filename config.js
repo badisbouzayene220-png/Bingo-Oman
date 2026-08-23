@@ -6,6 +6,7 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   css('release-mobile-v1.css?v=20260822-1');
   js('release-performance-v1.js?v=20260822-1','bingo-release-performance-loader');
   js('release-link-safety-v1.js?v=20260822-1','bingo-release-link-safety-loader');
+  js('mobile-push.js?v=20260823-1','bingo-mobile-push-loader');
   if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){css('bingo-delivery-modern-v1.css?v=20260822-1');css('bingo-delivery-modern-v2.css?v=20260822-1');js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');js('bingo-cancel-realtime-v1.js?v=20260823-1','bingo-cancel-realtime-loader');}
   if(/(?:^|\/)bingo-delivery-customer\.html$/i.test(location.pathname))js('bingo-customer-location-update-v2.js?v=20260822-2','bingo-customer-location-update-v2-loader');
   if(/(?:^|\/)order-tracking\.html$/i.test(location.pathname))js('bingo-order-tracking-location-v1.js?v=20260822-1','bingo-order-tracking-location-loader');
