@@ -6,10 +6,10 @@ window.BINGO_CONFIG={SUPABASE_URL:"https://ekjrizhsviftjiuumapg.supabase.co",SUP
   css('release-mobile-v1.css?v=20260822-1');
   js('release-performance-v1.js?v=20260822-1','bingo-release-performance-loader');
   js('release-link-safety-v1.js?v=20260822-1','bingo-release-link-safety-loader');
-  if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){css('bingo-delivery-modern-v1.css?v=20260822-1');css('bingo-delivery-modern-v2.css?v=20260822-1');js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');}
+  if(/(?:^|\/)(?:bingo-delivery-seller|bingo-delivery-driver)\.html$/i.test(location.pathname)){css('bingo-delivery-modern-v1.css?v=20260822-1');css('bingo-delivery-modern-v2.css?v=20260822-1');js('bingo-delivery-modern-v2.js?v=20260822-1','bingo-delivery-modern-v2-loader');js('bingo-cancel-realtime-v1.js?v=20260823-1','bingo-cancel-realtime-loader');}
   if(/(?:^|\/)bingo-delivery-customer\.html$/i.test(location.pathname))js('bingo-customer-location-update-v2.js?v=20260822-2','bingo-customer-location-update-v2-loader');
   if(/(?:^|\/)order-tracking\.html$/i.test(location.pathname))js('bingo-order-tracking-location-v1.js?v=20260822-1','bingo-order-tracking-location-loader');
-  if(/(?:^|\/)(?:orders|order-tracking)\.html$/i.test(location.pathname))js('bingo-customer-cancel-order-v1.js?v=20260822-1','bingo-customer-cancel-order-loader');
+  if(/(?:^|\/)(?:orders|order-tracking)\.html$/i.test(location.pathname))js('bingo-customer-cancel-order-v1.js?v=20260823-1','bingo-customer-cancel-order-loader');
   if(/(?:^|\/)(?:erp|hr|admin)\.html$/i.test(location.pathname))js('bingo-page-i18n.js','bingo-page-i18n-loader');
   if(/(?:^|\/)admin\.html$/i.test(location.pathname)){js('admin-product-seller-link.js?v=20260820-1','admin-product-seller-link-loader');js('admin-listing-promotions.js?v=20260822-4','admin-listing-promotions-loader');js('admin-listing-performance.js?v=20260822-1','admin-listing-performance-loader');js('admin-manual-purchases.js?v=20260822-1','admin-manual-purchases-loader')}
   if(/(?:^|\/)marketplace\.html$/i.test(location.pathname))js('marketplace-promotions-zone.js?v=20260822-1','marketplace-promotions-zone-loader');
